@@ -1,0 +1,631 @@
+<template>
+	<view class="myp-bg-inverse myp-position-relative">
+		<myp-navbar :lefts="leftIcons" :title="title" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:300rpx;" rightStyle="width:360rpx;" @rightAction="toRightTab"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" :reverse="hasMorePage" loadingText="" :showScrollbar="false" :down="null"
+			:up="{use: hasMorePage}" :useLoading="false" @up="toLoadData">
+			<myp-list-cell>
+				<view style="height: 26rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<text class="myp-size-ss" :class="hasMorePage&&'mtc-reverse'" v-if="timeInterval(idx)"
+					style="text-align: center;color: #9d9d9d;padding-top: 30rpx;padding-bottom: 30rpx;">{{timeInterval(idx)}}</text>
+				<!-- 复制一份组件，一份为left，一份为right -->
+				<msg-text-right-cell v-if="item.SendUserId==myUserId&&item.Type==1" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :msg="item.Content" @more="toShowMore"
+					@userDetail="toUser(item.SendUserId)"></msg-text-right-cell>
+				<msg-text-cell v-else-if="item.SendUserId!=myUserId&&item.Type==1" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :msg="item.Content" @more="toShowMore"
+					@userDetail="toUser(item.SendUserId)"></msg-text-cell>
+				<msg-image-right-cell v-else-if="item.SendUserId==myUserId&&item.Type==2" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :src="item.Content" @preview="toPreview"
+					@userDetail="toUser(item.SendUserId)"></msg-image-right-cell>
+				<msg-image-cell v-else-if="item.SendUserId!=myUserId&&item.Type==2" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :src="item.Content" @preview="toPreview"
+					@userDetail="toUser(item.SendUserId)"></msg-image-cell>
+				<msg-voice-right-cell v-else-if="item.SendUserId==myUserId&&item.Type==3" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :src="item.Content" :time="chatAudio(item)" :playTime="playTime"
+					:current="playingSrc" @play="toTogglePlay" @userDetail="toUser(item.SendUserId)">
+				</msg-voice-right-cell>
+				<msg-voice-cell v-else-if="item.SendUserId!=myUserId&&item.Type==3" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :src="item.Content" :time="chatAudio(item)" :playTime="playTime"
+					:current="playingSrc" @play="toTogglePlay" @userDetail="toUser(item.SendUserId)">
+				</msg-voice-cell>
+				<msg-content-cell v-else-if="item.SendUserId!=myUserId&&item.Type==4" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :contentItem="JSON.parse(item.FileInfo)" :contentId="item.Content"
+					@detail="toDetail" @userDetail="toUser(item.SendUserId)">
+				</msg-content-cell>
+				<msg-content-right-cell v-else-if="item.SendUserId==myUserId&&item.Type==4" :reverse="hasMorePage"
+					:avatar="chatAvatar(item)" :contentItem="JSON.parse(item.FileInfo)" :contentId="item.Content"
+					@detail="toDetail" @userDetail="toUser(item.SendUserId)">
+				</msg-content-right-cell>
+				<view style="height: 20rpx;"></view>
+			</myp-list-cell>
+		</myp-list>
+		<input-toolbar ref="input-toolbar" @kb="toKbChange" @image="toSendImage" @plus="toShowPlus"
+			@emotion="toShowEmotion" @record="toRecord" @confirm="toSendMsg"></input-toolbar>
+		<view :style="{height: footHeight+'px'}"></view>
+		<myp-xbar bgType="inverse"></myp-xbar>
+		<voice-keyboard :show="voiceVisible" @short="ToShowTimeShort" @voice="toSendVoice" @cancel="toCancelVoice"
+			@start="toStartVoice">
+		</voice-keyboard>
+		<plus-keyboard :show="plusVisible" :height="kbH" @collect="toSelectCollect"></plus-keyboard>
+		<emotion-keyboard :show="emotionVisible" @select="toSelectEmj" @delete="toDeleteEmj"></emotion-keyboard>
+		<!-- <more-pop :show="moreVisible" @collect="toCollect"></more-pop> -->
+		<view class="myp-overlay" style="background-color: #RRGGBB;" v-if="overlayShow">
+		</view>
+	</view>
+</template>
+
+<script>
+	import inputToolbar from './components/inputToolbar.vue'
+	import msgTextCell from './components/msgTextCell.vue'
+	import msgTextRightCell from './components/msgTextRightCell.vue'
+	import msgImageCell from './components/msgImageCell.vue'
+	import msgImageRightCell from './components/msgImageRightCell.vue'
+	import msgVoiceCell from './components/msgVoiceCell.vue'
+	import msgVoiceRightCell from './components/msgVoiceRightCell.vue'
+	import msgContentCell from './components/msgContentCell.vue'
+	import msgContentRightCell from './components/msgContentRightCell.vue'
+	import voiceKeyboard from './components/voiceKeyboard.vue'
+	import plusKeyboard from './components/plusKeyboard.vue'
+	import emotionKeyboard from './components/emotionKeyboard.vue'
+	import morePop from './components/morePop.vue'
+
+	import {
+		getDifferDate,
+		isToday,
+		parseTime
+	} from '@/mypUI/utils/date.js'
+	import navHelper from '@/service/navHelper.js'
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	const player = uni.createInnerAudioContext();
+	let playAudio = null;
+	let playingTime = 0;
+	import {
+		mapActions,
+		mapState,
+		mapGetters,
+		mapMutations
+	} from 'vuex'
+	import {
+		judgeIosPermission,
+		requestAndroidPermission,
+		gotoAppPermissionSetting
+	} from '@/js_sdk/wa-permission/permission.js'
+	export default {
+		components: {
+			inputToolbar,
+			msgTextCell,
+			msgTextRightCell,
+			msgImageCell,
+			msgImageRightCell,
+			msgVoiceCell,
+			msgVoiceRightCell,
+			msgContentCell,
+			msgContentRightCell,
+			voiceKeyboard,
+			plusKeyboard,
+			emotionKeyboard,
+			morePop
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				overlayShow: false,
+				chatItem: {},
+				// 是否具备第二页数据
+				// 聊天列表的逻辑是：
+				// 如果具备第二页数据(每一页的数据应该大于一个屏幕)，就反转列表
+				// 如果只有一页数据，就正常列表
+				// hasMorePage: false,
+				// items: [],
+				// 键盘高度
+				kbH: 0,
+				kbHeight: 0,
+				otherHeight: 0,
+				voiceVisible: false,
+				plusVisible: false,
+				emotionVisible: false,
+				moreVisible: false,
+				playTime: '00:00',
+				playingSrc: '',
+				searchDate: "",
+				isDownPaging: false
+			}
+		},
+		computed: {
+			rightIcons() {
+				if (this.friends.findIndex(m => m.FriendUserId == this.currentUser.FriendUserId) == -1 && !this.isGroup)
+					return [{
+						icon: 'plus',
+						text: '好友',
+						iconType: 'inverse',
+						iconSize: 'ss',
+						textType: 'inverse',
+						textSize: 'ss',
+						textStyle: 'margin-left:6rpx;',
+						bgType: 'error',
+						style: 'border-radius:60rpx;width:125rpx;height:25px;justify-content:center;'
+					}, {
+						icon: 'elipsis',
+						style: 'margin-left:36rpx;'
+					}]
+				else
+					return [{
+						icon: 'elipsis'
+					}]
+			},
+			footHeight() {
+				return this.kbHeight || this.otherHeight || 0
+			},
+			title() {
+				if (this.isGroup)
+					return this.currentGroup.Name;
+				else
+					return this.currentUser.FriendRemarkName;
+			},
+			...mapState({
+				friends: (state) => state.friend.friends,
+				items: state => state.chat.currentChat,
+				currentUser: state => state.chat.chattingUser,
+				currentGroup: state => state.chat.chattingGroup,
+				isGroup: state => state.chat.isGroup, //当前是否群聊
+				hasMorePage: state => state.chat.hasMore
+			}),
+			...mapGetters({
+				'myUserId': 'userId',
+				'myAvatar': 'avatar'
+			})
+		},
+		watch: { //监听接收到了消息  
+			items(val, oldVal) {
+				// let _this = this;
+				// const ins = _this.$refs['myp-list'];
+				// if (this.isUpPaging) {
+				// 	console.log(val.length, oldVal.length);
+				// 	ins.mypEndSuccess(val.length - oldVal.length >= 10);
+				// } else {
+				// 	// 滚动到顶部的代码建议加延时
+				// 	// if (this.hasMorePage)
+				// 	// 	this.$nextTick(() => {
+				// 	// 		setTimeout(() => {
+				// 	// 			const ins = this.$refs['myp-list']
+				// 	// 			ins.mypScrollToTop()
+				// 	// 		}, 50)
+				// 	// 	});
+				// 	// else
+				// 	// 	this.$nextTick(() => {
+				// 	// 		setTimeout(() => {
+				// 	// 			const ins = this.$refs['myp-list']
+				// 	// 			ins.mypScrollToBottom()
+				// 	// 		}, 50)
+				// 	// 	});
+
+				// }
+			}
+		},
+		methods: {
+			...mapActions({
+				GetCurrentChats: "chat/GetCurrentChatsAsync",
+				SendMsg: "chat/SendMsgAsync"
+			}),
+			...mapMutations({
+				SetLastSendChat: "chat/SetLastSendChat",
+				ResetCurrent: "chat/ResetCurrent"
+			}),
+			timeInterval(index) {
+				if (this.hasMorePage && index == 0) return;
+				let currentTime = this.items[index].SendTime;
+				if (index == 0) {
+					if (isToday(currentTime)) {
+						var mi = getDifferDate(currentTime, new Date(), 3);
+						if (mi > 15 || mi < -15)
+							return parseTime(currentTime, '{h}:{i}');
+						else
+							return "";
+					}
+					return parseTime(currentTime, '{y}-{m}-{d} {h}:{i}');
+				} else {
+					let preTime = this.items[index - 1].SendTime;
+					var mi = getDifferDate(preTime, currentTime, 3);
+					if (this.hasMorePage && isToday(preTime) || isToday(currentTime)) {
+						if (mi > 15 || mi < -15)
+							return parseTime(this.hasMorePage ? preTime : currentTime, '{h}:{i}');
+						else
+							return "";
+					} else {
+						if (mi > 15 || mi < -15)
+							return parseTime(this.hasMorePage ? preTime : currentTime, '{y}-{m}-{d} {h}:{i}');
+						else
+							return "";
+					}
+				}
+			},
+			PrefixZero(num, n) {
+				return (Array(n).join(0) + num).slice(-n)
+			},
+			chatAvatar(item) {
+				if (item.SendUserId === this.myUserId)
+					return this.myAvatar;
+				else if (this.isGroup)
+					return baseAvatar((this.currentGroup.Members.find(m => m.UserId == item.SendUserId) || {}).Avatar);
+				else
+					return baseAvatar(this.currentUser.Avatar);
+			},
+			chatAudio(item) {
+				try {
+					let time = parseInt(JSON.parse(item.FileInfo).time);
+					return this.PrefixZero(parseInt(time / 60), 2) + ':' + this.PrefixZero(time % 60, 2);
+				} catch (e) {
+					console.log(e);
+					//TODO handle the exception
+					return '00:00';
+				}
+			},
+			toRightTab(i) {
+				if (i === 1 || (i === 0 && this.rightIcons.length == 1)) {
+					let _this = this;
+					if (this.isGroup)
+						uni.navigateTo({
+							url: '/pages/chat/groupManage'
+						})
+					else
+						uni.navigateTo({
+							url: '/pages/chat/userManage'
+						})
+				} else if (i === 0) {
+					uni.navigateTo({
+						url: '/pages/friend/addFriend?userId=' + this.currentUser.FriendUserId
+					})
+				}
+			},
+			// 录音
+			toRecord() {
+				let _this = this;
+				if (plus.os.name == "iOS")
+					judgeIosPermission("record");
+				else
+					requestAndroidPermission("android.permission.RECORD_AUDIO").then(result => {
+						if (result != 1) {
+							uni.showModal({
+								content: "请先去开启录音权限",
+								// showCancel: false,
+								success: function(res) {
+									if (res.confirm) {
+										gotoAppPermissionSetting();
+									} else if (res.cancel) {
+										console.log('用户点击取消');
+										console.log(_this.voiceVisible);
+										_this.voiceVisible = false;
+										_this.otherHeight = 0;
+									}
+								}
+							});
+						}
+					});
+				this.voiceVisible = !this.voiceVisible
+				this.plusVisible = false
+				this.emotionVisible = false
+				if (this.voiceVisible) {
+					this.otherHeight = uni.upx2px(276)
+				} else {
+					this.otherHeight = 0
+				}
+			},
+			toStartVoice() {
+				this.overlayShow = true;
+			},
+			toCancelVoice() {
+				// this.voiceVisible = false
+				// this.otherHeight = 0
+				this.overlayShow = false;
+			},
+			ToShowTimeShort() {
+				// 录音时间过短
+				this.voiceVisible = false;
+				this.otherHeight = 0;
+				uni.showToast({
+					icon: 'none',
+					title: '时间太短',
+					duration: 1000
+				});
+				this.overlayShow = false;
+			},
+			toTogglePlay(val) {
+				if (val == this.playingSrc) {
+					player.stop()
+				} else {
+					player.stop()
+					player.src = val;
+					playingTime = 0;
+					clearInterval(playAudio);
+					playAudio = null;
+					player.play();
+				}
+			},
+			// 更多
+			toShowPlus() {
+				this.plusVisible = !this.plusVisible
+				if (this.plusVisible) {
+					this.otherHeight = this.kbH || 120
+				} else {
+					this.otherHeight = 0
+				}
+				this.emotionVisible = false
+				this.voiceVisible = false
+			},
+			toSelectCollect() {
+				let _this = this;
+				uni.navigateTo({
+					url: '/pages/chat/collected?type=chat',
+					events: {
+						sendContent(data) {
+							console.log(data);
+							_this.toConfirmMsg(data.guid, 4, {
+								Content: data.contents,
+								Pic: data.pics.length > 0 ? data.pics[0].path : ''
+							});
+						}
+					}
+				});
+			},
+			// 表情
+			toShowEmotion() {
+				this.emotionVisible = !this.emotionVisible
+				if (this.emotionVisible) {
+					this.otherHeight = 160
+				} else {
+					this.otherHeight = 0
+				}
+				this.plusVisible = false
+				this.voiceVisible = false
+			},
+			toSelectEmj(val) {
+				uni.$emit("chatEmj", val)
+			},
+			toDeleteEmj() {
+				uni.$emit("chatDelEmj")
+			},
+			toSendMsg(msg) {
+				this.toConfirmMsg(msg, 1)
+			},
+			// 图片
+			toSendImage(files) {
+				files.forEach(file => {
+					this.toConfirmMsg(file.path, 2, file);
+				});
+			},
+			toSendVoice(fileInfo) {
+				this.voiceVisible = false;
+				this.otherHeight = 0;
+				this.overlayShow = false;
+				this.toConfirmMsg(fileInfo.tempFilePath, 3, {
+					path: fileInfo.tempFilePath,
+					time: fileInfo.time
+				});
+			},
+			toConfirmMsg(msg, type, file) {
+				let sendObj = {
+					SendUserId: this.myUserId,
+					ReceiveUserId: this.isGroup === true ? this.currentGroup.GroupId : this.currentUser.FriendUserId,
+					Content: msg,
+					SendTime: Date.now(),
+					Type: type,
+					IsGroup: this.isGroup === true ? 1 : 0,
+					FileInfo: file
+				};
+				if (this.hasMorePage) {
+					this.items.unshift({
+						...sendObj,
+						...{
+							Avatar: this.myAvatar,
+							FileInfo: JSON.stringify(file)
+						},
+
+					});
+					// 滚动到顶部的代码建议加延时
+					this.$nextTick(() => {
+						setTimeout(() => {
+							const ins = this.$refs['myp-list']
+							ins.mypScrollToTop()
+						}, 50)
+					});
+				} else {
+					this.items.push({
+						...sendObj,
+						...{
+							Avatar: this.myAvatar,
+							FileInfo: JSON.stringify(file)
+						}
+					});
+					// 滚动到底部的代码建议加延时
+					this.$nextTick(() => {
+						setTimeout(() => {
+							const ins = this.$refs['myp-list']
+							ins.mypScrollToBottom()
+						}, 50)
+					});
+				}
+				if (type == 1 || type == 4) {
+					this.SendMsg(sendObj);
+				} else if (type == 2) {
+					let cloudPath = 'chat/img/' + getApp().globalData.userId + '/' + new Date().getFullYear() + '/' +
+						new Date().getMonth() + '/' + Date.now() +
+						file.path.substring(file.path.lastIndexOf('.'));
+					uniCloud.uploadFile({
+						filePath: file.path,
+						fileType: "image",
+						cloudPath: cloudPath
+					}).then(up => {
+						sendObj.Content = up.fileID;
+						sendObj.FileInfo = {
+							size: file.size
+						};
+						this.SendMsg(sendObj);
+					}).catch(upError => {
+						uni.showToast({
+							icon: 'none',
+							title: '发送失败'
+						});
+					})
+				} else if (type == 3) {
+					let cloudPath = 'chat/audio/' + getApp().globalData.userId + '/' + new Date().getFullYear() + '/' +
+						new Date().getMonth() + '/' + Date.now() +
+						file.path.substring(file.path.lastIndexOf('.'));
+					uniCloud.uploadFile({
+						filePath: file.path,
+						fileType: "audio",
+						cloudPath: cloudPath
+					}).then(up => {
+						sendObj.Content = up.fileID;
+						sendObj.FileInfo = {
+							time: file.time
+						};
+						this.SendMsg(sendObj);
+					}).catch(upError => {
+						uni.showToast({
+							icon: 'none',
+							title: '发送失败'
+						});
+					})
+				}
+				this.$refs['input-toolbar'].clear()
+			},
+			toKbChange(e) {
+				this.kbHeight = e.height
+				if (e.height > 0) {
+					this.kbH = e.height
+					// 键盘弹出的时候隐藏掉其他内容
+					this.otherHeight = 0
+					this.voiceVisible = false
+					this.emotionVisible = false
+					this.plusVisible = false
+				}
+			},
+			// toInitData() {
+			// 	// 在这里拉初始化/第一页的数据
+			// 	this.GetChats({
+			// 		sendTime: "",
+			// 		isNext: false
+			// 	});
+			// 	// setTimeout(() => {
+			// 	// 	// 根据返回的数据判断是不是存在更多页
+			// 	// 	// 这个值只需要在这里设置一次
+			// 	// }, 2000)
+			// },
+			toLoadData() {
+				// 这里拉取更多的数据
+				// 这里面的是否有下一页跟 hasMorePage 没有关系
+				// 建议自己管理页码，别用list的内部页码管理   
+				this.GetCurrentChats().then(data => {
+					let _this = this;
+					setTimeout(() => {
+						const ins = _this.$refs['myp-list'];
+						ins.mypEndSuccess(data.length >= 10);
+					}, 50);
+				});
+			},
+			toPreview(src) {
+				uni.previewImage({
+					urls: [src],
+					current: 0,
+					fail(err) {
+						console.log(err);
+					}
+				});
+			},
+			toShowMore() {
+				this.moreVisible = true
+			},
+			toCollect() {
+				this.moreVisible = false
+			},
+			toDetail(contentId) {
+				uni.navigateTo({
+					url: '../album/albumDetail?guid=' + contentId
+				})
+			},
+			toUser(userId) {
+				uni.navigateTo({
+					url: '/pages/chat/userMiddle?userId=' + userId
+				})
+			}
+		},
+		onLoad(options) {
+			if ((this.isGroup && this.currentGroup.GroupId > 0) || (!this.isGroup && this.currentUser.FriendUserId > 0)) {
+				this.page = options.page;
+				const that = this;
+				player.onEnded(() => {
+					that.playingSrc = '';
+					playingTime = 0;
+					this.playTime = '00:00';
+					clearInterval(playAudio);
+				})
+				player.onPause(() => {
+					playingTime = 0;
+					this.playTime = '00:00';
+					that.playingSrc = '';
+				})
+				player.onStop(() => {
+					that.playingSrc = '';
+					playingTime = 0;
+					this.playTime = '00:00';
+					clearInterval(playAudio);
+				})
+				player.onPlay(() => {
+					that.playingSrc = player.src;
+					if (playAudio == null)
+						playAudio = setInterval(() => {
+							playingTime++;
+							this.playTime = this.PrefixZero(parseInt(playingTime / 60), 2) + ':' + this
+								.PrefixZero(playingTime % 60, 2);
+							console.log(playingTime, this.playTime);
+						}, 1000);
+				})
+				player.onError(() => {
+					that.playingSrc = '';
+					playingTime = 0;
+					this.playTime = '00:00';
+					clearInterval(palyAudio);
+				})
+			} else
+				uni.navigateBack();
+
+		},
+		onUnload() {
+			if (this.page != "manage" && (this.items || []).length > 0) {
+				if (this.hasMorePage)
+					this.SetLastSendChat(this.items[0]);
+				else
+					this.SetLastSendChat(this.items[this.items.length - 1]);
+				this.ResetCurrent();
+			}
+			player.offEnded()
+			player.offPause()
+			player.offStop()
+			player.offPlay()
+			player.offError()
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.mtc {
+		&-reverse {
+			transform: rotateX(180deg);
+		}
+	}
+
+	.myp-overlay {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 340rpx;
+		left: 0;
+		z-index: 1;
+	}
+</style>

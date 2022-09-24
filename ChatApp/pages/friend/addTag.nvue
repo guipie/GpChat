@@ -1,0 +1,137 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :title="tagInfo.tagId>0?'编辑标签':'新建标签'" :rights="rightIcons"
+			leftStyle="width:90rpx;" centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction">
+		</myp-navbar>
+		<view style="height: 12rpx;"></view>
+		<view class="myp-flex-row myp-align-center" style="height: 72rpx;">
+			<text class="myp-size-ss myp-color-second" style="margin-left: 30rpx;">标签名称</text>
+		</view>
+		<view class="myp-flex-row myp-align-center myp-bg-inverse"
+			style="height: 100rpx;padding-left: 30rpx;padding-right: 30rpx;">
+			<input v-model="tagInfo.tagName" class="myp-flex-one myp-size-base myp-color-text" placeholder="请输入标签名称"
+				placeholder-style="color:#3A444A;font-weight:700;" style="font-weight: 700;" />
+		</view>
+		<view style="height: 12rpx;"></view>
+		<view class="myp-flex-row myp-align-center" style="height: 72rpx;">
+			<text class="myp-size-ss myp-color-second" style="margin-left: 30rpx;">标签成员({{members.length}})</text>
+		</view>
+		<view class="myp-flex-row myp-align-center myp-bg-inverse"
+			style="height: 100rpx;padding-left: 30rpx;padding-right: 30rpx;" bubble="true" @tap="toSelectMembers">
+			<myp-icon name="plus" type="success" size="base" @iconClicked="toSelectMembers"></myp-icon>
+			<text class="myp-color-success myp-size-base" style="font-weight: 700;margin-left: 12rpx;">添加成员</text>
+		</view>
+		<view style="height: 20rpx;"></view>
+		<view v-if="members.length>0" class="at-box">
+			<view class="myp-flex-row myp-wrap-nowrap">
+				<view v-for="(m,inxx) in members" :key="inxx" class="myp-flex-column myp-align-center"
+					:style="'height: 172rpx;'+(inxx===members.length-1?'margin-right: 0;':'margin-right:32rpx;')">
+					<image :src="avatar(m.Avatar)" mode="aspectFill"
+						style="width: 88rpx;height: 88rpx;border-radius: 16rpx;">
+					</image>
+					<view style="height: 10rpx;"></view>
+					<text class="myp-color-second myp-size-ss myp-lh-ss myp-lines-one"
+						style="width: 88rpx;text-align: center;">{{m.FriendRemarkName}}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		arrayChunk
+	} from '@/mypUI/utils/utils.js'
+	import {
+		mapState
+	} from 'vuex'
+	import {
+		PostTagMember,
+		GetMembers
+	} from '@/api/friend/tag.js'
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				userId: 0,
+				tagInfo: {
+					tagId: 0,
+					tagName: ''
+				},
+				members: []
+			}
+		},
+		computed: {
+			rightIcons() {
+				return [{
+					text: '确定',
+					textType: this.members.length > 0 && this.tagInfo.tagName ? 'primary' : 'third',
+					textStyle: 'font-weight: 700;'
+				}]
+			},
+			...mapState({
+				friends: (state) => state.friend.allFriends
+			})
+		},
+		methods: {
+			avatar(url) {
+				return baseAvatar(url);
+			},
+			toRightTab(i) {
+				this.tagInfo.memberUserIds = this.members.map(m => m.FriendUserId);
+				console.log(this.tagInfo);
+				PostTagMember(this.tagInfo).then(res => {
+					if (res.status)
+						uni.navigateBack();
+				});
+			},
+			toSelectMembers() {
+				let _this = this;
+				uni.navigateTo({
+					url: '/pages/friend/selectFriend?type=tag',
+					events: {
+						// 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据 
+						selectedUsers(data) {
+							_this.members = [];
+							console.log(data);
+							(data || []).forEach((friendUserId, index) => {
+								_this.members.push(_this.friends.find(m => m.FriendUserId ===
+									friendUserId));
+							});
+						}
+					},
+					success: function(res) {
+						// 通过eventChannel向被打开页面传送数据 
+						console.log(_this.members);
+						res.eventChannel.emit('selectedUsers', _this.members.map(m => m.FriendUserId));
+					}
+				})
+			},
+		},
+		onLoad(options) {
+			this.tagInfo.tagId = options.tagId || 0;
+			this.tagInfo.tagName = options.tagName || "";
+			this.userId = options.userId || 0;
+			if (this.tagInfo.tagId > 0) {
+				GetMembers(this.tagInfo.tagId).then(res => {
+					this.members = res.data
+				});
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.at {
+		&-box {
+			padding-left: 30rpx;
+			padding-top: 32rpx;
+			padding-bottom: 60rpx;
+			background-color: #FFFFFF;
+		}
+	}
+</style>

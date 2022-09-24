@@ -1,0 +1,454 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :title="title" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:300rpx;" rightStyle="width:360rpx;" @rightAction="toRightTab"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" :reverse="hasMorePage" :showScrollbar="false" :down="null" :up="{use: hasMorePage}"
+			:useLoading="true" @init="toInitData" @up="GetChats">
+			<myp-list-cell>
+				<view style="height: 26rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in currentChat" :key="idx">
+				<text class="myp-size-ss"
+					style="text-align: center;color: #9d9d9d;padding-bottom: 10rpx;">{{timeInterval(idx)}}</text>
+				<msg-text-cell v-if="item.Type==1" :isLeft="isLeft(item)" :avatar="chatAvatar(item.SenderAvatar)"
+					:msg="(item.Content)" @more="toShowMore" :reverse="hasMorePage">
+				</msg-text-cell>
+				<msg-image-cell v-else-if="item.Type==2" :reverse="hasMorePage" :isLeft="isLeft(item)"
+					:avatar="chatAvatar(item.SenderAvatar)" :src="(item.Content)">
+				</msg-image-cell>
+				<msg-voice-cell v-else-if="item.Type==3" :reverse="hasMorePage" :isLeft="isLeft(item)"
+					:avatar="chatAvatar(item.SenderAvatar)" :src="(item.Content)" :current="playingSrc"
+					@play="toTogglePlay"></msg-voice-cell>
+				<view style="height: 76rpx;"></view>
+			</myp-list-cell>
+		</myp-list>
+		<input-toolbar ref="input-toolbar" @kb="toKbChange" @image="toSendImage" @plus="toShowPlus"
+			@emotion="toShowEmotion" @record="toRecord" @confirm="toSendMsg"></input-toolbar>
+		<view :style="{height: footHeight+'px'}"></view>
+		<myp-xbar bgType="inverse"></myp-xbar>
+		<voice-keyboard :show="voiceVisible" @short="ToShowTimeShort" @voice="toSendVoice" @cancel="toCancelVoice">
+		</voice-keyboard>
+		<plus-keyboard :show="plusVisible" :height="kbH" @collect="toSelectCollect"></plus-keyboard>
+		<emotion-keyboard :show="emotionVisible" @select="toSelectEmj" @delete="toDeleteEmj"></emotion-keyboard>
+		<!-- <more-pop :show="moreVisible" @collect="toCollect"></more-pop> -->
+	</view>
+</template>
+
+<script>
+	import inputToolbar from './components/inputToolbar.vue'
+	import msgTextCell from './components/msgTextCell.vue'
+	import msgImageCell from './components/msgImageCell.vue'
+	import msgVoiceCell from './components/msgVoiceCell.vue'
+	import voiceKeyboard from './components/voiceKeyboard.vue'
+	import plusKeyboard from './components/plusKeyboard.vue'
+	import emotionKeyboard from './components/emotionKeyboard.vue'
+	import morePop from './components/morePop.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		getDifferDate,
+		isToday,
+		parseTime
+	} from '@/mypUI/utils/date.js'
+	import {
+		mapActions,
+		mapState,
+		mapGetters,
+		mapMutations
+	} from 'vuex'
+	const player = uni.createInnerAudioContext()
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	import {
+		isNullOrEmpty
+	} from '@/mypUI/utils/validate.js';
+
+	import {
+		judgeIosPermission,
+		requestAndroidPermission,
+		gotoAppPermissionSetting
+	} from '@/js_sdk/wa-permission/permission.js'
+	export default {
+		components: {
+			inputToolbar,
+			msgTextCell,
+			msgImageCell,
+			msgVoiceCell,
+			voiceKeyboard,
+			plusKeyboard,
+			emotionKeyboard,
+			morePop
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				// 是否具备第二页数据
+				// 聊天列表的逻辑是：
+				// 如果具备第二页数据(每一页的数据应该大于一个屏幕)，就反转列表
+				// 如果只有一页数据，就正常列表
+				hasMorePage: false,
+				// 键盘高度
+				kbH: 0,
+				kbHeight: 0,
+				otherHeight: 0,
+				voiceVisible: false,
+				plusVisible: false,
+				emotionVisible: false,
+				moreVisible: false,
+				playingSrc: '',
+				searchDate: "",
+				previousPage: ""
+			}
+		},
+		computed: {
+			...mapState({
+				currentChat: state => JSON.parse(JSON.stringify(state.chat.currentChat)),
+				allFriends: state => state.friend.allFriends,
+				currentUser: state => state.chat.chattingUser,
+				currentGroup: state => state.chat.chattingGroup,
+				isGroup: state => state.chat.isGroup //当前是否群聊
+				// hasMorePage: state => state.chat.hasMore
+				// myAvatar: state => state.user.userInfo.avatar
+			}),
+			...mapGetters({
+				'myUserId': 'userId',
+				'myAvatar': 'avatar'
+			}),
+			footHeight() {
+				return this.kbHeight || this.otherHeight || 0
+			},
+			title() {
+				if (this.isGroup)
+					return this.currentGroup.Name;
+				else
+					return this.currentUser.FriendRemarkName;
+			},
+			rightIcons() {
+				if (this.currentUser.Status != 1 && !this.isGroup)
+					return [{
+						icon: 'plus',
+						text: '好友',
+						iconType: 'inverse',
+						iconSize: 'ss',
+						textType: 'inverse',
+						textSize: 'ss',
+						textStyle: 'margin-left:6rpx;',
+						bgType: 'error',
+						style: 'border-radius:60rpx;width:125rpx;height:25px;justify-content:center;'
+					}, {
+						icon: 'elipsis',
+						style: 'margin-left:36rpx;'
+					}]
+				else
+					return [{
+						icon: 'elipsis'
+					}]
+			},
+		},
+		watch: { //监听接收到了消息
+			currentChat(val, oldVal) {
+				let _this = this;
+				if (val.length - oldVal.length == 1)
+					setTimeout(() => {
+						const ins = _this.$refs['myp-list'];
+						ins.mypScrollToBottom();
+					}, 100);
+			}
+		},
+		methods: {
+			...mapActions({
+				SendMsg: "chat/SendMsgAsync",
+				GetFriendDetail: "friend/GetFriendDetailAsync",
+				GetGroupDetail: "group/GetGroupDetailAsync"
+			}),
+			...mapMutations({
+				GetChats: "chat/GetChats",
+				SetChattingUser: "chat/SetChattingUser",
+				SetChattingGroup: "chat/SetChattingGroup",
+				SetLastChat: "chat/SetLastChat",
+				ResetCurrent: "chat/ResetCurrent"
+			}),
+			timeInterval(index) {
+				let currentTime = this.currentChat[index].SendTime;
+				if (index == 0) {
+					if (isToday(currentTime)) {
+						var mi = getDifferDate(currentTime, new Date(), 3);
+						if (mi > 15)
+							return parseTime(currentTime, '{h}:{i}');
+						else
+							return "";
+					}
+					return parseTime(currentTime, '{y}-{m}-{d} {h}:{i}');
+				} else {
+					let preTime = this.currentChat[index - 1].SendTime;
+					var mi = getDifferDate(preTime, currentTime, 3);
+					if (isToday(currentTime)) {
+						if (mi > 15)
+							return parseTime(currentTime, '{h}:{i}');
+						else
+							return "";
+					} else {
+						if (mi > 15)
+							return parseTime(currentTime, '{y}-{m}-{d} {h}:{i}');
+						else
+							return "";
+					}
+				}
+			},
+			isLeft(item) {
+				return item.SendUserId === this.currentUser.FriendUserId || (this.isGroup && item.SendUserId != this
+					.myUserId);
+			},
+			chatAvatar(avatar) {
+				return baseAvatar(avatar)
+			},
+			toRightTab(i) {
+				if (i === 1 || (i === 0 && this.rightIcons.length == 1)) {
+					let _this = this;
+					if (this.isGroup)
+						uni.navigateTo({
+							url: '/pages/chat/groupManage?groupId=' + this.currentGroup.GroupId
+						})
+					else
+						uni.navigateTo({
+							url: '/pages/chat/userManage?userId=' + this.currentUser.FriendUserId,
+							events: {
+								// 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据,修改昵称
+								friendSetting: function(friendInfo) {
+									_this.friendInfo = friendInfo;
+								}
+							}
+						})
+				} else if (i === 0) {
+					uni.navigateTo({
+						url: '/pages/friend/addFriend?userId=' + this.currentUser.FriendUserId
+					})
+				}
+			},
+			toSend(msg, type) {
+				let sendObj = {
+					SendUserId: this.myUserId,
+					ReceiveUserId: this.isGroup ? this.currentGroup.GroupId : this.currentUser.FriendUserId,
+					Content: msg,
+					Type: type,
+					IsGroup: this.isGroup
+				};
+				this.SendMsg(sendObj);
+				this.$refs['input-toolbar'].clear();
+			},
+			// 发消息
+			toSendMsg(msg) {
+				this.toSend(msg, 1); //ChatText 
+			},
+			//发送图片
+			toSendImage(src) {
+				this.toSend(src, 2); //ChatImage
+			},
+			//发送录音
+			toSendVoice(src) {
+				console.log(src)
+				this.voiceVisible = false
+				this.otherHeight = 0
+				this.toSend(src, 3); //ChatVoice
+			},
+			// 录音
+			toRecord() {
+				if (plus.os.name == "iOS")
+					judgeIosPermission("record");
+				else
+					requestAndroidPermission("android.permission.RECORD_AUDIO").then(result => {
+						if (result != 1) {
+							uni.showModal({
+								content: "请先去开启录音权限",
+								// showCancel: false,
+								success: function(res) {
+									if (res.confirm) {
+										gotoAppPermissionSetting();
+									} else if (res.cancel) {
+										console.log('用户点击取消');
+									}
+								}
+							});
+						}
+					});
+				this.voiceVisible = !this.voiceVisible
+				this.plusVisible = false
+				this.emotionVisible = false
+				if (this.voiceVisible) {
+					this.otherHeight = uni.upx2px(276)
+				} else {
+					this.otherHeight = 0
+				}
+			},
+			toCancelVoice() {
+				this.voiceVisible = false
+				this.otherHeight = 0
+			},
+			ToShowTimeShort() {
+				// 录音时间过短
+				this.voiceVisible = false
+				this.otherHeight = 0
+			},
+			toTogglePlay(val) {
+				if (val == this.playingSrc) {
+					player.stop()
+				} else {
+					player.stop()
+					player.src = val
+					player.play()
+				}
+			},
+			// 更多
+			toShowPlus() {
+				this.plusVisible = !this.plusVisible
+				if (this.plusVisible) {
+					this.otherHeight = this.kbH || 120
+				} else {
+					this.otherHeight = 0
+				}
+				this.emotionVisible = false
+				this.voiceVisible = false
+			},
+			toSelectCollect() {
+				uni.navigateTo({
+					url: '/pages/chat/collected'
+				});
+			},
+			// 表情
+			toShowEmotion() {
+				this.emotionVisible = !this.emotionVisible
+				if (this.emotionVisible) {
+					this.otherHeight = 160
+				} else {
+					this.otherHeight = 0
+				}
+				this.plusVisible = false
+				this.voiceVisible = false
+			},
+			toSelectEmj(val) {
+				uni.$emit("chatEmj", val)
+			},
+			toDeleteEmj() {
+				uni.$emit("chatDelEmj")
+			},
+			toKbChange(e) {
+				this.kbHeight = e.height;
+				if (e.height > 0) {
+					this.kbH = e.height
+					// 键盘弹出的时候隐藏掉其他内容
+					this.otherHeight = 0
+					this.voiceVisible = false
+					this.emotionVisible = false
+					this.plusVisible = false
+					const ins = this.$refs['myp-list'];
+					this.$nextTick(function() {
+						ins.mypScrollToBottom();
+					});
+				}
+			},
+			toShowMore() {
+				this.moreVisible = true
+			},
+			toCollect() {
+				this.moreVisible = false
+			},
+			getCurrentChats() {
+				this.GetChats(this.searchDate);
+				setTimeout(() => {
+					const ins = this.$refs['myp-list'];
+					ins.mypEndSuccess(this.currentChat.length % 10 == 0);
+					(this.currentChat.length > 0) && (this.searchDate = this.currentChat[0].SendTime);
+				}, 100);
+			},
+			toInitData() {
+				this.GetChats(this.searchDate);
+				// 在这里拉初始化/第一页的数据
+				setTimeout(() => {
+					// 根据返回的数据判断是不是存在更多页
+					// 这个值只需要在这里设置一次
+					this.hasMorePage = this.currentChat.length >= 10 // or false
+				}, 2000)
+			}
+		},
+		onLoad(options) {
+			const that = this
+			this.searchDate = "";
+			this.previousPage = options.page;
+			if (options.userId > 0) {
+				this.GetFriendDetail(options.userId).then(data => { //获取当前聊天好友信息
+					if (data.FriendUserId > 0) {
+						this.SetChattingUser(data);
+						this.getCurrentChats();
+						const ins = this.$refs['myp-list'];
+						setTimeout(() => {
+							ins.mypScrollToBottom();
+						}, 100);
+					} else
+						uni.navigateBack();
+				}).catch(err => {
+					console.log(err);
+					uni.navigateBack();
+				});
+			} else if (options.groupId > 0) {
+				this.GetGroupDetail(options.groupId).then(data => { //获取当前群聊信息
+					if (data.GroupId > 0) {
+						this.SetChattingGroup(data.GroupId);
+					} else
+						uni.navigateBack();
+				}).catch(err => {
+					console.log(err);
+					uni.navigateBack();
+				});
+			} else
+				uni.navigateBack();
+			player.onEnded(() => {
+				that.playingSrc = ''
+			})
+			player.onPause(() => {
+				that.playingSrc = ''
+			})
+			player.onStop(() => {
+				that.playingSrc = ''
+			})
+			player.onPlay(() => {
+				that.playingSrc = player.src
+			})
+			player.onError(() => {
+				that.playingSrc = ''
+			})
+		},
+		onUnload() {
+			if (this.currentChat.length > 0) {
+				let last = this.currentChat[this.currentChat.length - 1];
+				last.UnReadCount = 0;
+				last.IsOpened = true;
+				if (this.isGroup)
+					this.SetLastChat({
+						...{
+							FriendUserId: this.currentGroup.GroupId,
+							FriendRemarkName: this.currentGroup.Name
+						},
+						...last
+					})
+				else
+					this.SetLastChat({
+						...this.currentUser,
+						...last
+					});
+			}
+			if (this.previousPage != 'manage')
+				this.ResetCurrent();
+			player.offEnded();
+			player.offPause();
+			player.offStop();
+			player.offPlay();
+			player.offError();
+		}
+	}
+</script>
+
+<style>
+
+</style>

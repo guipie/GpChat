@@ -1,0 +1,79 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="系统通知" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<view style="height: 25rpx;"></view>
+		<view class="myp-bg-inverse">
+			<text class="myp-color-text myp-size-base" style="line-height: 75rpx;margin-left: 24rpx;">此功能介绍</text>
+			<text class="myp-color-second myp-size-base myp-lh-base"
+				style="margin-left: 62rpx;width: 626rpx;">故新系统通知，此功能不可停用，以免错过重要信息。（我们会尽量不打扰到您）</text>
+			<view style="height: 90rpx;"></view>
+			<view class="myp-flex-row myp-align-center myp-justify-between myp-border-bottom"
+				style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+				<text class="myp-size-l myp-color-text">置顶</text>
+				<myp-switch v-model="notice.Top" width="65rpx" height="40rpx" ballSize="40rpx" onBgType="success"
+					animateBgType="third" @change="toToggleTop"></myp-switch>
+			</view>
+			<view class="myp-flex-row myp-align-center myp-justify-between"
+				style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+				<text class="myp-size-l myp-color-text">消息免打扰</text>
+				<myp-switch v-model="notice.NotDisturb" width="65rpx" height="40rpx" ballSize="40rpx" onBgType="success"
+					animateBgType="third" @change="toToggleSilence"></myp-switch>
+			</view>
+		</view>
+		<view style="height: 56rpx;"></view>
+		<view class="myp-flex-row myp-justify-center myp-align-center myp-bg-inverse" style="height: 100rpx;"
+			@tap="toClear">
+			<text class="myp-size-l myp-color-text">清空消息记录</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		SetSysNotDisturb,
+		SetSysTop
+	} from '@/api/notices.js'
+	import {
+		mapState,
+		mapActions,
+		mapMutations
+	} from 'vuex'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				isTop: true,
+				isSilence: true
+			}
+		},
+		computed: {
+			...mapState({
+				notice: state => state.notice.noticeSettings.find(m => m.Type == 'notice')
+			})
+		},
+		methods: {
+			...mapMutations({
+				'SetNoticeSettings': 'notice/SetNoticeSettings'
+			}),
+			toToggleTop(val) {
+				SetSysTop(val).then(res => {
+					this.SetNoticeSettings();
+				});
+			},
+			toToggleSilence(val) {
+				SetSysNotDisturb(val).then(res => {
+					this.SetNoticeSettings();
+				});
+			},
+			toClear() {
+
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

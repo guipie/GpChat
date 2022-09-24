@@ -1,0 +1,48 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="发现" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:520rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 32rpx;"></view>
+				<myp-cell icon="/static/album.png" title="朋友圈" space="24rpx" indicator="right" border="none"
+					radius="none" bgTyp="inverse" iconStyle="width:56rpx;height:56rpx;" titleType="text"
+					titleSize="base" titleStyle="font-weight:700;" indicatorSize="ss" indicatorType="third"
+					boxStyle="width:690rpx;margin-left:30rpx;height:104rpx;padding-left:30rpx;padding-right:30rpx;"
+					@cellClicked="toAlbum"></myp-cell>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'search'
+				}, {
+					icon: 'plus',
+					style: 'margin-left: 46rpx;'
+				}]
+			}
+		},
+		methods: {
+			toRightTab(i) {
+
+			},
+			toAlbum() {
+				uni.navigateTo({
+					url: '/pages/album/friendAlbums'
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

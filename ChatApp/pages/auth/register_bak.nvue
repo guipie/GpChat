@@ -1,0 +1,136 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="注册" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 66rpx;"></view>
+				<view class="myp-flex-row myp-justify-center">
+					<image style="width: 150rpx;height: 150rpx;" mode="aspectFill"></image>
+				</view>
+				<view style="height: 40rpx;"></view>
+				<view class="big-regist-margin">
+					<myp-input v-model="phone" type="digit" :maxlength="11" icon="phone" height="l" placeholder="输入手机号"
+						space="20rpx" bgType="none" boxStyle="padding-left:10rpx;padding-right:10rpx;"></myp-input>
+					<view class="myp-flex-row myp-align-center myp-wrap-nowrap">
+						<myp-input v-model="code" type="digit" :maxlength="6" icon="lock" height="l" placeholder="输入验证码"
+							space="20rpx" bgType="none" boxStyle="padding-left:10rpx;padding-right:10rpx;flex:1;">
+						</myp-input>
+						<myp-button :loading="registerCodeLoading" :text="second>0?(second+'s后可获取'):'获取验证码'"
+							bgType="none" height="l" border="bottom" radius="none" boxStyle="width:280rpx;"
+							@buttonClicked="toGetCode"></myp-button>
+					</view>
+					<myp-input v-model="password" :maxlength="24" :password="pwdNoVisible" :indicator="rightEye"
+						icon="lock" height="l" placeholder="密码" space="20rpx" bgType="none"
+						boxStyle="padding-left:10rpx;padding-right:10rpx;" @indicatorClicked="togglePwdVisible">
+					</myp-input>
+					<myp-input :maxlength="6" :indicator="rightEye" icon="lock" height="l" placeholder="可填,输入邀请码."
+						space="20rpx" bgType="none" boxStyle="padding-left:10rpx;padding-right:10rpx;"
+						@indicatorClicked="togglePwdVisible">
+					</myp-input>
+				</view>
+				<myp-button :disabled="registDisabled" bgType="primary" text="确定注册" textType="inverse" radius="ll"
+					border="none" boxStyle="margin-left:75rpx;margin-right:75rpx;" @buttonClicked="toRegist">
+				</myp-button>
+			</myp-list-cell>
+		</myp-list>
+		<myp-loading ref="myp-loading" :needMask="true" maskStyle="background-color:transparent;"></myp-loading>
+		<myp-toast ref="myp-toast"></myp-toast>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import toastMixin from '@/mypUI/myp-mixin/toastMixin.js'
+	import loadingMixin from '@/mypUI/myp-mixin/loadingMixin.js'
+
+	import validator from '@/mypUI/utils/validate.js'
+	import request from '@/api/request.js'
+	import {
+		mapMutations,
+		mapActions
+	} from 'vuex'
+	export default {
+		mixins: [navHelper, toastMixin, loadingMixin],
+		computed: {
+			registDisabled() {
+				const pwdFlag = validator.is6To24Pwd(this.password)
+				const phoneFlag = validator.isMobile(this.phone)
+				const codeFlag = validator.isNum(this.code) && this.code.length === 4
+				if (pwdFlag && phoneFlag && codeFlag) {
+					return false
+				}
+				return true
+			}
+		},
+		data() {
+			return {
+				second: 0,
+				code: '',
+				phone: '',
+				pwdNoVisible: true,
+				password: "",
+				rightEye: "eye",
+				timer: null,
+				registerCodeLoading: false
+			}
+		},
+		methods: {
+			...mapActions({
+				RegisterAsync: "user/RegisterAsync"
+			}),
+			toRegist() {
+				let registerData = {
+					PhoneNo: this.phone,
+					PassWord: this.password,
+					VerificationCode: this.code
+				};
+				this.RegisterAsync(registerData).then(res => {
+					this.mypShowToastSuccess('注册成功');
+					uni.navigateBack();
+				}).catch(err => {})
+			},
+			toGetCode() {
+				let _this = this;
+				if (!validator.isMobile(this.phone))
+					return this.mypShowToastWarning("请输入正确手机号.");
+				if (this.second > 0) {
+					return
+				};
+				this.registerCodeLoading = true;
+				request.request({
+					toggle: true,
+					url: '/Api/AppUser/Vcode?PhoneNo=' + this.phone,
+					method: 'post'
+				}).then(res => {
+					this.registerCodeLoading = false;
+					this.mypShowToastSuccess("验证码发送成功");
+					this.timer && clearInterval(this.timer)
+					this.second = 60
+					this.timer = setInterval(() => {
+						this.second -= 1
+						if (this.second === 0) {
+							this.timer && clearInterval(this.timer)
+						}
+					}, 1000);
+				}).catch(err => {
+					this.registerCodeLoading = false;
+				});
+			},
+			togglePwdVisible() {
+				this.pwdNoVisible = !this.pwdNoVisible
+				this.rightEye = this.pwdNoVisible ? "eye" : "eye-close"
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.big-regist {
+		&-margin {
+			margin-left: 62rpx;
+			margin-right: 62rpx;
+			margin-bottom: 110rpx;
+		}
+	}
+</style>

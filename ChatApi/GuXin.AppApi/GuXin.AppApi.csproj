@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>GuXin.AppApi</AssemblyName>
+    <RootNamespace>GuXin.AppApi</RootNamespace>
+    <UserSecretsId>eeffe6d3-10af-4758-8507-d947d3f41661</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\work\GuxinCode\GuXinApi\GuXin.AppApi\GuXin.AppApi.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GuXin.Business\GuXin.Business.csproj" />
+    <ProjectReference Include="..\GuXin.Core\GuXin.Core.csproj" />
+    <ProjectReference Include="..\GuXin.Entity\GuXin.Entity.csproj" />
+    <ProjectReference Include="..\GuXin.Business\GuXin.Business.csproj" />
+    <ProjectReference Include="..\GuXin.Core\GuXin.Core.csproj" />
+    <ProjectReference Include="..\GuXin.System\GuXin.System.csproj" />
+  </ItemGroup>
+
+</Project>

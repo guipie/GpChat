@@ -1,0 +1,39 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :title="agreement.title" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<view style="padding: 30rpx;">
+			<mp-html :content="agreement.html"></mp-html>
+		</view>
+	</view>
+</template>
+
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import mpHtml from '@/components/mp-html/mp-html'
+	import {
+		Agreement
+	} from '../../api/system.js'
+	export default {
+		components: {
+			mpHtml
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				agreement: {}
+			}
+		},
+		methods: {},
+		onLoad(options) {
+			Agreement(options.type).then(res => {
+				this.agreement = res.data;
+			});
+		}
+	}
+</script>
+
+<style scoped>
+
+</style>

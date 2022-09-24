@@ -1,0 +1,76 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="群聊" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell v-for="(item,idx) in groups" :key="idx">
+				<view class="myp-flex-row myp-align-center myp-bg-inverse" style="height: 128rpx;padding-left: 30rpx;"
+					bubble="true" @tap="toGroup(item)" v-if="item.SaveGroup">
+					<view class="myp-flex-row myp-wrap-wrap myp-bg-inverse myp-align-center myp-justify-center"
+						style="width: 80rpx;height: 80rpx;background-color: #f0f0f0;border-radius: 20rpx;">
+						<image v-for="u in (item.Members||[]).slice(0,8)" lazy-load='true' :key="u.UserId"
+							:src="avatar(u.Avatar)" mode="aspectFill"
+							style="width: 23rpx;height:23rpx;border-radius: 10rpx;margin: 2rpx;">
+						</image>
+					</view>
+					<text class="myp-size-base myp-color-text" style="margin-left: 24rpx;">{{item.Name}}</text>
+				</view>
+				<view v-if="groups.length-1>idx" class="myp-flex-row myp-align-center myp-wrap-nowrap"
+					style="width: 750rpx;">
+					<view style="width: 142rpx;height: 0.5px;background-color: #FFFFFF;"></view>
+					<view class="myp-flex-one" style="height: 0.5px;background-color: #EFEFF4;"></view>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	import {
+		GetGroups,
+		GetGroupInfo
+	} from '@/api/chat/group.js'
+	import {
+		mapActions,
+		mapMutations,
+		mapState
+	} from 'vuex'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {}
+		},
+		computed: {
+			...mapState({
+				"groups": state => state.group.groups
+			})
+		},
+		methods: {
+			...mapMutations({
+				"SetChattingGroup": "chat/SetChattingGroup"
+			}),
+			...mapActions({
+				"GetGroups": "group/GetGroupsAsync"
+			}),
+			toGroup(item) {
+				this.SetChattingGroup({
+					groupId: item.GroupId
+				});
+			},
+			avatar(src) {
+				return baseAvatar(src);
+			}
+		},
+		onLoad() {
+			this.GetGroups();
+		}
+	}
+</script>
+
+<style>
+
+</style>

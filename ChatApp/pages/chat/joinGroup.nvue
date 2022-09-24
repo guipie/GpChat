@@ -1,0 +1,40 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;" @leftAction="navLeftAction"></myp-navbar>
+		<view class="myp-flex-column myp-align-center">
+			<view style="height: 90rpx;"></view>
+			<image src="/static/logo.png" mode="aspectFill" style="width: 150rpx;height: 150rpx;border-radius: 24rpx;"></image>
+			<view style="height: 67rpx;"></view>
+			<text class="myp-color-text" style="font-size: 44rpx;line-height: 74rpx;">京东之家</text>
+			<text class="myp-size-l myp-color-second myp-lh-l" style="width: 456rpx;margin-top: 90rpx;">请注意您的隐私安全，群聊人数较多，请文明礼貌。</text>
+			<view style="height: 90rpx;"></view>
+			<view class="myp-bg-success myp-flex-row myp-align-center myp-justify-center" style="width: 432rpx;height: 100rpx;border-radius: 8rpx;" @click="toJoin">
+				<text class="myp-size-base myp-color-inverse">加入群聊</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				
+			}
+		},
+		methods: {
+			toJoin() {
+				
+			}
+		},
+		onLoad(options) {
+			
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+</style>

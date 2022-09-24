@@ -1,0 +1,57 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction" @rightAction="toRightTab"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 20rpx;"></view>
+				<view class="myp-bg-inverse"
+					style="width: 750rpx;padding-left: 38rpx;padding-right: 38rpx;padding-top: 16rpx;padding-bottom: 16rpx;">
+					<textarea v-model="tempSign" :maxlength="25" class="myp-color-text myp-size-s" placeholder="最多25个字"
+						style="width: 674rpx;height: 160rpx;"></textarea>
+				</view>
+				<text class="myp-color-second myp-size-ss myp-lh-ss"
+					style="margin-left: 56rpx;width: 638rpx;margin-top: 36rpx;">在这里编辑您的个性签名，个性签名将在公共主页和朋友圈主页显示。</text>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		mapActions
+	} from 'vuex'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				leftIcons: [{
+					text: '取消'
+				}],
+				tempSign: ''
+			}
+		},
+		computed: {
+			rightIcons() {
+				return [{
+					text: '确定',
+					textType: this.tempSign.length > 0 ? 'primary' : "third"
+				}]
+			}
+		},
+		methods: {
+			...mapActions({
+				"setRemark": "user/SetRemarkAsync"
+			}),
+			toRightTab(i) {
+				this.setRemark(this.tempSign);
+				uni.navigateBack();
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

@@ -1,0 +1,665 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GuXin.AppApi</name>
+    </assembly>
+    <members>
+        <member name="T:GuXin.App.Controllers.CommonController">
+            <summary>
+            公共接口文档
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.CommonController.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,GuXin.System.IServices.ISys_ProvinceService)">
+            <summary>
+            
+            </summary>
+            <param name="httpContextAccessor"></param>
+            <param name="provinceService"></param>
+        </member>
+        <member name="M:GuXin.App.Controllers.CommonController.Provinces">
+            <summary>
+            省
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.CommonController.Cities(System.String)">
+            <summary>
+            市区
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.App.Controllers.ContentIntroController">
+            <summary>
+            内容简介
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentIntroController.Get(System.Int32,System.Nullable{System.DateTime})">
+            <summary>
+            获取用户简介列表
+            </summary>
+            <param name="userId"></param>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.App.Controllers.ContentsController">
+            <summary>
+            内容收藏
+            </summary>
+            <summary>
+            内容评论
+            </summary>
+            <summary>
+            朋友圈相关内容
+            </summary> 
+             <summary>
+            内容 赞/新赞
+             </summary>
+            <summary>
+            用户内容相关
+            </summary> 
+             <summary>
+            内容 赞/新赞
+             </summary>
+            <summary>
+            内容相关接口
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetCollect(System.Nullable{System.DateTime})">
+            <summary>
+            获取收藏内容
+            </summary> 
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.AddCollect(System.Guid)">
+            <summary>
+            新增收藏内容
+            </summary>
+            <param name="contentGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetComments(System.Guid,System.Nullable{System.DateTime})">
+            <summary>
+            获取内容评论
+            </summary>
+            <param name="contentGuid"></param>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.PraiseComments(System.Int32)">
+            <summary>
+            点赞评论
+            </summary>
+            <param name="commentsId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetFriendComments(System.Guid,System.Nullable{System.DateTime})">
+            <summary>
+            获取朋友圈评论
+            </summary>
+            <param name="contentGuid"></param> 
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.AddComment(System.Guid,System.String,System.Int32)">
+            <summary>
+            新增内容评论
+            </summary>
+            <param name="contentGuid"></param>
+            <param name="comments"></param>
+            <param name="parentId">回复内容</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.AddFriendComment(System.Guid,System.String,System.Int32)">
+            <summary>
+            新增朋友圈评论
+            </summary>
+            <param name="contentGuid"></param>
+            <param name="comments"></param>
+            <param name="parentId">回复内容</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetFriendContentsAsync(System.Nullable{System.DateTime})">
+            <summary>
+            朋友圈内容
+            </summary>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetFriendUserContentsAsync(System.Nullable{System.DateTime},System.Int32)">
+            <summary>
+            某个用户朋友圈内容
+            </summary>
+            <param name="searchDate"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetPraiseUsers(System.Guid,System.Nullable{System.DateTime})">
+            <summary>
+            获取内容点赞用户
+            </summary>
+            <param name="contentGuid"></param>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetPraiseFriendUsers(System.Guid,System.Nullable{System.DateTime})">
+            <summary>
+            获取朋友圈点赞用户
+            </summary>
+            <param name="contentGuid"></param>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.AddPraise(System.Guid)">
+            <summary>
+            点赞公共内容
+            </summary>
+            <param name="contentGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.AddFriendPraise(System.Guid)">
+            <summary>
+            点赞朋友圈内容
+            </summary>
+            <param name="contentGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetAsync(System.Nullable{System.Int32},System.Nullable{System.DateTime})">
+            <summary>
+            获取用户内容
+            </summary>
+            <param name="userId"></param>
+            <param name="dateTime"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetTopAsync(System.Nullable{System.Int32},System.Nullable{System.DateTime})">
+            <summary>
+            用户优质内容
+            </summary>
+            <param name="userId"></param>
+            <param name="dateTime"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.Post(GuXin.Entity.AppDto.Input.ContentInput)">
+            <summary>
+            新增内容
+            </summary>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.Put(GuXin.Entity.AppDto.Input.ContentInput)">
+            <summary>
+            修改内容
+            </summary>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.Del(System.Guid)">
+            <summary>
+            删除内容
+            </summary>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.Statistic">
+            <summary>
+            数据统计
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.InteractAsync(System.Nullable{System.DateTime},System.Int32)">
+            <summary>
+            我的互动内容
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.AddXinPraise(System.Guid)">
+            <summary>
+            新赞公共内容
+            </summary>
+            <param name="contentGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,GuXin.Business.IServices.IContentService,GuXin.Business.IServices.IContent_CommentService,GuXin.Business.IServices.IContent_PraiseService,GuXin.Business.IServices.IContent_XinPraiseService,GuXin.Business.IServices.IContent_CollectService,GuXin.Business.IServices.IUser_Interact_SettingService)">
+            <summary>
+            
+            </summary>
+            <param name="httpContextAccessor"></param>
+            <param name="contentService"></param>
+            <param name="content_CommentService"></param>
+            <param name="praiseService"></param>
+            <param name="xinPraiseService"></param>
+            <param name="collectService"></param>
+            <param name="user_Interact_SettingService"></param>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetInitContentsAsync(System.Nullable{System.DateTime})">
+            <summary>
+            初始化内容
+            </summary>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetRecommendContentsAsync(System.Nullable{System.DateTime})">
+            <summary>
+            推荐内容
+            </summary>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetTopContentsAsync(System.Nullable{System.DateTime})">
+            <summary>
+            榜单内容
+            </summary>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetFollowContentsAsync(System.Nullable{System.DateTime})">
+            <summary>
+            关注内容
+            </summary>
+            <param name="searchDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.GetFollowUserContentsAsync(System.Nullable{System.DateTime},System.Int32)">
+            <summary>
+            关注的某个用户内容
+            </summary>
+            <param name="searchDate"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.SearchContentsAsync(System.Nullable{System.DateTime},System.String)">
+            <summary>
+            搜索故新内容
+            </summary>
+            <param name="searchDate"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.ContentsController.SearchUserContentsAsync(System.Nullable{System.DateTime},System.Nullable{System.Int32},System.String)">
+            <summary>
+            搜索故新用户及内容
+            </summary>
+            <param name="searchDate"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.App.Controllers.FriendController">
+            <summary>
+            好友相关接口
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,GuXin.Business.IServices.IUser_FriendService,GuXin.Business.IServices.IUser_FollowService)">
+            <summary>
+            
+            </summary>
+            <param name="httpContextAccessor"></param>
+            <param name="friendService"></param>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.GetMyFriends(System.Nullable{System.DateTime})">
+            <summary>
+            最新的注册用户
+            </summary>
+            <param name="registrationDate">注册用户</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.GetMyFriends(System.String)">
+            <summary>
+            搜索用户添加
+            </summary>
+            <param name="keyword">手机号、故新号</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.AddFriend(System.Int32,System.String,System.String)">
+            <summary>
+            添加好友
+            </summary>
+            <param name="friendUserId"></param>
+            <param name="nickName">好友备注</param>
+            <param name="resean"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.AcceptFriend(System.Int32)">
+            <summary>
+            接受添加
+            </summary>
+            <param name="friendUserId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.DelFrinend(System.Int32)">
+            <summary>
+            删除
+            </summary>
+            <param name="friendUserId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.GetFriendInfo(System.Int32)">
+            <summary>
+            好友信息[包含朋友圈，tag标签]
+            </summary>
+            <param name="friendUserId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.GetMyFriends">
+            <summary>
+            获取好友-树形
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.GetTobeAgreeFriends">
+            <summary>
+            搜索待我同意好友的用户
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.FriendSettingNotDisturb(System.Int32,System.Boolean)">
+            <summary>
+            好友设置-是否免打扰
+            </summary>
+            <param name="friendUserId">好友ID</param>
+            <param name="notDisturb">是否免打扰</param> 
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.FriendSettingTop(System.Int32,System.Boolean)">
+            <summary>
+            好友设置-是否置顶
+            </summary>
+            <param name="friendUserId">好友ID</param>
+            <param name="top">是否置顶</param> 
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.FriendSettingBlack(System.Int32,System.Boolean)">
+            <summary>
+            好友设置-是否拉黑
+            </summary>
+            <param name="friendUserId">好友ID</param> 
+            <param name="black">是否拉黑</param> 
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.FriendSettingImage(System.Int32,System.String)">
+            <summary>
+            好友设置-图片地址
+            </summary>
+            <param name="friendUserId">好友ID</param> 
+            <param name="backGroundImg">图片地址</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.FriendController.FriendSettingRemark(System.Int32,System.String)">
+            <summary>
+            好友设置-备注昵称
+            </summary>
+            <param name="friendUserId">好友ID</param>
+            <param name="remarkName">备注昵称</param>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.App.Controllers.GroupController">
+            <summary>
+            用户群
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.GroupController.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,GuXin.Business.IServices.IUser_GroupService)">
+            <summary>
+            
+            </summary>
+            <param name="httpContextAccessor"></param>
+        </member>
+        <member name="M:GuXin.App.Controllers.GroupController.GetSaveMyGroups">
+            <summary>
+            获取保存到群聊的群
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.GroupController.Post(System.Int32[])">
+            <summary>
+            创建群聊
+            </summary>
+            <param name="userIds">群用户</param>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.App.Controllers.InteractController">
+            <summary>
+            互动相关接口
+            </summary>
+        </member>
+        <member name="T:GuXin.App.Controllers.NoticesController">
+            <summary>
+            用户通知
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.NoticesController.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,GuXin.Business.IServices.IUser_Sys_NoticeService)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="httpContextAccessor"></param>
+            <param name="user_Sys_NoticeService"></param>
+        </member>
+        <member name="M:GuXin.App.Controllers.NoticesController.SysNotices">
+            <summary>
+            系统通知
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.NoticesController.InteractNotices">
+            <summary>
+            互动通知
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.NoticesController.FollowNotices">
+            <summary>
+            动态通知
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.NoticesController.FriendRequestNotices">
+            <summary>
+            好友请求通知
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.NoticesController.FriendAcceptNotices">
+            <summary>
+            好友接受通知
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.SystemController.Upgrade(System.String,System.String)">
+            <summary>
+            版本升级
+            </summary>
+            <param name="platform">android或ios或pc</param>
+            <param name="version">版本号</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.SystemController.Agreement(GuXin.Entity.AppEnum.Agreement)">
+            <summary>
+            协议
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.App.Controllers.TagController">
+            <summary>
+            用户标签相关接口
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.TagController.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,GuXin.Business.IServices.IUser_TagService)">
+            <summary>
+            
+            </summary>
+            <param name="httpContextAccessor"></param>
+            <param name="tagService"></param>
+        </member>
+        <member name="M:GuXin.App.Controllers.TagController.Post(GuXin.Entity.AppDto.Input.TagDto)">
+            <summary>
+            添加/修改标签
+            </summary>
+            <param name="tag"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.TagController.GetTags">
+            <summary>
+            获取标签数据
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.TagController.GetMembers(System.Int32)">
+            <summary>
+            获取标签数据
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.App.Controllers.UserController">
+            <summary>
+            用户相关接口
+            </summary>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.#ctor(GuXin.Business.IServices.IUserService,GuXin.Business.IServices.IUser_XinPraiseService,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="service"></param>
+            <param name="httpContextAccessor"></param>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.LCode(System.String,GuXin.Entity.AppEnum.VCode)">
+            <summary>
+            获取验证码
+            </summary>
+            <param name="phoneNo">手机号</param>
+            <param name="code">验证码类别</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.Login(GuXin.Entity.AppDto.Input.AppLogin)">
+            <summary>
+            登录
+            </summary>
+            <param name="appLogin"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.Register(GuXin.Entity.AppDto.Input.AppRegistereUser)">
+            <summary>
+            用户注册
+            </summary>
+            <param name="rUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.ReplaceToken">
+            <summary>
+            token替换
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.PwdReset(GuXin.Entity.AppDto.Input.AppLogin)">
+            <summary>
+            密码重置
+            </summary>
+            <param name="appLogin"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.PhoneReset(System.String,GuXin.Entity.AppDto.Input.AppLogin)">
+            <summary>
+            手机号变更
+            </summary>
+            <param name="oldPhone">老手机号</param>
+            <param name="appLogin"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.SexReset(System.Int32)">
+            <summary>
+            性别修改
+            </summary>
+            <param name="sex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.NickNameResetAsync(System.String)">
+            <summary>
+            修改昵称
+            </summary>
+            <param name="nickName">昵称</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.LocationReset(System.String,System.String)">
+            <summary>
+            省市修改
+            </summary>
+            <param name="province">省</param>
+            <param name="city">市</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.RemarkReset(System.String)">
+            <summary>
+            备注介绍修改
+            </summary>
+            <param name="remark">介绍</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.Logout(System.String)">
+            <summary>
+            注销登出
+            </summary>
+            <param name="password">密码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.AvatarUpload">
+            <summary>
+            上传头像
+            </summary>
+            <param name="formFile"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.AlbumInfo(System.Int32)">
+            <summary>
+            内容统计信息
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.GetInfo">
+            <summary>
+            个人新赞统计详情
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.App.Controllers.UserController.UpdateAsync(GuXin.Entity.AppEnum.XinPraiseType)">
+            <summary>
+            个人新赞更新
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GuXin.AppApi.Controllers.WebSocketController">
+            <summary>
+            消息推送
+            </summary>
+        </member>
+        <member name="M:GuXin.AppApi.Controllers.WebSocketController.#ctor(GuXin.Business.IServices.IUserService,GuXin.Business.IServices.IUser_FriendService,GuXin.Business.IServices.IUser_GroupService,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="service"></param>
+            <param name="httpContextAccessor"></param>
+        </member>
+        <member name="P:GuXin.AppApi.Controllers.WebSocketController.Ip">
+            <summary>
+            请求IP
+            </summary>
+        </member>
+        <member name="M:GuXin.AppApi.Controllers.WebSocketController.SocketInit">
+            <summary>
+            初始化获取websocket分区
+            </summary> 
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.AppApi.Controllers.WebSocketController.Sendmsg(GuXin.ImCore.ChatObject,System.Boolean)">
+            <summary>
+            im发消息
+            </summary>
+            <param name="sendObject">发送对象</param>
+            <param name="IsReceive">是否回执告诉客户端</param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.AppApi.Controllers.WebSocketController.SendNotice(System.Int32,System.Int32,GuXin.ImCore.ChatType)">
+            <summary>
+            推送通知
+            </summary> 
+            <returns></returns>
+        </member>
+    </members>
+</doc>

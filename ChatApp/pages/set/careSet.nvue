@@ -1,0 +1,82 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="关注的动态" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<view style="height: 25rpx;"></view>
+		<view class="myp-bg-inverse">
+			<text class="myp-color-text myp-size-base" style="line-height: 75rpx;margin-left: 24rpx;">此功能介绍</text>
+			<text class="myp-color-second myp-size-base myp-lh-base"
+				style="margin-left: 62rpx;width: 626rpx;">可以获得关注的好友消息提醒，无需跳转到关注页面。</text>
+			<view style="height: 90rpx;"></view>
+			<view class="myp-flex-row myp-align-center myp-justify-between myp-border-bottom"
+				style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+				<text class="myp-size-l myp-color-text">置顶</text>
+				<myp-switch v-model="settings.Top" width="65rpx" height="40rpx" ballSize="40rpx" onBgType="success"
+					animateBgType="third" @change="toToggleTop"></myp-switch>
+			</view>
+			<view class="myp-flex-row myp-align-center myp-justify-between myp-border-bottom"
+				style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+				<text class="myp-size-l myp-color-text">消息免打扰</text>
+				<myp-switch v-model="settings.NotDisturb" width="65rpx" height="40rpx" ballSize="40rpx"
+					onBgType="success" animateBgType="third" @change="toToggleSilence"></myp-switch>
+			</view>
+			<view class="myp-flex-row myp-align-center myp-justify-between"
+				style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+				<text class="myp-size-l myp-color-error">停用</text>
+				<myp-switch v-model="settings.Disable" width="65rpx" height="40rpx" ballSize="40rpx" onBgType="success"
+					animateBgType="third" @change="toToggleStop"></myp-switch>
+			</view>
+		</view>
+		<view style="height: 56rpx;"></view>
+		<view class="myp-flex-row myp-justify-center myp-align-center myp-bg-inverse" style="height: 100rpx;"
+			@tap="toClear">
+			<text class="myp-size-l myp-color-text">清空消息记录</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+
+	import {
+		SetFollowNotDisturb,
+		SetFollowTop,
+		SetFollowDisable
+	} from '@/api/notices.js'
+	import {
+		mapState,
+		mapActions
+	} from 'vuex';
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {}
+		},
+		computed: {
+			...mapState({
+				settings: state => state.notice.noticeSettings.find(m => m.Type == "follow")
+			})
+		},
+		methods: {
+			toToggleTop(val) {
+				SetFollowTop(val);
+			},
+			toToggleSilence(val) {
+				SetFollowNotDisturb(val);
+			},
+			toToggleStop(val) {
+				SetFollowDisable(val);
+			},
+			toClear() {
+				console.log(this.settings);
+			}
+		},
+		onLoad() {
+
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

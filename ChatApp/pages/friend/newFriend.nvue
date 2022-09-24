@@ -1,0 +1,131 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="新的好友" :rights="null" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<view style="height: 16rpx;"></view>
+		<view class="myp-flex-row myp-align-center myp-wrap-nowrap myp-radius-ss myp-bg-inverse"
+			style="width: 690rpx;height: 80rpx;padding-left:16rpx;padding-right:16rpx;margin-left: 30rpx;">
+			<myp-icon name="search" size="s" type="second" boxStyle="margin-right:16rpx;"></myp-icon>
+			<input v-model="search" class="myp-size-s myp-color-text myp-flex-one" placeholder="搜索故新号/手机号"
+				placeholder-style="color:#9092A5;" :adjust-position="false" confirm-type="search" @confirm="toSearch" />
+		</view>
+		<view style="height: 10rpx;"></view>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view v-for="(item,idx) in  tobeAgreeFriends" :key="idx">
+					<new-friend-cell :item="item" @agree="toAgree"></new-friend-cell>
+				</view>
+				<view class="myp-flex-row myp-align-center myp-justify-center myp-bg-inverse" style="height: 52rpx;">
+					<text class="myp-color-third" style="font-size: 10px;" @click="toMore">查看更多</text>
+					<myp-icon name="right" type="third" iconStyle="font-size:10px;" @iconClicked="toMore"></myp-icon>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view class="myp-flex-row myp-align-end myp-justify-between"
+					style="height: 74rpx;padding-right: 30rpx;padding-bottom: 12rpx;padding-left: 30rpx;">
+					<!-- <myp-button textType="inverse" textSize="s" bgType="error" border="none" radius="ll" boxStyle="width:148rpx;height:50rpx;"></myp-button> -->
+					<image src="/static/ui/tuijianhaoyou.png" mode="aspectFill"
+						style="width: 148rpx;height: 50rpx;border-radius: 12rpx;"></image>
+					<!-- <text class="myp-color-third" style="font-size: 20rpx;font-weight: 700;color: #9092A5;">今天</text> -->
+				</view>
+				<view v-for="(m, iix) in newestUsers" :key="iix">
+					<recommend-cell :item="m" :isLast="iix===newestUsers.length-1" @chat="toChat">
+					</recommend-cell>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import newFriendCell from './components/newFriendCell.vue'
+	import recommendCell from './components/recommendCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		TobeAgreeFriends,
+		GetNewestUsers,
+		AcceptFriend
+	} from '@/api/friend/index.js'
+	import {
+		mapActions,
+		mapMutations,
+		mapState
+	} from 'vuex'
+	export default {
+		components: {
+			newFriendCell,
+			recommendCell
+		},
+		mixins: [navHelper],
+		computed: {
+			...mapState({})
+		},
+		data() {
+			return {
+				search: '',
+				rightIcons: [{
+					icon: 'plus'
+				}],
+				newestUsers: [],
+				tobeAgreeFriends: []
+			}
+		},
+		methods: {
+			...mapMutations({
+				"SetChattingUser": "chat/SetChattingUser",
+				'ClearUnReadFriendRequest': 'notice/ClearUnReadFriendRequest'
+			}),
+			...mapActions({
+				'GetFriends': 'friend/GetFriendsAsync',
+				"SendMsgNoReceive": "chat/SendMsgNoReceiveAsync"
+			}),
+			toRightTab(i) {
+				uni.navigateTo({
+					url: '/pages/chat/search?type=newFriend'
+				})
+			},
+			toSearch() {
+				uni.navigateTo({
+					url: '/pages/chat/search?type=newFriend&search=' + (this.search || "")
+				})
+			},
+			toAgree(friend) {
+				AcceptFriend(friend.createID).then(res => {
+					this.GetFriends();
+					let sendObj = {
+						SendUserId: getApp().globalData.userId,
+						ReceiveUserId: friend.createID,
+						Content: "我同意了你的好友请求",
+						Type: 1
+					};
+					this.SendMsgNoReceive(sendObj);
+				});
+				uni.navigateBack();
+			},
+			toMore() {
+				uni.redirectTo({
+					url: '/pages/friend/new'
+				})
+			},
+			toChat(item) {
+				this.SetChattingUser({
+					FriendRemarkName: item.nickName,
+					FriendUserId: item.userId,
+					Avatar: item.avatar
+				});
+			}
+		},
+		onLoad() {
+			this.ClearUnReadFriendRequest();
+			TobeAgreeFriends().then(res => this.tobeAgreeFriends = res.data);
+			GetNewestUsers(new Date()).then(res => {
+				this.newestUsers = res.data;
+			});
+		}
+	}
+</script>
+
+<style>
+
+</style>

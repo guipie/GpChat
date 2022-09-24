@@ -1,0 +1,12 @@
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\bin\Debug\net5.0\GuXin.ImCore.deps.json
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\bin\Debug\net5.0\GuXin.ImCore.dll
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\bin\Debug\net5.0\ref\GuXin.ImCore.dll
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\bin\Debug\net5.0\GuXin.ImCore.pdb
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\bin\Debug\net5.0\ImCore.xml
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\obj\Debug\net5.0\GuXin.ImCore.GeneratedMSBuildEditorConfig.editorconfig
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\obj\Debug\net5.0\GuXin.ImCore.AssemblyInfoInputs.cache
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\obj\Debug\net5.0\GuXin.ImCore.AssemblyInfo.cs
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\obj\Debug\net5.0\GuXin.ImCore.csproj.CoreCompileInputs.cache
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\obj\Debug\net5.0\GuXin.ImCore.dll
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\obj\Debug\net5.0\ref\GuXin.ImCore.dll
+D:\work\GuxinCode\GuXinApi\GuXin.ImCore\obj\Debug\net5.0\GuXin.ImCore.pdb

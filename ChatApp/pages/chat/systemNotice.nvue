@@ -1,0 +1,78 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="系统通知" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" @down="toNotices" @up="toNotices" :autoUpdate="true">
+			<myp-list-cell>
+				<view style="height: 8rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<sys-notice-cell :item="item" @detail="toDetail" :createDate="fmtDate(item)">
+				</sys-notice-cell>
+				<view style="height: 8rpx;"></view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import sysNoticeCell from './components/sysNoticeCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		GetNotices
+	} from '@/api/notices.js'
+	import {
+		parseTime
+	} from '@/mypUI/utils/date.js'
+	export default {
+		components: {
+			sysNoticeCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'elipsis'
+				}],
+				items: [],
+				searchDate: new Date()
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				uni.navigateTo({
+					url: '/pages/set/systemNoticeSet'
+				})
+			},
+			fmtDate(item) {
+				return parseTime(item.CreateDate, '{y}-{m}-{d} {h}:{i}');
+			},
+			toNotices() {
+				const ins = this.$refs['myp-list'];
+				const cp = ins.mypCurrentPage;
+				if (cp === 1) {
+					this.searchDate = new Date();
+					this.items = [];
+				}
+				GetNotices(this.searchDate).then(res => {
+					this.items.push.apply(this.items, res.data || []);
+					this.searchDate = res.data.map(m => m.CreateDate)[res.data.length - 1];
+					ins.mypEndSuccess(res.data.length >= 5)
+				}).catch(err => {
+					ins.mypEndError()
+				});
+			},
+			toDetail(item) {
+				this.$store.commit("notice/SetCurrentNotice", item);
+				uni.navigateTo({
+					url: '/pages/chat/systemNoticeDetail'
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

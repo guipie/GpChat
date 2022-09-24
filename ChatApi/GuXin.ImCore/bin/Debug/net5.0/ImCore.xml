@@ -1,0 +1,381 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GuXin.ImCore</name>
+    </assembly>
+    <members>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.String2Json(System.String)">
+            <summary>
+            过滤特殊字符
+            </summary>
+            <param name="s">字符串</param>
+            <returns>json字符串</returns>
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.StringFormat(System.String,System.Type)">
+            <summary>
+            格式化字符型、日期型、布尔型
+            </summary>
+            <param name="str"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ListToJson``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            list转换为Json
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ListToJson``1(System.Collections.Generic.IList{``0},System.String)">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="list"></param>
+            <param name="JsonName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ToJson(System.Object)">
+            <summary>
+            对象转换为json
+            </summary>
+            <param name="jsonObject">json对象</param>
+            <returns>json字符串</returns>
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ToJson(System.Collections.IEnumerable)">
+            <summary>
+            对象集合转换为json
+            </summary>
+            <param name="array">对象集合</param>
+            <returns>json字符串</returns>
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ToArrayString(System.Collections.IEnumerable)">
+            <summary>    
+            普通集合转换Json   
+            </summary>   
+            <param name="array">集合对象</param> 
+            <returns>Json字符串</returns>  
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ToJson(System.Data.DataSet)">
+            <summary>    
+            DataSet转换为Json   
+            </summary>    
+            <param name="dataSet">DataSet对象</param>   
+            <returns>Json字符串</returns>    
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ToJson(System.Data.DataTable)">
+            <summary>
+            
+            </summary>
+            <param name="dt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ToJson(System.Data.DataTable,System.String)">
+            <summary>    
+            DataTable转换为Json     
+            </summary>    
+        </member>
+        <member name="M:GuXin.ImCore.ConvertJsonExtension.ReaderJson(System.Data.IDataReader)">
+            <summary>     
+            DataReader转换为Json     
+            </summary>     
+            <param name="dataReader">DataReader对象</param>     
+            <returns>Json字符串</returns>  
+        </member>
+        <member name="F:GuXin.ImCore.ChatType.ChatText">
+            <summary>
+            故新消息
+            </summary>
+        </member>
+        <member name="P:GuXin.ImCore.Models.NoticeObject.Count">
+            <summary>
+            通知数量
+            </summary>
+        </member>
+        <member name="T:GuXin.ImCore.Models.RedisKey">
+            <summary>
+            缓存键
+            </summary>
+        </member>
+        <member name="M:GuXin.ImCore.Models.RedisKey.ChatKey(System.String,System.Guid)">
+            <summary>
+            未读聊天消息
+            </summary>
+            <param name="prefix"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GuXin.ImCore.Models.RedisKey.NoticeKey(System.String,System.Guid,GuXin.ImCore.ChatType)">
+            <summary>
+            通知消息
+            </summary>
+            <param name="prefix"></param>
+            <param name="userId"></param> 
+            <param name="type">通知类型</param> 
+            <returns></returns>
+        </member>
+        <member name="T:ImClientOptions">
+            <summary>
+            im 核心类实现的配置所需
+            </summary>
+        </member>
+        <member name="P:ImClientOptions.Redis">
+            <summary>
+            CSRedis 对象，用于存储数据和发送消息
+            </summary>
+        </member>
+        <member name="P:ImClientOptions.Servers">
+            <summary>
+            负载的服务端
+            </summary>
+        </member>
+        <member name="P:ImClientOptions.PathMatch">
+            <summary>
+            websocket请求的路径，默认值：/ws
+            </summary>
+        </member>
+        <member name="P:ImSendEventArgs.SenderClientId">
+            <summary>
+            发送者的客户端id
+            </summary>
+        </member>
+        <member name="P:ImSendEventArgs.ReceiveClientId">
+            <summary>
+            接收者的客户端id
+            </summary>
+        </member>
+        <member name="P:ImSendEventArgs.Server">
+            <summary>
+            imServer 服务器节点
+            </summary>
+        </member>
+        <member name="P:ImSendEventArgs.Message">
+            <summary>
+            消息
+            </summary>
+        </member>
+        <member name="P:ImSendEventArgs.Receipt">
+            <summary>
+            是否回执
+            </summary>
+        </member>
+        <member name="T:ImClient">
+            <summary>
+            im 核心类实现
+            </summary>
+        </member>
+        <member name="F:ImClient.OnSend">
+            <summary>
+            推送消息的事件，可审查推向哪个Server节点
+            </summary>
+        </member>
+        <member name="M:ImClient.#ctor(ImClientOptions)">
+            <summary>
+            初始化 imclient
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:ImClient.SelectServer(System.Guid)">
+            <summary>
+            负载分区规则：取clientId后四位字符，转成10进制数字0-65535，求模
+            </summary>
+            <param name="clientId">客户端id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ImClient.PrevConnectServer(System.Guid,System.String)">
+            <summary>
+            ImServer 连接前的负载、授权，返回 ws 目标地址，使用该地址连接 websocket 服务端
+            </summary>
+            <param name="clientId">客户端id</param>
+            <param name="clientMetaData">客户端相关信息，比如ip</param>
+            <returns>websocket 地址：ws://xxxx/ws?token=xxx</returns>
+        </member>
+        <member name="M:ImClient.SendMessage(System.Guid,System.Collections.Generic.IEnumerable{System.Guid},GuXin.ImCore.ChatObject,System.Boolean)">
+            <summary>
+            向指定的多个客户端id发送chat消息
+            </summary>
+            <param name="senderClientId">发送者的客户端id</param>
+            <param name="receiveClientId">接收者的客户端id</param>
+            <param name="sendObject">发送对象</param>
+        </member>
+        <member name="M:ImClient.GetClientListByOnline">
+            <summary>
+            获取所在线客户端id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ImClient.HasOnline(System.Guid)">
+            <summary>
+            判断客户端是否在线
+            </summary>
+            <param name="clientId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ImClient.EventBus(System.Action{System.ValueTuple{System.Guid,System.String}},System.Action{System.ValueTuple{System.Guid,System.String}})">
+            <summary>
+            事件订阅
+            </summary>
+            <param name="online">上线</param>
+            <param name="offline">下线</param>
+        </member>
+        <member name="M:ImClient.JoinChan(System.Guid,System.String)">
+            <summary>
+            加入群聊频道，每次上线都必须重新加入
+            </summary>
+            <param name="clientId">客户端id</param>
+            <param name="chan">群聊频道名</param>
+        </member>
+        <member name="M:ImClient.LeaveChan(System.Guid,System.String[])">
+            <summary>
+            离开群聊频道
+            </summary>
+            <param name="clientId">客户端id</param>
+            <param name="chans">群聊频道名</param>
+        </member>
+        <member name="M:ImClient.GetChanClientList(System.String)">
+            <summary>
+            获取群聊频道所有客户端id（测试）
+            </summary>
+            <param name="chan">群聊频道名</param>
+            <returns></returns>
+        </member>
+        <member name="M:ImClient.ClearChanClient(System.String)">
+            <summary>
+            清理群聊频道的离线客户端（测试）
+            </summary>
+            <param name="chan">群聊频道名</param>
+        </member>
+        <member name="M:ImClient.GetChanList">
+            <summary>
+            获取所有群聊频道和在线人数
+            </summary>
+            <returns>频道名和在线人数</returns>
+        </member>
+        <member name="M:ImClient.GetChanListByClientId(System.Guid)">
+            <summary>
+            获取用户参与的所有群聊频道
+            </summary>
+            <param name="clientId">客户端id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ImClient.GetChanOnline(System.String)">
+            <summary>
+            获取群聊频道的在线人数
+            </summary>
+            <param name="chan">群聊频道名</param>
+            <returns>在线人数</returns>
+        </member>
+        <member name="M:ImClient.SendChanMessage(System.Guid,System.String,GuXin.ImCore.ChatObject,System.Boolean)">
+            <summary>
+            发送群聊消息
+            </summary>
+            <param name="senderClientId">发送者的客户端id</param>
+            <param name="chan">群聊频道名</param>
+            <param name="message">消息</param>
+        </member>
+        <member name="T:ImHelper">
+            <summary>
+            im 核心类实现的静态代理类
+            </summary>
+        </member>
+        <member name="M:ImHelper.Initialization(ImClientOptions)">
+            <summary>
+            初始化 ImHelper
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:ImHelper.PrevConnectServer(System.Guid,System.String)">
+            <summary>
+            ImServer 连接前的负载、授权，返回 ws 目标地址，使用该地址连接 websocket 服务端
+            </summary>
+            <param name="clientId">客户端id</param>
+            <param name="clientMetaData">客户端相关信息，比如ip</param>
+            <returns>websocket 地址：ws://xxxx/ws?token=xxx</returns>
+        </member>
+        <member name="M:ImHelper.SendMessage(System.Guid,System.Collections.Generic.IEnumerable{System.Guid},GuXin.ImCore.ChatObject,System.Boolean)">
+            <summary>
+            向指定的多个客户端id发送消息
+            </summary>
+            <param name="senderClientId">发送者的客户端id</param>
+            <param name="receiveClientId">接收者的客户端id</param>
+            <param name="sendObject">发送对象</param>
+            <param name="IsReceive">是否回执</param>
+        </member>
+        <member name="M:ImHelper.GetClientListByOnline">
+            <summary>
+            获取所在线客户端id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ImHelper.HasOnline(System.Guid)">
+            <summary>
+            判断客户端是否在线
+            </summary>
+            <param name="clientId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ImHelper.EventBus(System.Action{System.ValueTuple{System.Guid,System.String}},System.Action{System.ValueTuple{System.Guid,System.String}})">
+            <summary>
+            事件订阅
+            </summary>
+            <param name="online">上线</param>
+            <param name="offline">下线</param>
+        </member>
+        <member name="M:ImHelper.JoinChan(System.Guid,System.String)">
+            <summary>
+            加入群聊频道，每次上线都必须重新加入
+            </summary>
+            <param name="clientId">客户端id</param>
+            <param name="chan">群聊频道名</param>
+        </member>
+        <member name="M:ImHelper.LeaveChan(System.Guid,System.String[])">
+            <summary>
+            离开群聊频道
+            </summary>
+            <param name="clientId">客户端id</param>
+            <param name="chans">群聊频道名</param>
+        </member>
+        <member name="M:ImHelper.GetChanClientList(System.String)">
+            <summary>
+            获取群聊频道所有客户端id（测试）
+            </summary>
+            <param name="chan">群聊频道名</param>
+            <returns></returns>
+        </member>
+        <member name="M:ImHelper.ClearChanClient(System.String)">
+            <summary>
+            清理群聊频道的离线客户端（测试）
+            </summary>
+            <param name="chan">群聊频道名</param>
+        </member>
+        <member name="M:ImHelper.GetChanList">
+            <summary>
+            获取所有群聊频道和在线人数
+            </summary>
+            <returns>频道名和在线人数</returns>
+        </member>
+        <member name="M:ImHelper.GetChanListByClientId(System.Guid)">
+            <summary>
+            获取用户参与的所有群聊频道
+            </summary>
+            <param name="clientId">客户端id</param>
+            <returns></returns>
+        </member>
+        <member name="M:ImHelper.GetChanOnline(System.String)">
+            <summary>
+            获取群聊频道的在线人数
+            </summary>
+            <param name="chan">群聊频道名</param>
+            <returns>在线人数</returns>
+        </member>
+        <member name="M:ImHelper.SendChanMessage(System.Guid,System.String,GuXin.ImCore.ChatObject,System.Boolean)">
+            <summary>
+            发送群聊消息，所有在线的用户将收到消息
+            </summary>
+            <param name="senderClientId">发送者的客户端id</param>
+            <param name="chan">群聊频道名</param>
+            <param name="message">消息</param>
+        </member>
+    </members>
+</doc>

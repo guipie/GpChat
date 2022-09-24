@@ -1,0 +1,2083 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GuXin.Entity</name>
+    </assembly>
+    <members>
+        <member name="P:GuXin.Entity.AppDto.Input.AppLogin.PhoneNo">
+            <summary>
+            手机号
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.AppDto.Input.AppLogin.PassWord">
+            <summary>
+            密码
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.AppDto.Input.AppLogin.ConfirmPassWord">
+            <summary>
+            确认密码
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.AppDto.Input.AppLogin.Vcode">
+            <summary>
+             验证码
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.AppDto.Input.ContentIntroInput.DelFiles">
+            <summary>
+            修改时删除的图片ID
+            </summary>
+        </member>
+        <member name="T:GuXin.Entity.AppDto.Output.FriendContent">
+            <summary>
+            朋友圈内容
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.AppDto.Output.UserXinZanInfo.invitedUsers">
+            <summary>
+            邀请用户
+            </summary>
+        </member>
+        <member name="T:GuXin.Entity.AppEnum.Agreement">
+            <summary>
+            app协议
+            </summary>
+        </member>
+        <member name="T:GuXin.Entity.AppEnum.VCode">
+            <summary>
+            手机验证码类别
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.VCode.Lcode">
+            <summary>
+            登录验证码
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.VCode.Rcode">
+            <summary>
+            注册验证码
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.VCode.Ucode">
+            <summary>
+            修改密码
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.VCode.Ccode">
+            <summary>
+            更改手机号
+            </summary>
+        </member>
+        <member name="T:GuXin.Entity.AppEnum.FriendStatus">
+            <summary>
+            好友状态
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.FriendStatus.Temp">
+            <summary>
+            临时好友
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.FriendStatus.ToBeAgreed">
+            <summary>
+            待同意
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.FriendStatus.Friend">
+            <summary>
+            好友
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.FriendStatus.Reject">
+            <summary>
+            拒绝
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.FriendStatus.Black">
+            <summary>
+            拉黑
+            </summary>
+        </member>
+        <member name="T:GuXin.Entity.AppEnum.UserStatus">
+            <summary>
+            用户状态
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.UserStatus.Disable">
+            <summary>
+            禁用
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.UserStatus.Enable">
+            <summary>
+            启用
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.UserStatus.Logout">
+            <summary>
+            注销
+            </summary>
+        </member>
+        <member name="T:GuXin.Entity.AppEnum.SysSetting">
+            <summary>
+            App相关配置枚举
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.SysSetting.top">
+            <summary>
+            榜单算法配置
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.SysSetting.recommend">
+            <summary>
+            推荐算法配置
+            </summary>
+        </member>
+        <member name="T:GuXin.Entity.AppEnum.XinPraiseType">
+            <summary>
+            获取新赞类别
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.XinPraiseType.Login">
+            <summary>
+            登录
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.XinPraiseType.Invite">
+            <summary>
+            邀请注册
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.ComplaintType.intro">
+            <summary>
+            简介投诉
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.ComplaintType.content">
+            <summary>
+            内容投诉
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.ComplaintType.user">
+            <summary>
+            用户投诉
+            </summary>
+        </member>
+        <member name="F:GuXin.Entity.AppEnum.ComplaintType.chat">
+            <summary>
+            聊天投诉
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.EntityAttribute.TableName">
+            <summary>
+            真实表名(数据库表名，若没有填写默认实体为表名)
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.EntityAttribute.TableCnName">
+            <summary>
+            表中文名
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.EntityAttribute.DetailTable">
+            <summary>
+            子表
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.EntityAttribute.DetailTableCnName">
+            <summary>
+            子表中文名
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.EntityAttribute.DBServer">
+            <summary>
+            数据库
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.AttributeManager.PermissionTableAttribute.Name">
+            <summary>
+            需要控制权限的表名与Sys_Menu表的表名必须一致
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.ApiSys_UserInput.UserName">
+             <summary>
+            用户名
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.ApiSys_UserInput.UserPwd">
+             <summary>
+            密码
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.ApiSys_UserInput.PhoneNo">
+             <summary>
+            手机号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.ApiSys_UserOutput.UserName">
+             <summary>
+            用户名
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.ApiSys_UserOutput.DeptName">
+             <summary>
+            部门
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.ApiSys_UserOutput.Role_Id">
+             <summary>
+            角色
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.IntroGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.BeginDate">
+             <summary>
+            开始时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.EndDate">
+             <summary>
+            结束时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.Location">
+             <summary>
+            位置
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.Introduction">
+             <summary>
+            经历
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.PicCount">
+             <summary>
+            图片个数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.AuditDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.Auditor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.AuditStatus">
+             <summary>
+            内容审核状态
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro.PraiseCount">
+             <summary>
+            新赞数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro_Praise.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro_Praise.IntroGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro_Praise.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro_Praise.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Intro_Praise.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.ParentGuid">
+             <summary>
+            转发ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.Contents">
+             <summary>
+            内容
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.AuditStatus">
+             <summary>
+            内容审核状态
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.PicCount">
+             <summary>
+            图片个数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.CollectCount">
+             <summary>
+            收藏数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.ShareCount">
+             <summary>
+            分享转发数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.PraiseCount">
+             <summary>
+            点赞数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.XinPraiseCount">
+             <summary>
+            新赞数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.CommentCount">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.VisibleDays">
+             <summary>
+            可见天数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.AuditDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.Auditor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content.ContentGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Collect.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Collect.ContentGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Collect.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Collect.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Collect.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.ContentGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.Contents">
+             <summary>
+            评论内容
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.PraiseCount">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment.ParentId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment_Praise.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment_Praise.CommentId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment_Praise.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment_Praise.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Comment_Praise.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.Guid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.ContentGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.Name">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.UploadPath">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.ContentType">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.Length">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.IsFriend">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_File.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Praise.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Praise.ContentGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Praise.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Praise.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_Praise.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_XinPraise.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_XinPraise.ContentGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_XinPraise.Quantity">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_XinPraise.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_XinPraise.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Content_XinPraise.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.PageDataOptions.Order">
+            <summary>
+            排序方式
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.PageGridData`1.extra">
+            <summary>
+            可以在返回前，再返回一些额外的数据，比如返回其他表的信息，前台找到查询后的方法取出来
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.SaveModel.Extra">
+            <summary>
+            从前台传入的其他参数(自定义扩展可以使用)
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Table_Id" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.ColumnId" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.ColumnName" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.ColumnCnName" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.ColumnType" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.TableName" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Maxlength" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.IsNull" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.IsDisplay" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.IsKey" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Columnformat" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Script" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.DropNo" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Sortable" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.ColumnWidth" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.SearchRowNo" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.SearchType" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.EditRowNo" -->
+        <member name="P:GuXin.Entity.DomainModels.Sys_TableColumn.EditType">
+            <summary>
+            
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.IsReadDataset" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Enable" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.CreateID" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Creator" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.CreateDate" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.ModifyID" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.Modifier" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.ModifyDate" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.OrderNo" -->
+        <!-- Badly formed XML comment ignored for member "P:GuXin.Entity.DomainModels.Sys_TableColumn.IsColumnData" -->
+        <member name="P:GuXin.Entity.DomainModels.User_Follow.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow.FollowUserId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.Top">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.NotDisturb">
+             <summary>
+            是否关注后才能回复
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.Disable">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.LastNoticeTime">
+             <summary>
+            最后一次通知消息时间，获取/清空时用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Follow_Setting.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.FriendUserId">
+             <summary>
+            用户好友ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.FriendRemarkName">
+             <summary>
+            好友备注
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.Status">
+             <summary>
+            好友状态(0待同意，1同意，2拒绝，3，拉黑)
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.Description">
+             <summary>
+            添加好友描述
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.Top">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.NotDisturb">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.BackgroundImage">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Friend.Avatar">
+            <summary>
+            好友头像
+            </summary>
+        </member>
+        <member name="M:GuXin.Entity.DomainModels.User_Friend.Init(GuXin.Entity.DomainModels.User_Friend,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="source"></param>
+            <param name="avatar"></param>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.GroupId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.Name">
+             <summary>
+            群名称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.Description">
+             <summary>
+            q群描述
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.Modifier">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Member.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Member.GroupId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Member.UserId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Member.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Member.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Member.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.GroupId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.Top">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.NotDisturb">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.SaveGroup">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.AcceptAdd">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Group_Setting.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.TagId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.Name">
+             <summary>
+            标签名称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.Description">
+             <summary>
+            标签描述
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.Modifier">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.TagName">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.TagId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.UserId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.UserNickName">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Tag_Member.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.Type">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.Title">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.Summary">
+            <summary>
+            简介
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.Contents">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.Top">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.NotDisturb">
+             <summary>
+            是否关注后才能回复
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.LastNoticeTime">
+             <summary>
+            最后一次通知消息时间，获取/清空时用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Sys_Notice_Setting.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.Id">
+             <summary>
+            编号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.DicNo">
+             <summary>
+            app协议
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.Title">
+             <summary>
+            标题
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.Html">
+             <summary>
+            内容
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.CreateDate">
+             <summary>
+            创建时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.Creator">
+             <summary>
+            创建人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.Modifier">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.ModifyDate">
+             <summary>
+            更新时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Agreement.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Setting.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Setting.DicNo">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Setting.SettingsJson">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Setting.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Setting.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Setting.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Setting.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.Top">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.NotDisturb">
+             <summary>
+            是否关注后才能回复
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.Disable">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.LastNoticeTime">
+             <summary>
+            最后一次通知消息时间，获取/清空时用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Interact_Setting.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Setting.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Setting.HalfYearVisible">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Setting.ReplyByFollow">
+             <summary>
+            是否关注后才能回复
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Setting.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Setting.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Setting.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_Setting.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.Version">
+             <summary>
+            版本号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.Url">
+             <summary>
+            下载地址
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.Desc">
+             <summary>
+            升级描述
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.Force">
+             <summary>
+            是否强制升级
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.App_Upgrade.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.ComplaintDic">
+             <summary>
+            投诉类型
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.ComplaintType">
+             <summary>
+            投诉内容类别
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.ComplaintGuid">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.Remark">
+             <summary>
+            备注
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.Pics">
+             <summary>
+            图片
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.AuditDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.Auditor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Complaint.AuditStatus">
+             <summary>
+            内容审核状态
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Permissions.UserAuthArr">
+            <summary>
+            当前用户权限,存储的是权限的值，如:Add,Search等
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_City.CityId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_City.CityCode">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_City.CityName">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_City.ProvinceCode">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.Dic_ID">
+             <summary>
+            字典ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.DicNo">
+             <summary>
+            字典编号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.DicName">
+             <summary>
+            字典名称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.ParentId">
+             <summary>
+            父级ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.Config">
+             <summary>
+            配置项
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.DbSql">
+             <summary>
+            sql语句
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.DBServer">
+             <summary>
+            DBServer
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.OrderNo">
+             <summary>
+            排序号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.Remark">
+             <summary>
+            备注
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.Enable">
+             <summary>
+            是否启用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.Creator">
+             <summary>
+            创建人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.CreateDate">
+             <summary>
+            创建时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.Modifier">
+             <summary>
+            修改人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Dictionary.ModifyDate">
+             <summary>
+            修改时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.DicList_ID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.Dic_ID">
+             <summary>
+            数据源ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.DicValue">
+             <summary>
+            数据源Value
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.DicName">
+             <summary>
+            数据源Text
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.OrderNo">
+             <summary>
+            排序号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.Remark">
+             <summary>
+            备注
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.Enable">
+             <summary>
+            是否可用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.Creator">
+             <summary>
+            创建人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.CreateDate">
+             <summary>
+            创建时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.Modifier">
+             <summary>
+            修改人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_DictionaryList.ModifyDate">
+             <summary>
+            修改时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.BeginDate">
+             <summary>
+            开始时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.Url">
+             <summary>
+            请求地址
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.LogType">
+             <summary>
+            日志类型
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.Success">
+             <summary>
+            响应状态
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.ElapsedTime">
+             <summary>
+            时长(毫秒)
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.RequestParameter">
+             <summary>
+            请求参数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.ResponseParameter">
+             <summary>
+            响应参数
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.ExceptionInfo">
+             <summary>
+            异常信息
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.UserIP">
+             <summary>
+            用户IP
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.ServiceIP">
+             <summary>
+            服务器IP
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.BrowserType">
+             <summary>
+            浏览器类型
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.User_Id">
+             <summary>
+            用户ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.UserName">
+             <summary>
+            用户名称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.Role_Id">
+             <summary>
+            角色ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Log.EndDate">
+             <summary>
+            结束时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Menu_Id">
+             <summary>
+            ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.ParentId">
+             <summary>
+            父级ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.MenuName">
+             <summary>
+            菜单名称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.TableName">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Url">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Auth">
+             <summary>
+            权限
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Description">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Icon">
+             <summary>
+            图标
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.OrderNo">
+             <summary>
+            排序号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Creator">
+             <summary>
+            创建人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.CreateDate">
+             <summary>
+            创建时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Modifier">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Menu.Enable">
+             <summary>
+            是否启用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Province.ProvinceId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Province.ProvinceCode">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Province.ProvinceName">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Province.RegionCode">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.Role_Id">
+             <summary>
+            Id
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.ParentId">
+             <summary>
+            父级ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.RoleName">
+             <summary>
+            角色名称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.Dept_Id">
+             <summary>
+            部门ID
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.DeptName">
+             <summary>
+            部门名称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.OrderNo">
+             <summary>
+            排序
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.Creator">
+             <summary>
+            创建人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.CreateDate">
+             <summary>
+            创建时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.Modifier">
+             <summary>
+            修改人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.ModifyDate">
+             <summary>
+            修改时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.DeleteBy">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_Role.Enable">
+             <summary>
+            是否启用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.Auth_Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.Role_Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.User_Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.Menu_Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.AuthValue">
+             <summary>
+            用户权限
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.Modifier">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_RoleAuth.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.UserName">
+             <summary>
+            用户名
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.User_Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Gender">
+             <summary>
+            性别
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Avatar">
+             <summary>
+            头像
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Dept_Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.DeptName">
+             <summary>
+            部门
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Role_Id">
+             <summary>
+            角色
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.RoleName">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Token">
+             <summary>
+            Token
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.AppType">
+             <summary>
+            登陆设备类型
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.NickName">
+             <summary>
+            用户昵称
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.UserPwd">
+             <summary>
+            密码
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.CreateDate">
+             <summary>
+            注册时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.PhoneNo">
+             <summary>
+            手机号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Tel">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Creator">
+             <summary>
+            创建人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Enable">
+             <summary>
+            是否可用
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Modifier">
+             <summary>
+            修改人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.ModifyDate">
+             <summary>
+            修改时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.AuditStatus">
+             <summary>
+            审核状态
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Auditor">
+             <summary>
+            审核人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.AuditDate">
+             <summary>
+            审核时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.LastLoginDate">
+             <summary>
+            最后登陆时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.LastModifyPwdDate">
+             <summary>
+            最后密码修改时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Address">
+             <summary>
+            地址
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Mobile">
+             <summary>
+            电话
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Email">
+             <summary>
+            Email
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Remark">
+             <summary>
+            备注
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.OrderNo">
+             <summary>
+            排序号
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.Province">
+            <summary>
+            省份
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.Sys_User.City">
+            <summary>
+            城市
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.UserInfo.Role_Id">
+            <summary>
+            多个角色ID
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise.UserId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise.Quantity">
+            <summary>
+            新赞数量
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise.UsedCount">
+            <summary>
+            可使用新赞
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise.NextUsedCount">
+            <summary>
+            下次可使用新赞
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise.Modifier">
+             <summary>
+            修改人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise.ModifyDate">
+             <summary>
+            修改时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise_Record.UserId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise_Record.Quantity">
+            <summary>
+            获取数量，默认一个
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise_Record.PraiseType">
+            <summary>
+            可使用新赞
+            </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise_Record.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise_Record.Creator">
+             <summary>
+            创建人
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.System.User_XinPraise_Record.CreateDate">
+             <summary>
+            修改时间
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise.UserId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise.Quantity">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise.Modifier">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise.ModifyDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise.ModifyID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise_Record.Id">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise_Record.UserId">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise_Record.Quantity">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise_Record.PraiseType">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise_Record.CreateDate">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise_Record.CreateID">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:GuXin.Entity.DomainModels.User_XinPraise_Record.Creator">
+             <summary>
+            
+             </summary>
+        </member>
+    </members>
+</doc>

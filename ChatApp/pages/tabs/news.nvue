@@ -1,0 +1,216 @@
+<template>
+	<view ref="news">
+		<myp-navbar :title="title" :rights="rightIcons" leftStyle="width:30rpx;" centerStyle="width:520rpx;"
+			@rightAction="toRightTab"></myp-navbar>
+		<myp-list :down="{use:true}" @down="toRefresh()" :up="null" ref="myp-list">
+			<myp-list-cell>
+				<view style="height: 5rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<news-cell :item="item" :last="lastChat.length-1===idx" :isTemp="isTemp(item)" :avatars="avatars(item)"
+					@detail="toDetail" @delete="toDeleteNews(item)">
+				</news-cell>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import newsCell from './components/newsCell.vue'
+	import request from '@/api/request.js'
+	import {
+		baseWebsocketUrl,
+		baseAvatar
+	} from '@/common/env.js'
+	import {
+		handleChat
+	} from '../../api/request_socket.js'
+	import {
+		LoadChat
+	} from '../../api/chat/index.js'
+	import {
+		mapState,
+		mapGetters,
+		mapActions,
+		mapMutations
+	} from 'vuex'
+	export default {
+		components: {
+			newsCell
+		},
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'search'
+				}, {
+					icon: '/static/ui/album-line.png',
+					style: 'margin-left: 30rpx;justify-content:center;width:57rpx;height:57rpx;',
+					iconStyle: 'width:44rpx;height:44rpx;',
+					// badge: {
+					// 	bgType: 'error',
+					// 	size: '21rpx',
+					// 	text: '',
+					// 	boxStyle: 'position:absolute;top:0;right:0;'
+					// }
+				}]
+			}
+		},
+		computed: {
+			...mapGetters(['hasLogedIn', 'userId']),
+			...mapState({
+				lastChat: (state) => state.chat.lastChat,
+				noticeSettings: (state) => state.notice.noticeSettings,
+				allFriends: (state) => state.friend.allFriends,
+				groups: (state) => state.group.groups,
+				isOpen: (state) => state.socket.isOpen,
+				connecting: (state) => state.socket.connecting,
+				reconnectCount: (state) => state.socket.reconnectCount
+			}),
+			items() {
+				return [...this.lastChat, ...this.noticeSettings].sort((a, b) => {
+					if (a.Top || b.Top)
+						return (b.Top ? 1 : 0) - (a.Top ? 1 : 0);
+					else
+						return (new Date(b.SendTime).getTime()) - (new Date(a.SendTime).getTime());
+				});
+			},
+			title() {
+				if (!this.isOpen)
+					return '服务器断开连接..';
+				if (!this.connecting)
+					return '正在重新连接网络...（' + this.reconnectCount + ')'
+				return '消息';
+			}
+		},
+		methods: {
+			...mapActions({
+				LoginExist: 'user/LoginExistAsync',
+				GetInteractSetting: "notice/GetInteractSettingAsync",
+				GetFollowSetting: "notice/GetFollowSettingAsync",
+				GetSysNoticeSetting: "notice/GetSysNoticeSettingAsync",
+				GetFriends: "friend/GetFriendsAsync"
+			}),
+			...mapMutations({
+				GetLastChats: "chat/GetLastChats",
+				ClearChats: 'chat/ClearChats',
+				ClearGroupChats: "chat/ClearGroupChats",
+				RemoveTabBar: "tabBar/RemoveTabBar",
+				ClearUnReadNotice: "notice/ClearUnReadNotice",
+				SetChattingUser: "chat/SetChattingUser",
+				SetChattingGroup: "chat/SetChattingGroup"
+			}),
+			avatars(item) {
+				if (item.IsSys)
+					return [item.Avatar];
+				else if (item.IsGroup === 1) {
+					return item.Avatar.split(',').map(m => baseAvatar(m));
+				} else
+					return [baseAvatar(item.Avatar)];
+			},
+			isTemp(item) {
+				if (item.IsSys)
+					return false;
+				else if (item.IsGroup == 1)
+					return false;
+				else
+					return this.allFriends.findIndex(m => m.FriendUserId == item.FriendUserId && m.Status == 1) == -1;
+			},
+			toRightTab(i) {
+				if (i === 0) {
+					uni.navigateTo({
+						url: '/pages/chat/search'
+					})
+				} else if (i == 1) {
+					uni.navigateTo({
+						url: '/pages/album/friendAlbums'
+					})
+				}
+			},
+			toDeleteNews(item) {
+				let _this = this;
+				uni.showModal({
+					title: '删除提示',
+					content: '您确定要彻底删除' + item.FriendRemarkName + '的聊天记录?',
+					confirmColor: '#E02020',
+					success: function(res) {
+						if (res.confirm) {
+							if (item.IsGroup == 0)
+								_this.ClearChats(item.FriendUserId);
+							else if (item.IsGroup == 1)
+								_this.ClearGroupChats(item.FriendUserId);
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				});
+			},
+			toDetail(item) {
+				if (item.Type == "interact") {
+					this.ClearUnReadNotice("interact");
+					uni.navigateTo({
+						url: '/pages/chat/interactNotice'
+					})
+				} else if (item.Type == "follow") {
+					this.ClearUnReadNotice("follow");
+					uni.navigateTo({
+						url: '/pages/album/followAlbums'
+					})
+				} else if (item.Type == "notice") {
+					this.ClearUnReadNotice("notice");
+					uni.navigateTo({
+						url: '/pages/chat/systemNotice'
+					})
+				} else if (item.IsGroup === 1) {
+					this.SetChattingGroup({
+						groupId: item.FriendUserId
+					});
+				} else if (item.IsGroup === 0) {
+					item.FriendRemarkName = item.Name;
+					this.SetChattingUser(item);
+				}
+			},
+			toRefresh() {
+				// const ins = this.$refs['myp-list'];
+				// ins.mypRefresh();
+				const ins = this.$refs['myp-list']
+				// 您需要更换这个api接口
+				LoadChat().then(res => {
+					ins.mypEndSuccess(true);
+					if (res.data && res.data.length > 0)
+						handleChat(res.data);
+				}).catch(err => {
+					ins.mypEndError();
+				})
+			}
+		},
+		onShow() {
+			this.RemoveTabBar(0);
+		},
+		onLoad() {
+			if (this.hasLogedIn)
+				Promise.all([
+					this.GetFriends(),
+					this.GetInteractSetting(),
+					this.GetFollowSetting(),
+					this.GetSysNoticeSetting()
+				]).then(res => {
+					// this.GetLastChats();
+				}).catch(ex => {
+					console.log(ex);
+					if (ex.statusCode == 401)
+						return uni.reLaunch({
+							url: '../auth/login'
+						})
+					// plus.runtime.quit();
+				});
+			else
+				uni.reLaunch({
+					url: '../auth/login'
+				})
+		}
+	}
+</script>
+
+<style>
+
+</style>

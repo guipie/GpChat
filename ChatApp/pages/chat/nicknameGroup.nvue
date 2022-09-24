@@ -1,0 +1,67 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :title="title" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<view style="height: 32rpx;"></view>
+		<view class="myp-bg-inverse myp-flex-row myp-align-center"
+			style="height: 100rpx;padding-left: 30rpx;padding-right: 30rpx;">
+			<input v-model="name" class="myp-flex-one myp-size-base myp-color-text" style="font-weight: 700;"
+				:adjust-position="false" />
+		</view>
+		<view class="myp-flex-row myp-align-center" style="height: 90rpx;">
+			<text class="myp-size-ss myp-color-second" style="margin-left: 30rpx;">在这设置您在群里的昵称</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		arrayChunk
+	} from '@/mypUI/utils/utils.js'
+	import {
+		SetGroupNickName,
+		SetGroup
+	} from '@/api/chat/group.js'
+	import {
+		mapState,
+		mapActions
+	} from 'vuex'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					text: '确定',
+					textType: 'primary',
+					textStyle: 'font-weight: 700;'
+				}],
+				title: "",
+				name: ""
+			}
+		},
+		computed: {
+			...mapState({
+				currentGroup: state => state.chat.chattingGroup
+			}),
+		},
+		methods: {
+			...mapActions({
+				"SetGroupMyNick": "group/SetGroupMyNickAsync"
+			}),
+			toRightTab(i) {
+				this.SetGroupMyNick({
+					groupId: this.currentGroup.GroupId,
+					nickName: this.name
+				});
+			}
+		},
+		onLoad(options) {
+			this.title = '我在' + this.currentGroup.Name + '的昵称';
+			this.name = this.currentGroup.Members.find(m => m.UserId == getApp().globalData.userId).NickName;
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+</style>

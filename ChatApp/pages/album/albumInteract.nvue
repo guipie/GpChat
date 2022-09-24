@@ -1,0 +1,54 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" title="朋友圈互动" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @leftAction="navLeftAction" @rightAction="toRightTab"></myp-navbar>
+		<myp-list bgType="page" :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 5rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<album-interact-cell :item="item" :isLast="idx===items.length-1"></album-interact-cell>
+			</myp-list-cell>
+		</myp-list>
+		<clear-and-out-pop :show="clearVisible" desc="清空所有记录" @cancel="toCancelClear" @clear="toClear">
+		</clear-and-out-pop>
+	</view>
+</template>
+
+<script>
+	import albumInteractCell from './components/albumInteractCell.vue'
+	import clearAndOutPop from '../chat/components/clearAndOutPop.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	export default {
+		components: {
+			albumInteractCell,
+			clearAndOutPop
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					text: '清空'
+				}],
+				items: [1, 2, 3, 4, 5, 6, 7],
+				clearVisible: false
+			}
+		},
+		methods: {
+			toRightTab() {
+				this.clearVisible = true
+			},
+			toCancelClear() {
+				this.clearVisible = false
+			},
+			toClear() {
+				this.clearVisible = true
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

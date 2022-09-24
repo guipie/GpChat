@@ -1,0 +1,225 @@
+<template>
+	<view>
+		<myp-navbar title="通讯录" :rights="rightIcons" leftStyle="width:30rpx;" centerStyle="width:520rpx;"
+			@rightAction="toRightTab"></myp-navbar>
+		<myp-popup :show="plusShow" pos="top" :hasOverlay="true" overlayStyle="background-color:rgba(0,0,0,0);"
+			top="status-nav" width="252rpx" height="216rpx" rightOffset="30rpx" @overlayClicked="hidePlusShow">
+			<view class="myp-flex-column myp-align-left"
+				style="width: 252rpx;height: 231rpx;background-color: rgba(58,68,74,0.95);border-radius: 6rpx;">
+				<view class="myp-flex-row myp-align-center" style="height: 77rpx;margin-left:42rpx;" bubble="true"
+					@tap="toPub(1)">
+					<myp-icon name="tel" type="inverse" size="base"></myp-icon>
+					<text class="myp-color-inverse myp-size-s" style="margin-left: 18rpx;">添加好友</text>
+				</view>
+				<view class="myp-flex-row myp-align-center" style="height: 77rpx;margin-left:42rpx;" bubble="true"
+					@tap="toPub(2)">
+					<myp-icon name="chat-dot" type="inverse" size="base"></myp-icon>
+					<text class="myp-color-inverse myp-size-s" style="margin-left: 18rpx;">发起群聊</text>
+				</view>
+				<view class="myp-flex-row myp-align-center" style="height: 77rpx;margin-left:42rpx;" bubble="true"
+					@tap="toPub(3)">
+					<myp-icon name="help" type="inverse" size="base"></myp-icon>
+					<text class="myp-color-inverse myp-size-s" style="margin-left: 18rpx;">帮助与反馈</text>
+				</view>
+			</view>
+		</myp-popup>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view ref="idx-#"></view>
+				<view v-for="(item,idx) in functions" :key="idx"
+					class="myp-flex-row myp-align-center myp-bg-inverse myp-wrap-nowrap myp-position-relative"
+					style="padding-left: 30rpx;width: 750rpx;" bubble="true" @tap="toFunctionPage(item)">
+					<view class="myp-flex-row myp-align-center myp-justify-center"
+						:style="'width: 72rpx; height: 72rpx;border-radius: 12rpx;background-color:'+item.bg+';'">
+						<myp-icon :name="item.icon" size="ll" type="inverse" @iconClicked="toFunctionPage(item)">
+						</myp-icon>
+					</view>
+					<view class="myp-flex-column myp-justify-between myp-flex-one"
+						style="height: 104rpx;margin-left: 24rpx;">
+						<view style="height: 0.5px;"></view>
+						<text class="myp-size-base myp-color-text" style="font-weight: 700;">{{item.title}}</text>
+						<view
+							:style="'height: 0.5px;'+((idx!=functions.length-1&&idx>0)?'background-color: #EFEFF4;':'')">
+						</view>
+					</view>
+					<!-- 认识新的朋友 -->
+					<myp-button v-if="idx===0" :text="frTxt" textType="inverse" textSize="ss" bgType="error" radius="ll"
+						boxStyle="width:158rpx;height:40rpx;margin-right:80rpx;" @buttonClicked="toFunctionPage(item)">
+					</myp-button>
+					<view
+						style="height: 0.5px;background-color: #EFEFF4;position: absolute;right: 0;bottom: 0;width: 624rpx;">
+					</view>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in addressBook" :key="idx">
+				<view :ref="'idx-'+item.key" class="myp-flex-row myp-align-center" style="height: 58rpx;">
+					<text style="margin-left: 30rpx;font-size: 12px;color: #9092A5;">{{item.key}}</text>
+				</view>
+				<view v-for="(friend, ix) in item.value" :key="ix" class="myp-flex-row myp-align-center myp-bg-inverse"
+					style="padding-left: 30rpx;width: 750rpx;" bubble="true" @tap="toFriend(friend)">
+					<image :src="avatar(friend.Avatar)" mode="aspectFill"
+						style="width: 72rpx; height: 72rpx;border-radius: 12rpx;"></image>
+					<view class="myp-flex-column myp-justify-between myp-flex-one"
+						style="height: 104rpx;margin-left: 24rpx;">
+						<view style="height: 0.5px;"></view>
+						<text class="myp-size-base myp-color-text">{{friend.FriendRemarkName}}</text>
+						<view :style="'height: 0.5px;'+(ix!=item.value.length-1?'background-color: #EFEFF4;':'')">
+						</view>
+					</view>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell v-if="addressBook.length==0">
+				<text class="myp-color-second myp-size-l"
+					style="height: 44rpx;margin-top: 72rpx;text-align: center;width: 750rpx;">您暂无好友.</text>
+			</myp-list-cell>
+		</myp-list>
+		<view class="myp-flex-column myp-align-center f-idx" :style="{top: idxTop+'px'}" bubble="true"
+			@tap.stop="toPrevent">
+			<text style="line-height: 36rpx;color: #D8D9DF;font-size: 12px;" @tap.stop="toKey('#')">#</text>
+			<text v-for="(item, idx) in addressBook" :key="idx"
+				style="line-height: 36rpx;color: #D8D9DF;font-size: 12px;" @tap.stop="toKey(item.key)">
+				{{ item.key }}
+			</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	const dom = uni.requireNativePlugin("dom")
+	import {
+		getStatusBarHeight,
+		getNavBarHeight
+	} from '@/mypUI/utils/system.js'
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	import {
+		mapActions,
+		mapState,
+		mapMutations
+	} from 'vuex'
+	export default {
+		data() {
+			return {
+				idxTop: 0,
+				rightIcons: [{
+					icon: 'search'
+				}, {
+					icon: 'plus-circle',
+					style: 'margin-left: 46rpx;'
+				}],
+				functions: [{
+						icon: 'friend-add',
+						bg: '#FFAD45',
+						title: '新的好友',
+						url: '/pages/friend/newFriend'
+					}, {
+						icon: 'tag',
+						bg: '#FF0132',
+						title: '标签',
+						url: '/pages/friend/tag'
+					},
+					{
+						icon: 'club',
+						bg: '#00B005',
+						title: '群聊',
+						url: '/pages/friend/group'
+					},
+					{
+						icon: 'mine',
+						bg: '#3696FA',
+						title: '我的关注',
+						url: '/pages/friend/cared'
+					}
+				],
+				plusShow: false
+			}
+		},
+		computed: {
+			...mapState({
+				addressBook: state => state.friend.addressBook,
+				FriendRequest: state => state.notice.FriendRequest,
+				frTxt() {
+					if (this.FriendRequest.UnReadCount > 0) return this.FriendRequest.UnReadCount + '个好友请求';
+					else return '认识新的朋友';
+				}
+			})
+		},
+		methods: {
+			...mapMutations({
+				RemoveTabBar: 'tabBar/RemoveTabBar'
+			}),
+			avatar(url) {
+				return baseAvatar(url);
+			},
+			toRightTab(i) {
+				if (i === 0)
+					uni.navigateTo({
+						url: '/pages/chat/search'
+					})
+				else if (i === 1)
+					this.plusShow = !this.plusShow;
+			},
+			toFunctionPage(val) {
+				uni.navigateTo({
+					url: val.url
+				})
+			},
+			toFriend(friend) {
+				uni.navigateTo({
+					url: '../chat/userMiddle?type=friend&userId=' + friend.FriendUserId,
+					animationType: 'pop-in',
+					animationDuration: 600
+				});
+			},
+			toKey(val) {
+				let keyEl = null
+				if (val == '#') {
+					keyEl = this.$refs['idx-#']
+				} else {
+					keyEl = this.$refs['idx-' + val][0]
+				}
+				keyEl && dom.scrollToElement(keyEl, {
+					offset: 0,
+					animated: true
+				})
+			},
+			toPrevent(e) {
+				e.stopPropagation && e.stopPropagation()
+			},
+			toPub(i) {
+				if (i === 1)
+					uni.navigateTo({
+						url: '/pages/chat/search?type=newFriend'
+					})
+				else if (i === 2)
+					uni.navigateTo({
+						url: '/pages/friend/selectFriend?type=create'
+					})
+				else if (i === 3)
+					uni.navigateTo({
+						url: '/pages/common/pubRichText?type=help'
+					})
+			},
+			hidePlusShow() {
+				this.plusShow = false;
+			}
+		},
+		onLoad() {
+			this.idxTop = getStatusBarHeight() + getNavBarHeight() + 60;
+		},
+		onShow() {
+			this.RemoveTabBar(1);
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.f {
+		&-idx {
+			position: fixed;
+			right: 16rpx;
+			width: 20rpx;
+		}
+	}
+</style>

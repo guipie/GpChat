@@ -1,0 +1,119 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction" @rightAction="toRightTab"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 40rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-justify-between myp-wrap-nowrap myp-bg-inverse"
+					style="width: 750rpx;height: 98rpx;padding-left: 32rpx;padding-right: 50rpx;" @click="toToggle">
+					<myp-icon name="location" type="text" size="ll"></myp-icon>
+					<text class="myp-flex-one myp-color-text myp-size-l" style="margin-left: 46rpx;">
+						{{province}} {{city}}
+					</text>
+					<myp-icon v-if="selected" name="check-solid" type="success" size="ll" @iconClicked="toToggle">
+					</myp-icon>
+				</view>
+				<text class="myp-color-second myp-size-ss myp-lh-ss"
+					style="margin-left: 56rpx;width: 638rpx;margin-top: 40rpx;">在这里开启您的地区，系统自动定位，可能稍有误差，请谅解。</text>
+				<text class="myp-color-second myp-size-s myp-lh-ss" style="margin-right: 56rpx;text-align: right;"
+					@tap="loadLocation">修改位置</text>
+			</myp-list-cell>
+		</myp-list>
+
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		mapActions
+	} from 'vuex';
+	import {
+		GetProvinces,
+		GetCities
+	} from '@/api/public.js'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				leftIcons: [{
+					text: '取消'
+				}],
+				selected: true,
+				city: '',
+				province: ''
+			}
+		},
+		computed: {
+			rightIcons() {
+				return [{
+					text: '确定',
+					textType: this.city.length > 0 ? 'primary' : "third"
+				}];
+			}
+		},
+		methods: {
+			...mapActions({
+				"SetLocation": "user/SetLocationAsync"
+			}),
+			toRightTab(i) {
+				this.SetLocation({
+					province: this.province,
+					city: this.city
+				});
+				uni.navigateBack();
+			},
+			toToggle() {
+				this.selected = !this.selected
+			},
+			loadLocation() {
+				let _this = this;
+				GetProvinces().then(res => {
+					let provinces = res.data;
+					uni.showActionSheet({
+						itemList: provinces.map(m => m.provinceName),
+						success: function(p) {
+							let currentProvince = provinces[p.tapIndex];
+							GetCities(currentProvince.provinceCode).then(city => {
+								let cities = city.data;
+								uni.showActionSheet({
+									itemList: cities.map(m => m.cityName),
+									success: function(c) {
+										_this.province = currentProvince
+											.provinceName;
+										_this.city = cities[c.tapIndex]
+											.cityName;
+									},
+									fail: function(res) {
+										console.log(res.errMsg);
+									}
+								});
+							});
+						},
+						fail: function(res) {
+							console.log(res.errMsg);
+						}
+					});
+				});
+			}
+		},
+		onLoad() {
+			uni.getLocation({
+				geocode: true,
+				type: 'gcj02',
+				success: (res) => {
+					this.province = res.address.province;
+					this.city = res.address.city;
+				},
+				fail: (err) => {
+					console.log(err);
+				}
+			})
+		}
+	}
+</script>
+
+<style>
+
+</style>

@@ -1,0 +1,144 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="新的好友" :rights="null" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<!-- <myp-list-cell>
+				<view v-for="(item,idx) in newItems" :key="idx">
+					<new-friend-cell :item="item" @agree="toAgree"></new-friend-cell>
+				</view>
+			</myp-list-cell> -->
+			<myp-list-cell v-for="(item,idx) in allFriends" :key="idx">
+				<view class="myp-flex-row myp-align-center myp-justify-end" style="height: 76rpx;padding-right: 30rpx;">
+					<text style="font-size: 20rpx;font-weight: 700;color: #9092A5;">{{item.type}}</text>
+				</view>
+				<view v-for="(m, iix) in item.data" :key="iix">
+					<view class="myp-flex-row myp-align-center myp-bg-inverse"
+						style="height: 104rpx;padding-left: 30rpx;padding-right: 30rpx;" bubble="true">
+						<image :src="avatar(m.avatar)" mode="aspectFill"
+							style="width: 88rpx;height: 88rpx;border-radius: 20rpx;"></image>
+						<text class="myp-size-base myp-color-text myp-flex-one myp-lines-one"
+							style="margin-left: 24rpx;font-weight: 700;">{{m.creator}}</text>
+						<text class="myp-size-ss myp-color-third"
+							v-if='disabledObj(m).disabled'>{{disabledObj(m).txt}}</text>
+						<myp-button v-else text="同意" border="none" radius="ll" textType="inverse" textSize="ss"
+							bgType="error" boxStyle="width:90rpx;height:46rpx;" @buttonClicked="toAgree(m)">
+						</myp-button>
+					</view>
+					<view v-if="item.data.length-1>iix" class="myp-flex-row myp-align-center myp-wrap-nowrap"
+						style="width: 750rpx;">
+						<view style="width: 126rpx;height: 0.5px;background-color: #FFFFFF;"></view>
+						<view class="myp-flex-one" style="height: 0.5px;background-color: #EFEFF4;"></view>
+					</view>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import newFriendCell from './components/newFriendCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	var dayjs = require('dayjs');
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+
+	import {
+		SearchAllFriendsToMe,
+		AcceptFriend
+	} from '@/api/friend/index.js'
+	import {
+		mapActions
+	} from 'vuex'
+	export default {
+		components: {
+			newFriendCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'plus'
+				}],
+				allFriends: []
+			}
+		},
+		computed: {},
+		methods: {
+			...mapActions({}),
+			disabledObj(item) {
+				if (item.status == 0) return {
+					disabled: false,
+					txt: '同意' //待我同意
+				};
+				if (item.status == 1) return {
+					disabled: true,
+					txt: '已同意'
+				};
+				if (item.status == 2) return {
+					disabled: true,
+					txt: '已拒绝'
+				};
+				if (item.status == 3) return {
+					disabled: true,
+					txt: '已拉黑'
+				};
+			},
+			toRightTab(i) {
+				uni.navigateTo({
+					url: '/pages/chat/search?type=newFriend'
+				})
+			},
+			toAgree(item) {
+				AcceptFriend(item.createID).then(res => {
+					item.status = 1;
+				});
+			},
+			avatar(url) {
+				return baseAvatar(url);
+			},
+			groupBy(arr, key) {
+				let newArr = [],
+					types = {},
+					newItem, i, j, cur;
+				for (i = 0, j = arr.length; i < j; i++) {
+					cur = arr[i];
+					if (!(cur[key] in types)) {
+						types[cur[key]] = {
+							type: cur[key],
+							data: []
+						};
+						newArr.push(types[cur[key]]);
+					}
+					types[cur[key]].data.push(cur);
+				}
+				return newArr;
+			}
+		},
+		onLoad() {
+			SearchAllFriendsToMe(new Date()).then(res => {
+				if (res.status)
+					res.data.forEach((item, index) => {
+						if (dayjs().isSame(item.createDate, 'day')) {
+							item.key = '今天';
+						} else if (dayjs().isSame(item.createDate, 'week')) {
+							item.key = '本周';
+						} else if (dayjs().isSame(item.createDate, 'month')) {
+							item.key = '本月';
+						} else {
+							item.key = '一个月以前';
+						}
+						this.allFriends.push(item);
+					});
+				this.allFriends = this.groupBy(this.allFriends, 'key')
+				console.log(this.allFriends);
+			});
+		}
+	}
+</script>
+
+<style>
+
+</style>

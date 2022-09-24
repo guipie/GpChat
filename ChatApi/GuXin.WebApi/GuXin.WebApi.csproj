@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>1bc2edb3-fde2-446c-87e3-a30a6d02b1b3</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GuXin.Builder\GuXin.Builder.csproj" />
+    <ProjectReference Include="..\GuXin.Core\GuXin.Core.csproj" />
+    <ProjectReference Include="..\GuXin.Entity\GuXin.Entity.csproj" />
+    <ProjectReference Include="..\GuXin.System\GuXin.System.csproj" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
+
+</Project>

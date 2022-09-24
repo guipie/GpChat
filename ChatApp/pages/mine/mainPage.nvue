@@ -1,0 +1,195 @@
+<template>
+	<view class="myp-bg-inverse">
+		<list :id="mypListId" :bounce="true" isSwiperList="true" ref="myp-scroller" style="width:750rpx;flex:1;"
+			@scroll="handleParentScroll">
+			<myp-refresher-n ref="myp-refresher" scrollerRef="myp-scroller" @refresh="handleRefresh"></myp-refresher-n>
+			<cell>
+				<!-- 428 + 76 -->
+				<user-head @edit="toEditIntro"></user-head>
+				<myp-tabs-h :items="tabs" :value="mypCurrentTab" :delay="50" :isTap="mypIsTap" :offset="mypDx"
+					:last="mypLastTabIndex" justify="center" width="160rpx" height="76rpx" textType="second"
+					activeTextType="text" textStyle="font-weight:700;" indicatorWidth="64rpx" indicatorType="custom"
+					@change="mypOnTabChange"></myp-tabs-h>
+			</cell>
+			<cell>
+				<myp-content-box extra="status-nav-76rpx">
+					<swiper id="swiper" ref="swiper" :current="mypCurrentTab" style="flex: 1;"
+						@change="mypOnSwiperChange" @animationfinish="mypOnSwiperAnimationFinish"
+						@onAnimationEnd="mypOnSwiperAnimationFinish" @transition="mypOnSwiperScroll">
+						<swiper-item>
+							<album-list ref="nice" :parentId="mypListId" :current="mypCurrentTab" :index="0" @pop="toShowPop"></album-list>
+						</swiper-item>
+						<swiper-item>
+							<album-list ref="all" :parentId="mypListId" :current="mypCurrentTab" :index="1"></album-list>
+						</swiper-item>
+						<swiper-item>
+							<info-list ref="info" :parentId="mypListId" :current="mypCurrentTab" :index="2"></info-list>
+						</swiper-item>
+					</swiper>
+				</myp-content-box>
+			</cell>
+		</list>
+		<view :class="['myp-position-fixed', navVisible&&'myp-bg-inverse']" style="top: 0;left: 0;width: 750rpx;">
+			<myp-status bgType="none"></myp-status>
+			<myp-height height="nav"
+				boxStyle="flex-direction:row;justify-content:space-between;align-items:center;width:750rpx;padding-left:30rpx;padding-right:30rpx;">
+				<myp-icon name="left" :type="navVisible?'text':'inverse'" iconStyle="font-size: 20px;"
+					@iconClicked="toLeft"></myp-icon>
+				<myp-icon name="search" :type="navVisible?'text':'inverse'" iconStyle="font-size: 20px;"
+					@iconClicked="toSearch"></myp-icon>
+			</myp-height>
+		</view>
+		<myp-popup :show="popVisible" pos="center" width="420rpx" height="200rpx" :leftOffset="popLeft" :bottomOffset="popBottom" :topOffset="popTop" @overlayClicked="toHidePop">
+			<view class="myp-bg-inverse myp-flex-column myp-align-center" style="width: 420rpx;height: 202rpx;border-radius: 32rpx;">
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;">编辑</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #808080;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;">删除</text>
+			</view>
+		</myp-popup>
+	</view>
+</template>
+
+<script>
+	import userHead from '../album/components/userHead.vue'
+	import albumList from './components/mainAlbumList.vue'
+	import infoList from './components/mainInfoList.vue'
+
+	import tabsSwiperMixin from '@/mypUI/myp-tabs-h/tabsSwiperMixin.js'
+	import parentMixin from '@/mypUI/myp-list/header/headerParent.js'
+	
+	import {
+		getScreenHeight,
+		getNavBarHeight,
+		getStatusBarHeight,
+		getPlatform
+	} from '@/mypUI/utils/system.js'
+
+	export default {
+		components: {
+			userHead,
+			albumList,
+			infoList
+		},
+		mixins: [tabsSwiperMixin, parentMixin],
+		data() {
+			return {
+				tabs: ['优质', '全部', '简介'],
+				items: [1, 2, 3, 4, 5, 6],
+				navVisible: false,
+				statusNavHeight: 64,
+				platform: '',
+				popVisible: false,
+				popLeft: '-1',
+				popBottom: '-1',
+				popTop: '-1'
+			}
+		},
+		computed: {
+			screenHeight() {
+				return getScreenHeight()
+			}
+		},
+		methods: {
+			toLeft() {
+				uni.navigateBack({
+					delta: 1
+				})
+			},
+			toSearch() {
+
+			},
+			toEditIntro() {
+				uni.navigateTo({
+					url: '/pages/mine/editIntro'
+				})
+			},
+			toShowPop(e) {
+				this.popLeft = uni.upx2px(375) - uni.upx2px(210) - uni.upx2px(60)
+				const h = uni.upx2px(101)
+				let c1 = e.sY
+				if (c1 + h*2 >= this.screenHeight) {
+					c1 = c1 - h
+				} else {
+					c1 = c1 + h
+				}
+				const off = c1 - this.screenHeight * 0.5
+				if (off > 0) {
+					this.popTop = off + 'px'
+					this.popBottom = '-1'
+				} else if (off < 0) {
+					this.popBottom = (-1 * off) + 'px'
+					this.popTop = '-1'
+				} else {
+					this.popTop = '-1'
+					this.popBottom = '-1'
+				}
+				setTimeout(()=>{
+					this.popVisible = true
+				}, 0)
+			},
+			toHidePop() {
+				this.popVisible = false
+			},
+			handleRefresh() {
+				let ref = null
+				if (this.mypCurrentTab === 0) {
+					ref = this.$refs.nice
+				} else if (this.mypCurrentTab === 1) {
+					ref = this.$refs.all
+				} else if (this.mypCurrentTab === 2) {
+					ref = this.$refs.info
+				}
+				this.mypHandleRefresh(ref)
+			},
+			handleParentScroll(e) {
+				const offsetY = e.contentOffset.y
+				// console.log(offsetY)
+				let offY = -offsetY
+				if (offY >= this.statusNavHeight) {
+					this.navVisible = true
+				} else {
+					this.navVisible = false
+				}
+			},
+			mypToSwitchTab(i) {
+				this.toSwitchTab(i)
+				this.mypCurrentTab = i
+			},
+			toSwitchTab(i) {
+				let ref = null
+				if (i === 0) {
+					ref = this.$refs.nice
+				} else if (i === 1) {
+					ref = this.$refs.all
+				} else if (i === 2) {
+					ref = this.$refs.info
+				}
+				this.mypSetScrollRef(ref)
+			},
+			toInitSpecial() {
+				this.toSwitchTab(0)
+			}
+		},
+		onReady() {
+			this.platform = getPlatform()
+			const h = uni.upx2px(428) - getNavBarHeight() - getStatusBarHeight()
+			if (this.platform === 'android') {
+				this.mypAllHeight = h - uni.upx2px(140)
+			} else {
+				this.mypAllHeight = h
+			}
+			setTimeout(() => {
+				this.toInitSpecial()
+			}, 100)
+		},
+		onLoad(options) {
+			this.mypCurrentTab = (options.albumsType||0)*1;
+			this.platform = getPlatform();
+			this.statusNavHeight = getNavBarHeight() + getStatusBarHeight();
+		}
+	}
+</script>
+
+<style>
+
+</style>

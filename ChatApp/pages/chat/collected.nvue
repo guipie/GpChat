@@ -1,0 +1,120 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="收藏" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list class="ac" ref="myp-list" style="width:750rpx;flex:1;" loadingText="正在加载收藏内容..." :down='{use:false}'
+			@up="toLoadData">
+			<cell v-for="(item,idx) in items" :key="idx" style="background-color: #FFFFFF;">
+				<view style="height: 40rpx;background-color: #f3f3f3;"></view>
+				<view class="myp-flex-row myp-align-center myp-justify-end"
+					style="padding-top: 30rpx;padding-right: 30rpx;">
+					<text class="myp-size-ss myp-color-third myp-lh-ss">{{toParseDate(item.createDate)}}</text>
+					<myp-button v-if="type=='chat'" textSize="ss" radius="ll" text="发 送" textType='inverse'
+						bgType='error'
+						boxStyle="width:100rpx;height:40rpx;border:1rpx;border-color:#F3F3F6;margin-left:10rpx;"
+						@buttonClicked="toSend(item)">
+					</myp-button>
+				</view>
+				<view style="height: 26rpx;" @tap="toDetail(item.guid)"></view>
+				<text class="myp-lines-two myp-color-text myp-size-s myp-lh-s" @tap="toDetail(item.guid)"
+					style="padding-left: 30rpx;padding-right: 30rpx;">{{item.contents}}</text>
+				<view style="height: 16rpx;" @tap="toDetail(item.guid)"></view>
+				<view v-if="item.pics.length>0" class="myp-flex-row myp-wrap-wrap"
+					style="padding-left: 30rpx;padding-right: 30rpx;">
+					<image v-for="(img,idx) in item.pics" :key="idx" :src="img.path"
+						:style="'width:220rpx;height:220rpx;margin-bottom:15rpx;'+(idx%3==2?'margin-right:0;':'margin-right:15rpx;')"
+						mode="aspectFill" @tap="previewImage(item.pics.map(m=>m.path),idx)"></image>
+				</view>
+				<view style="padding-left: 30rpx;padding-right: 30rpx;padding-bottom: 30rpx;"
+					v-if="item.parentGuid&&item.parent">
+					<albumCellParent :parentItem="item.parent" @detail="toParentDetail">
+					</albumCellParent>
+				</view>
+			</cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import albumCellParent from '@/pages/tabs/components/albumCellParent.vue'
+	import {
+		getTouchPoint
+	} from '@/mypUI/utils/element.js'
+	import {
+		parseTime
+	} from '@/mypUI/utils/date.js'
+	import navHelper from '@/service/navHelper.js'
+	import imageHelper from '@/service/imageHelper.js'
+
+	import {
+		GetAlbumCollect
+	} from '@/api/album/index.js'
+	export default {
+		components: {
+			albumCellParent
+		},
+		mixins: [imageHelper, navHelper],
+		data() {
+			return {
+				items: [],
+				searchDate: "",
+				type: ''
+			}
+		},
+		computed: {},
+		methods: {
+			toSend(item) {
+				let eventChannel = this.$scope.eventChannel;
+				eventChannel.emit('sendContent', item);
+				eventChannel.off('sendContent');
+				uni.navigateBack();
+			},
+			toDetail(guid) {
+				uni.navigateTo({
+					url: '/pages/album/albumDetail?guid=' + guid,
+					animationType: 'slide-in-right',
+					animationDuration: 400
+				})
+			},
+			toParentDetail(parent) {
+				this.toDetail(parent.guid);
+			},
+			toParseDate(date) {
+				return parseTime(date, '{y}/{m}');
+			},
+			toLoadData() {
+				const ins = this.$refs['myp-list'];
+				const cp = ins.mypCurrentPage;
+				console.log(cp);
+				if (cp === 1) {
+					this.searchDate = "";
+					this.items = [];
+				}
+				GetAlbumCollect(this.searchDate).then(res => {
+					this.items.push.apply(this.items, res.data || []);
+					this.searchDate = res.data.map(m => m.createDate)[res.data.length - 1];
+					ins.mypEndSuccess(res.data.length >= 5)
+				}).catch(err => {
+					console.log(err);
+					ins.mypEndError();
+				})
+			}
+		},
+		mounted() {
+			const ins = this.$refs['myp-list'];
+			ins.mypLoad();
+		},
+		onLoad(options) {
+			this.type = options.type;
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.ac {
+		width: 750rpx;
+
+		padding-bottom: 16rpx;
+		position: relative;
+	}
+</style>

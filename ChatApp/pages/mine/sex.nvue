@@ -1,0 +1,79 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction" @rightAction="toRightTab"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 40rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-justify-between myp-wrap-nowrap myp-bg-inverse"
+					style="width: 750rpx;height: 98rpx;padding-left: 40rpx;padding-right: 50rpx;" @click="toToggle(1)">
+					<text class="myp-flex-one myp-color-text myp-size-l">男</text>
+					<myp-icon v-if="tempSex==1" name="check-solid" type="success" size="ll" @iconClicked="toToggle(1)">
+					</myp-icon>
+				</view>
+				<view class="myp-bg-inverse" style="height: 0.5px;width: 46rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-justify-between myp-wrap-nowrap myp-bg-inverse"
+					style="width: 750rpx;height: 98rpx;padding-left: 40rpx;padding-right: 50rpx;" @click="toToggle(0)">
+					<text class="myp-flex-one myp-color-text myp-size-l">女</text>
+					<myp-icon v-if="tempSex==0" name="check-solid" type="success" size="ll" @iconClicked="toToggle(0)">
+					</myp-icon>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		UpdateNickName
+	} from '@/api/user/index.js'
+	import {
+		mapState,
+		mapActions
+	} from 'vuex'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				leftIcons: [{
+					text: '取消'
+				}],
+				tempSex: null
+			}
+		},
+		computed: {
+			...mapState({
+				sex: (state) => state.user.userInfo.sex
+			}),
+			rightIcons() {
+				return [{
+					text: '确定',
+					textType: (this.tempSex || -1) >= -1 ? 'primary' : 'third'
+				}];
+			}
+		},
+		mounted() {
+			this.tempSex = this.sex;
+		},
+		methods: {
+			...mapActions({
+				'setSex': 'user/SetSexAsync'
+			}),
+			toRightTab(i) {
+				this.setSex(this.tempSex);
+				uni.navigateBack();
+			},
+			toToggle(i) {
+				this.tempSex = i
+			}
+		},
+		onLoad(options) {
+			// this.tempSex = options.sex;
+		}
+	}
+</script>
+
+<style>
+
+</style>

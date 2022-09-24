@@ -1,0 +1,66 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="好友备注" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<view style="height: 32rpx;"></view>
+		<view class="myp-bg-inverse myp-flex-row myp-align-center"
+			style="height: 100rpx;padding-left: 30rpx;padding-right: 30rpx;">
+			<input v-model="currentUser.FriendRemarkName" class="myp-flex-one myp-size-base myp-color-text"
+				style="font-weight: 700;" :adjust-position="false" />
+		</view>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		arrayChunk
+	} from '@/mypUI/utils/utils.js'
+	import {
+		SetGroupNickName,
+		SetGroup
+	} from '@/api/chat/group.js'
+	import {
+		mapState,
+		mapActions
+	} from 'vuex'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					text: '确定',
+					textType: 'primary',
+					textStyle: 'font-weight: 700;'
+				}],
+				friendId: 0,
+				groupId: 0,
+				name: "",
+				title: ""
+			}
+		},
+		computed: {
+			...mapState({
+				currentUser: state => state.chat.chattingUser
+			}),
+		},
+		methods: {
+			...mapActions({
+				"SetFriendRemark": "friend/SetFriendRemarkAsync",
+			}),
+			toRightTab(i) {
+				this.SetFriendRemark({
+					userId: this.currentUser.FriendUserId,
+					remarkName: this.currentUser.FriendRemarkName
+				});
+				uni.navigateBack();
+			}
+		},
+		onLoad(options) {
+
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+</style>

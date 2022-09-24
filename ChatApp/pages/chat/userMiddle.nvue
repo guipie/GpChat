@@ -1,0 +1,156 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction" @rightAction="navRightAction">
+		</myp-navbar>
+		<view class="myp-bg-inverse" style="height: 60rpx;"></view>
+		<view class="myp-flex-row myp-wrap-nowrap myp-bg-inverse"
+			style="width: 750rpx;padding-left: 30rpx;padding-right: 30rpx;padding-bottom: 16rpx;">
+			<image :src="userInfo.avatar" mode="aspectFill" style="width: 120rpx;height: 120rpx;border-radius: 20rpx;">
+			</image>
+			<view style="margin-left: 24rpx;width: 546rpx;">
+				<view style="height: 12rpx;"></view>
+				<text
+					class="myp-size-ll myp-color-text myp-lh-ll">{{userInfo.isFriend?userInfo.friendName:userInfo.nickName}}</text>
+				<text class="myp-size-ss myp-color-second myp-lh-ss">昵称：{{userInfo.nickName}}</text>
+				<view style="height: 5rpx;"></view>
+				<text class="myp-size-ss myp-color-second myp-lh-ss">故新号：{{userInfo.userName}}</text>
+				<view style="height: 5rpx;"></view>
+				<text class="myp-size-ss myp-color-second myp-lh-ss">地区：{{userInfo.province}}{{userInfo.city}}</text>
+			</view>
+		</view>
+		<view v-if="userInfo.isFriend" class="myp-flex-row myp-align-center myp-justify-between myp-bg-inverse"
+			style="width: 750rpx;height: 92rpx;padding-left: 30rpx;padding-right: 32rpx;margin-top: 26rpx;"
+			@tap="toTag">
+			<text class="myp-size-base myp-color-text">{{tagName||"标签"}}</text>
+			<myp-icon name="right" type="second" @iconClicked="toTag"></myp-icon>
+		</view>
+		<view v-if="userInfo.isFriend"
+			class="myp-flex-row myp-align-center myp-wrap-nowrap myp-justify-between myp-bg-inverse"
+			style="margin-top: 26rpx;padding-left: 30rpx;padding-right: 32rpx;" bubble="true" @click="toAlbum">
+			<view>
+				<text class="myp-color-text myp-size-base" style="line-height: 68rpx;">朋友圈</text>
+				<view class="myp-flex-row myp-wrap-nowrap" style="margin-top: 8rpx;">
+					<image v-for="(url,idx) in friendPics" :key="idx" :src="url" mode="aspectFill"
+						style="width: 140rpx;height: 140rpx;border-radius: 6rpx;margin-right:40rpx;"></image>
+				</view>
+			</view>
+			<myp-icon name="right" type="second" @iconClicked="toAlbum"></myp-icon>
+		</view>
+		<view v-if="!isTemp" class="myp-flex-column myp-align-center" style="margin-top: 52rpx;">
+			<myp-button bgType="success" text="发消息" textType="inverse" textSIze="ll" border="none" radius="base"
+				boxStyle="width:432rpx;height:100rpx;" @buttonClicked="toChat"></myp-button>
+		</view>
+		<view v-else class="myp-flex-column myp-align-center" style="margin-top: 90rpx;">
+			<myp-button bgType="success" text="发消息" textType="inverse" textSIze="ll" border="none" radius="base"
+				boxStyle="width:432rpx;height:100rpx;" @buttonClicked="toChat"></myp-button>
+			<view style="height: 68rpx;"></view>
+			<myp-button bgType="error" text="申请加为好友" textType="inverse" textSIze="ll" border="none" radius="base"
+				boxStyle="width:432rpx;height:100rpx;" @buttonClicked="toAdd"></myp-button>
+		</view>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		SearchUserByUserId
+	} from '@/api/friend/index.js'
+	import {
+		isBool
+	} from '../../mypUI/utils/utils.js'
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	import {
+		mapMutations,
+		mapActions
+	} from 'vuex'
+	// 用户中间页面，不同关系展示样式不一样
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				images: [1],
+				userId: '',
+				userInfo: {},
+				friendPics: [],
+				tagId: 0,
+				tagName: '',
+				fromType: ''
+			}
+		},
+		computed: {
+			rightIcons() {
+				if (this.userInfo.isFriend)
+					return [{
+						icon: 'elipsis',
+						style: 'margin-left:36rpx;'
+					}];
+			}
+		},
+		methods: {
+			...mapActions({
+				GetFriendDetail: "friend/GetFriendDetailAsync"
+			}),
+			...mapMutations({
+				SetChattingUser: "chat/SetChattingUser"
+			}),
+			navRightAction() {
+				this.GetFriendDetail(this.userId).then(data => {
+					this.SetChattingUser(data);
+					uni.navigateTo({
+						url: '/pages/chat/userManage?userId=' + this.userId
+					})
+				}).catch(err => {
+					console.log(err);
+				});
+			},
+			toChat() {
+				this.SetChattingUser({
+					Avatar: this.userInfo.avatar,
+					FriendUserId: this.userInfo.userId,
+					FriendRemarkName: this.userInfo.nickName,
+					page: this.fromType || 'manage'
+				});
+			},
+			toAdd() {
+				uni.navigateTo({
+					url: '/pages/friend/addFriend'
+				})
+			},
+			toTag() {
+				uni.navigateTo({
+					url: '/pages/friend/addTag?tagId=' + this.tagId + '&tagName=' + this.tagName
+				})
+			},
+			toAlbum() {
+				uni.navigateTo({
+					url: '/pages/album/friendAlbums?userId=' + this.userId
+				})
+			}
+		},
+		onLoad(options) {
+			this.userId = options.userId;
+			this.fromType = options.type;
+			SearchUserByUserId(this.userId).then(res => {
+				if (res.status) {
+					this.userInfo = res.data.userInfo;
+					this.friendPics = res.data.pics;
+					this.tagId = res.data.tagId;
+					this.tagName = res.data.tagName;
+					this.$store.commit("chat/UpdateFriend", {
+						nickName: this.userInfo.friendName || this.userInfo.nickName,
+						avatar: this.userInfo.avatar,
+						userId: this.userInfo.userId
+					});
+					this.userInfo.avatar = baseAvatar(this.userInfo.avatar);
+				} else
+					uni.navigateBack();
+			});
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+</style>

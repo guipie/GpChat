@@ -1,0 +1,64 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction" @rightAction="toRightTab"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 40rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-bg-inverse"
+					style="width: 750rpx;height: 100rpx;padding-left: 36rpx;padding-right: 36rpx;">
+					<input v-model="tempName" class="myp-size-base myp-color-text myp-flex-one" maxlength="10" />
+				</view>
+				<text class="myp-color-second myp-size-ss"
+					style="line-height: 72rpx;margin-left: 30rpx;">在这里设置您的昵称。</text>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		mapGetters,
+		mapActions
+	} from 'vuex'
+	import {
+		UpdateNickName
+	} from '@/api/user/index.js'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				leftIcons: [{
+					text: '取消'
+				}],
+				tempName: ''
+			}
+		},
+		computed: {
+			...mapGetters(["nickName"]),
+			rightIcons() {
+				return [{
+					text: '确定',
+					textType: this.tempName.length > 0 ? 'primary' : 'third'
+				}];
+			}
+		},
+		methods: {
+			...mapActions({
+				'setNickName': 'user/SetNickNameAsync'
+			}),
+			toRightTab(i) {
+				this.setNickName(this.tempName);
+				uni.navigateBack();
+			}
+		},
+		onLoad() {
+			this.tempName = this.nickName;
+		}
+	}
+</script>
+
+<style>
+
+</style>

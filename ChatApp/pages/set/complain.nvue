@@ -1,0 +1,164 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="投诉" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<view style="height: 24rpx;"></view>
+		<view class="myp-flex-row myp-wrap-wrap" style="margin-left: 30rpx;width: 720rpx;">
+			<view v-for="(item,idx) in items" :key="idx"
+				:class="['c-tag', item==current&&'c-tag-current', (idx+1)%3===0&&'c-tag-no', 'myp-flex-row', 'myp-align-center', 'myp-justify-center']"
+				@click="toSelect(item)">
+				<text class="myp-color-text myp-size-base"
+					style="line-height: 40rpx;width: 90rpx;text-align: center;">{{item}}</text>
+			</view>
+		</view>
+		<text class="myp-size-ss myp-color-second" style="line-height: 68rpx;margin-left: 28rpx;">在这里详细说明您遇到的问题</text>
+		<textarea v-model="content" placeholder="描述问题" class="c-area" style="width: 750rpx;height: 255rpx;"></textarea>
+		<text class="myp-size-ss myp-color-second"
+			style="line-height: 68rpx;margin-left: 28rpx;">添加聊天记录截图或者相关信息截图</text>
+		<view class="myp-flex-row myp-wrap-wrap" style="width: 750rpx;padding-left: 30rpx;">
+			<view v-for="(img,idx) in imgs" :key="idx" style="margin-right: 15rpx;margin-bottom: 15rpx;">
+				<img-cell :src="img" @delete="toDeleteImg" @preview="toPreviewImg"></img-cell>
+			</view>
+			<img-token v-if="imgs.length < 9" @add="toChooseImg"></img-token>
+		</view>
+		<view class="myp-position-fixed myp-flex-row myp-justify-center" style="bottom: 110rpx;left: 0;width: 750rpx;">
+			<text class="myp-size-ss myp-lh-ss myp-color-second" @click="toRules">投诉须知</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import imgToken from '../album/components/imgToken.vue'
+	import imgCell from '../album/components/imgCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		PostComplaint
+	} from '@/api/system.js'
+	import {
+		mapState
+	} from 'vuex'
+	export default {
+		components: {
+			imgToken,
+			imgCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				items: ['色情', '赌博', '政治话题', '暴恐问题', '违法违规', '其他'],
+				current: '',
+				content: '',
+				imgs: []
+			}
+		},
+		computed: {
+			rightIcons() {
+				return [{
+					text: '确定',
+					textType: this.current ? 'primary' : 'third',
+					textStyle: 'font-weight: 700;'
+				}];
+			},
+			...mapState({
+				currentUser: state => state.chat.chattingUser,
+				currentGroup: state => state.chat.chattingGroup,
+				isGroup: state => state.chat.isGroup, //当前是否群聊
+			})
+		},
+		methods: {
+			toRightTab(i) {
+				PostComplaint({
+					ComplaintDic: this.current,
+					ComplaintType: "user",
+					ComplaintGuid: this.isGroup ? this.currentGroup.GroupId : this.currentUser.FriendUserId,
+					Pics: this.imgs.toString()
+				}, this.imgs).then(res => {
+					this.toHideTsPop();
+					uni.navigateBack()
+				});
+			},
+			toSelect(val) {
+				this.current = val
+			},
+			toRules() {
+
+			},
+			toChooseImg() {
+				if (this.imgs.length >= 9) return;
+				uni.chooseImage({
+					count: 9 - this.imgs.length,
+					success: (res) => {
+						res.tempFilePaths.forEach(path => {
+							let cloudPath = 'complain/' + this.userId + '/' + new Date().getTime() +
+								path.substring(path.lastIndexOf('.'));
+							uniCloud.uploadFile({
+								filePath: path,
+								fileType: "image",
+								cloudPath: cloudPath
+							}).then(res => {
+								this.imgs.push(res.fileID);
+							}).catch(err => {
+								console.log(err);
+							});
+						});
+					},
+					fail: (err) => {
+						console.log(err);
+					}
+				})
+			},
+			toDeleteImg(val) {
+				let k = -1
+				for (const i in this.imgs) {
+					const theImg = this.imgs[i]
+					if (theImg === val) {
+						k = i * 1
+						break
+					}
+				}
+				if (k >= 0) {
+					this.imgs.splice(k, 1)
+				}
+			},
+			toPreviewImg(val) {
+				uni.previewImage({
+					current: val,
+					urls: this.imgs
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.c {
+		&-tag {
+			border-radius: 20rpx;
+			width: 180rpx;
+			height: 100rpx;
+			background-color: #DBDBDB;
+			padding-left: 45rpx;
+			padding-right: 45rpx;
+			margin-bottom: 24rpx;
+			margin-right: 60rpx;
+
+			&-current {
+				background-color: $myp-color-success;
+			}
+
+			&-no {
+				margin-right: 0;
+			}
+		}
+
+		&-area {
+			padding-left: 28rpx;
+			padding-right: 28rpx;
+			padding-top: 15rpx;
+			padding-bottom: 15rpx;
+			font-size: 28rpx;
+			color: $myp-text-color;
+		}
+	}
+</style>

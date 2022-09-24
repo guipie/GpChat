@@ -1,0 +1,246 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" leftStyle="width:200rpx;" centerStyle="width:350rpx;"
+			@rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<textarea v-model="content" :maxlength="1000" :placeholder="fromType==='friend'?'':'认识新的朋友^_^！'"
+			placeholder-style="color:#9092A5;" :adjust-position="false" class="wa-area"></textarea>
+		<view v-if='shareAlbumId' class="myp-flex-row myp-align-center" style="margin-left: 30rpx;">
+			<view style="height: 24rpx;"></view>
+			<view class="myp-flex-row myp-wrap-wrap">
+				<image :src="sharePic" v-if="sharePic" mode="aspectFill" style="width: 120rpx;height: 120rpx;"></image>
+				<view class="myp-flex-one" style="background-color: #F7F8FA;">
+					<text class="myp-size-s myp-color-text myp-lh-s myp-lines-two"
+						style="width: 520rpx;margin-left: 24rpx;margin-top: 12rpx;">{{shareContents}}</text>
+				</view>
+			</view>
+		</view>
+		<view v-else-if='updateModel.ParentGuid' class="myp-flex-row myp-align-center"
+			style="background-color: #efefef;">
+			<view class="myp-flex-row myp-wrap-wrap">
+				转发内容[不可编辑]
+			</view>
+		</view>
+		<view class="myp-flex-row myp-wrap-wrap" style="width: 750rpx;padding-left: 30rpx;" v-else>
+			<view v-for="(img,idx) in imgs" :key="idx" style="margin-right: 15rpx;margin-bottom: 15rpx;">
+				<img-cell :src="img.UploadPath" @delete="toDeleteImg" @preview="toPreviewImg"></img-cell>
+			</view>
+			<img-token v-if="imgs.length <= 9" @add="toChooseImg"></img-token>
+		</view>
+		<view style="height: 32rpx;"></view>
+		<view v-if='fromType==="album"' class="myp-flex-row myp-align-center" style="margin-left: 30rpx;">
+			<image :src="syncAlbum?'/static/check-h.png':'/static/check.png'" mode="aspectFill"
+				style="width: 45rpx;height: 42rpx;" @click="toToggleSync"></image>
+			<!--
+			<myp-icon name='check-solid' :type="syncAlbum?'success':'second'" iconStyle="width: 45rpx;"
+				@iconClicked="toToggleSync"></myp-icon>
+				-->
+			<text class="myp-size-base myp-lh-base myp-color-second" style="padding-left: 16rpx;"
+				@tap="toToggleSync">15D 消失</text>
+		</view>
+		<view v-else-if='fromType==="friend"' class="myp-flex-row myp-align-center" style="margin-left: 30rpx;">
+			<image :src="syncAlbum?'/static/logo.png':'/static/logo_default.png'" mode="aspectFill"
+				style="width: 45rpx;height: 38rpx;" @tap="toToggleSync"></image>
+			<text class="myp-size-base myp-lh-base myp-color-second" style="padding-left: 16rpx;"
+				@tap="toToggleSync">同步到故新广场</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import imgToken from './components/imgToken.vue'
+	import imgCell from './components/imgCell.vue'
+	import {
+		isBool
+	} from '@/mypUI/utils/utils.js'
+	import {
+		isNullOrEmpty
+	} from '@/mypUI/utils/validate.js'
+	import {
+		mapGetters,
+		mapActions
+	} from 'vuex';
+	import {
+		GetEditAlbumDetail,
+		Put
+	} from '@/api/album/index.js'
+	import toastMixin from '@/mypUI/myp-mixin/toastMixin.js'
+	export default {
+		components: {
+			imgToken,
+			imgCell
+		},
+		mixins: [toastMixin],
+		data() {
+			return {
+				leftIcons: [{
+					text: '取消',
+					textStyle: 'font-weight: 700;'
+				}],
+				content: '',
+				delImgs: [],
+				imgs: [],
+				syncAlbum: false,
+				fromType: '',
+				shareContents: "",
+				sharePic: "",
+				updateModel: {}
+			}
+		},
+		computed: {
+			...mapGetters(['userId']),
+			rightIcons() {
+				return [{
+					text: '发布',
+					textType: (this.content || this.imgs.length > 0) ? 'primary' : 'third',
+					textStyle: 'font-weight: 700;'
+				}]
+			}
+		},
+		methods: {
+			...mapActions({
+				'Post': "album/PostAsync"
+			}),
+			toRightTab() {
+				// to publish
+				if (this.updateModel.Guid) {
+					this.updateModel.Content = this.content;
+					this.updateModel.DelFiles = this.delImgs.map(m => m.Guid);
+					this.updateModel.Files = this.imgs.filter(m => isNullOrEmpty(m.ContentGuid));
+					Put(this.updateModel).then(res => {
+						if (this.delImgs.Length > 0)
+							uniCloud.callFunction({
+								name: 'delFiles',
+								data: {
+									urls: this.delImgs.map(m => m.UploadPath)
+								}
+							});
+						let eventChannel = this.$scope.eventChannel;
+						eventChannel.emit('resetUserAlbums', this.updateModel);
+						eventChannel.off('resetUserAlbums');
+						uni.navigateBack({
+							delta: 1
+						});
+					});
+				} else
+					this.Post({
+						content: this.content,
+						isFriend: this.fromType === "friend",
+						isPublic: (this.syncAlbum || this.fromType === "album"),
+						visibleDays: (this.syncAlbum && this.fromType === "album") ? 15 : null,
+						files: this.imgs,
+						parentGuid: this.shareAlbumId
+					}).then(res => {
+						uni.navigateBack();
+					});
+			},
+			navLeftAction() {
+				uni.navigateBack({
+					delta: 1
+				})
+			},
+			toToggleSync() {
+				this.syncAlbum = !this.syncAlbum;
+			},
+			toChooseImg() {
+				let _this = this;
+				if (_this.imgs.length >= 9) return;
+				uni.chooseImage({
+					count: 9 - _this.imgs.length,
+					success: (res) => {
+						res.tempFiles.forEach(file => {
+							let fileInfo = new Object();
+							uni.getImageInfo({
+								src: file.path,
+								success: function(info) {
+									fileInfo.ContentType = info.type;
+									fileInfo.Width = info.width;
+									fileInfo.Height = info.height;
+									fileInfo.Orientation = info.orientation;
+								}
+							});
+							let cloudPath = 'contents/' + _this.userId + '/' + new Date().getTime() +
+								file.path.substring(file.path.lastIndexOf('.'));
+							uniCloud.uploadFile({
+								filePath: file.path,
+								fileType: "image",
+								cloudPath: cloudPath,
+								onUploadProgress: function(progressEvent) {
+									if (progressEvent.loaded === progressEvent.total) {
+										fileInfo.loaded = true;
+									}
+								}
+							}).then(up => {
+								fileInfo.Name = cloudPath;
+								fileInfo.UploadPath = up.fileID;
+								fileInfo.Length = file.size;
+								_this.imgs.push(fileInfo);
+								console.log(_this.imgs);
+							}).catch(upError => {
+								console.log(uploadError);
+							})
+						});
+					},
+					fail: (chooseError) => {
+						console.log(chooseError);
+					}
+				});
+			},
+			toDeleteImg(val) {
+				let delIndex = this.imgs.findIndex(m => m.UploadPath == val);
+				if (this.imgs[delIndex].Guid)
+					this.delImgs.push(this.imgs[delIndex]);
+				this.imgs.splice(delIndex, 1);
+			},
+			toPreviewImg(val) {
+				let _this = this;
+				uni.previewImage({
+					current: val,
+					urls: this.imgs,
+					longPressActions: {
+						itemList: ['移除'],
+						success: function(data) {
+							// _this.toDeleteImg(_this.imgs[data.tapIndex]);
+							_this.imgs.splice(data.tapIndex, 1);
+							_this.showToastSuccess("已移除");
+						},
+						fail: function(err) {
+							console.log(err.errMsg);
+						}
+					}
+				})
+			}
+		},
+		onLoad(options) {
+			console.log(options);
+			this.fromType = options.fromType;
+			this.shareAlbumId = options.shareAlbumId;
+			if (this.shareAlbumId) {
+				this.shareContents = options.contents;
+				this.sharePic = isNullOrEmpty(options.pic) ? "" : options.pic;
+			} else if (options.guid) {
+				GetEditAlbumDetail(options.guid).then(res => {
+					this.updateModel = res.data;
+					this.fromType === "album";
+					this.content = this.updateModel.Content;
+					this.syncAlbum = this.updateModel.VisibleDays > 0;
+					this.imgs = this.updateModel.Files;
+				});
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.wa {
+		&-area {
+			width: 750rpx;
+			padding-top: 32rpx;
+			padding-right: 30rpx;
+			padding-left: 30rpx;
+			padding-bottom: 24rpx;
+			height: 204rpx;
+			font-size: 32rpx;
+			color: $myp-text-color;
+		}
+	}
+</style>

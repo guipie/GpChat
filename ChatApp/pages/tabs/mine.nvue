@@ -1,0 +1,192 @@
+<template>
+	<view>
+		<myp-navbar bgType="none" title="" leftStyle="width:30rpx;" centerStyle="width:520rpx;"
+			boxStyle="background: #EDEDED;"></myp-navbar>
+		<myp-list :down="null" :up="null" boxStyle="background: #EDEDED;">
+			<myp-list-cell>
+				<mine-head @detail="toUserDetail" @qr="toUserQr"></mine-head>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view style="height: 20rpx;"></view>
+				<view class="myp-bg-inverse"
+					style="margin-left: 20rpx;width: 710rpx;background: #FFFFFF;overflow: hidden;">
+					<myp-cell icon="/static/icon/2user.png" iconType="error" iconStyle="width: 40rpx;height:40rpx;"
+						title="公共主页" indicator="right" space="24rpx" border="none" radius="none"
+						titleStyle="font-weight:700;color:#3A444A" indicatorSize="ss" indicatorType="third"
+						boxStyle="height:112rpx;padding-left;30rpx;padding-right:30rpx;" @cellClicked="toMyAlbum(2)">
+					</myp-cell>
+					<view class="myp-bg-inverse">
+						<view class="myp-bg-page" style="height: 1px;margin-left: 82rpx;width: 580rpx;"></view>
+					</view>
+					<!-- <myp-cell icon="vip" iconType="warning" iconSize="ll" title="会员管理" indicator="right" space="20rpx"
+						border="none" radius="none" bgType="inverse" titleStyle="font-weight:700;" indicatorSize="ss"
+						indicatorType="third" boxStyle="height:112rpx;padding-left;30rpx;padding-right:30rpx;"
+						@cellClicked="toVip"></myp-cell> -->
+					<view class="myp-flex-row myp-align-center myp-justify-center myp-bg-inverse"
+						style="width: 710rpx;height: 166rpx;padding-left: 40rpx;padding-right: 40rpx;border-radius: 10rpx;background: #FFFFFF;">
+						<view class="myp-flex-one myp-flex-column myp-align-center myp-justify-center" bubble="true"
+							@tap="toMyAlbum(1)">
+							<myp-icon name="plane" iconStyle="font-size:50rpx;color:#4569FF;"
+								@iconClicked="toMyAlbum(1)">
+							</myp-icon>
+							<view class="myp-flex-row">
+								<text class="public-txt">动态</text>
+								<text class="public-num">{{contentCount>99?'99+':contentCount}}</text>
+							</view>
+						</view>
+						<view class="myp-flex-one myp-flex-column myp-align-center myp-justify-center" bubble="true"
+							@tap="toNewThumb">
+							<myp-icon name="hand" type="warning" iconStyle="font-size:50rpx;" @iconClicked="toNewThumb">
+							</myp-icon>
+							<view class="myp-flex-row">
+								<text class="public-txt">新赞</text>
+								<text class="public-num">{{xinPraiseCount>99?'99+':xinPraiseCount}}</text>
+							</view>
+						</view>
+						<view class="myp-flex-one myp-flex-column myp-align-center myp-justify-center" bubble="true"
+							@tap="toInteract" :boxStyle="'height:30rpx;'">
+							<myp-icon name="keyboard" iconStyle="font-size:50rpx;color:#2292E9;"
+								@iconClicked="toInteract">
+							</myp-icon>
+							<view class="myp-flex-row">
+								<text class="public-txt">互动</text>
+								<text class="public-num">{{interactionCount>99?'99+':interactionCount}}</text>
+							</view>
+						</view>
+					</view>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view style="height: 20rpx;"></view>
+				<view class="myp-bg-inverse"
+					style="margin-left: 20rpx;width: 710rpx;background: #FFFFFF;overflow: hidden;">
+					<myp-cell icon="fav" iconStyle="color:#417505" iconSize="ll" title="收藏" indicator="right"
+						space="26rpx" border="none" radius="none" bgType="inverse" titleStyle="font-weight:700;"
+						indicatorSize="ss" indicatorType="third"
+						boxStyle="height:112rpx;padding-left;30rpx;padding-right:30rpx;" @cellClicked="toCollect">
+					</myp-cell>
+					<view class="myp-bg-inverse">
+						<view class="myp-bg-page" style="height: 1px;margin-left: 82rpx;width: 580rpx;"></view>
+					</view>
+					<myp-cell icon="photo" iconStyle="color:#FF0000" iconSize="ll" title="相册" indicator="right"
+						space="26rpx" border="none" radius="none" bgType="inverse" titleStyle="font-weight:700;"
+						indicatorSize="ss" indicatorType="third"
+						boxStyle="height:112rpx;padding-left;30rpx;padding-right:30rpx;" @cellClicked="toPhoto">
+					</myp-cell>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view style="height: 20rpx;"></view>
+				<view class="myp-bg-inverse" style="margin-left: 20rpx;width: 710rpx;overflow: hidden;">
+					<myp-cell icon="set" iconStyle="color:#4298FD" iconSize="ll" title="设置" indicator="right"
+						space="26rpx" border="none" radius="none" bgType="inverse" titleStyle="font-weight:700;"
+						indicatorSize="ss" indicatorType="third"
+						boxStyle="height:112rpx;padding-left;30rpx;padding-right:30rpx;" @cellClicked="toSet">
+					</myp-cell>
+				</view>
+				<view style="height: 20rpx;"></view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import {
+		mapState,
+		mapGetters,
+		mapMutations,
+		mapActions
+	} from 'vuex'
+	import mineHead from './components/mineHead.vue'
+	export default {
+		components: {
+			mineHead
+		},
+		computed: {
+			...mapState({
+				xinPraiseCount: (state) => state.user.xinPraiseCount,
+				contentCount: (state) => state.user.contentCount,
+				interactionCount: (state) => state.user.interactionCount
+			}),
+			...mapGetters([
+				'hasLogedIn'
+			])
+		},
+		methods: {
+			...mapActions({
+				Statistic: "user/Statistic"
+			}),
+			toUserDetail() {
+				uni.navigateTo({
+					url: '/pages/mine/info'
+				})
+			},
+			toUserQr() {
+				if (!this.hasLogedIn) {
+					uni.reLaunch({
+						url: '@/auth/login'
+					});
+				}
+			},
+			toMyAlbum(type) {
+				uni.navigateTo({
+					url: '/pages/album/userAlbums?albumsType=' + type
+				})
+			},
+			toInteract() {
+				uni.navigateTo({
+					url: '/pages/album/interactAlbums'
+				})
+			},
+			toCollect() {
+				uni.navigateTo({
+					url: '/pages/chat/collected'
+				})
+			},
+			toNewThumb() {
+				uni.navigateTo({
+					url: '/pages/mine/newThumb'
+				})
+			},
+			toPhoto() {
+				uni.navigateTo({
+					url: '/pages/mine/photoAlbum'
+				})
+			},
+			toSet() {
+				uni.navigateTo({
+					url: '/pages/mine/set'
+				})
+			}
+		},
+		onReady() {
+			let _this = this;
+			_this.Statistic();
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.public {
+
+		&-txt {
+			color: #9A9A9A;
+			font-family: Microsoft YaHei;
+			font-size: 12px;
+			line-height: 16px;
+			text-align: center;
+			padding-top: 16rpx;
+		}
+
+		&-num {
+			color: #000000;
+			font-family: Microsoft YaHei;
+			font-size: 14px;
+			line-height: 16px;
+			text-align: center;
+			padding-top: 15rpx;
+			padding-left: 6rpx;
+			width: 26px;
+		}
+	}
+</style>

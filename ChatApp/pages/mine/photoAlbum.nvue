@@ -1,0 +1,74 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="相册" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list bgType="inverse" ref="photoList" :autoUpdate="true" @down="toLoadData" @up="toLoadData">
+			<myp-list-cell>
+				<view class="myp-flex-row myp-align-center myp-justify-end" style="height: 92rpx;padding-right: 30rpx;">
+					<text class="myp-size-s myp-color-primary" style="padding-right: 4rpx;font-weight: 700;"
+						@tap="toAlbum">朋友圈</text>
+					<myp-icon name="right" type="primary" size="ss" @iconClicked="toAlbum"></myp-icon>
+				</view>
+				<view style="height: 4rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<photo-cell :item="item" @preview="toPreview"></photo-cell>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import photoCell from './components/photoCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import imageHelper from '@/service/imageHelper.js'
+	import {
+		MyFriendPhotos
+	} from '@/api/album/friend.js'
+	export default {
+		components: {
+			photoCell
+		},
+		mixins: [navHelper, imageHelper],
+		data() {
+			return {
+				items: [],
+				searchDate: ""
+			}
+		},
+		methods: {
+			toPreview(item) {
+				this.previewImage(item.pics, item.index);
+			},
+			toAlbum() {
+				// /pages/album/mineAlbums
+				uni.navigateTo({
+					url: '/pages/album/friendAlbums?fromType=photo'
+				})
+			},
+			toLoadData() {
+				const ins = this.$refs['photoList'];
+				const cp = ins.mypCurrentPage;
+				if (cp === 1) this.searchDate = "";
+				console.log(cp);
+				MyFriendPhotos(this.searchDate).then(res => {
+					var data = res.data.photos;
+					if (this.cp === 1) {
+						this.items = data || []
+					} else {
+						this.items.push.apply(this.items, data || []);
+						this.searchDate = res.minDate;
+					}
+					ins.mypEndSuccess(data.length >= 5)
+				}).catch(err => {
+					ins.mypEndError()
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

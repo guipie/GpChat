@@ -1,0 +1,57 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="标签" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-result icon='/static/ui/warning.png' v-if="tags.length==0" desc="您还未设置标签" top='100rpx'></myp-result>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell v-for="(item,idx) in tags" :key="idx">
+				<tag-cell :item="item" :last="tags.length-1===idx" @detail="toDetail"></tag-cell>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import tagCell from './components/tagCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		GetTags
+	} from '@/api/friend/tag.js'
+	export default {
+		components: {
+			tagCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'plus'
+				}],
+				tags: []
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				uni.navigateTo({
+					url: '/pages/friend/addTag'
+				})
+			},
+			toDetail(item) {
+				uni.navigateTo({
+					url: '/pages/friend/addTag?tagId=' + item.tagId + '&tagName=' + item.name
+				})
+			}
+		},
+		onShow() {
+			GetTags().then(res => {
+				if (res.status)
+					this.tags = res.data;
+			});
+		}
+	}
+</script>
+
+<style>
+
+</style>

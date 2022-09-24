@@ -1,0 +1,618 @@
+<template>
+	<view class="myp-position-relative">
+		<myp-navbar :lefts="leftIcons" title="故新" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" :autoUpdate="true" @down="toLoadData" @up="toLoadData">
+			<myp-list-cell>
+				<view class="myp-bg-inverse" style="height: 30rpx;"></view>
+				<view class="myp-bg-inverse myp-flex-row myp-align-center myp-justify-between"
+					style="padding-left: 30rpx;padding-right: 30rpx;height: 88rpx;">
+					<view class="myp-flex-row myp-align-center" @tap="toUser((contentInfo.contentUser||{}).userId)">
+						<image :src="avatar" mode="aspectFill" style="width: 64rpx;height: 64rpx;border-radius: 12rpx;">
+						</image>
+						<view style="margin-left: 20rpx;">
+							<text
+								class="myp-size-s myp-lh-s myp-color-text">{{(contentInfo.contentUser||{}).nickName}}</text>
+							<text class="myp-size-ss myp-lh-ss myp-color-second"
+								style="font-weight: 700;">{{(contentInfo.contentUser||{}).remark}}</text>
+						</view>
+					</view>
+					<myp-button v-if="contentInfo.createID!=$store.getters.userId" textSize="ss" radius="ll"
+						:text="contentInfo.isFollowing?'已关注':'关注'" :textType="contentInfo.isFollowing?'':'inverse'"
+						:bgType="contentInfo.isFollowing?'':'error'"
+						:textStyle="contentInfo.isFollowing?'color: #A0A3B8;':'color: #ffffff;'"
+						boxStyle="width:100rpx;height:40rpx;border:1rpx;border-color:#F3F3F6;"
+						@buttonClicked="toFollow">
+					</myp-button>
+				</view>
+				<view class="myp-bg-inverse" style="height: 20rpx;"></view>
+				<view class="myp-bg-inverse" style="padding-left: 30rpx;padding-right: 30rpx;">
+					<text class="myp-lines-two myp-color-text myp-size-s myp-lh-s">{{contentInfo.contents}}</text>
+				</view>
+				<view class="myp-flex-row myp-wrap-wrap myp-bg-inverse"
+					style="padding-top: 18rpx;padding-left: 30rpx;width: 750rpx;">
+					<image v-for="(img,idx) in contentInfo.pics" lazy-load='true' :key="idx" :src="img.path"
+						mode="aspectFill" @tap="previewImage( contentInfo.pics.map(m=>m.path),idx)"
+						:style="'width: 220rpx;height: 200rpx;margin-bottom:15rpx;'+((idx+1)%3===0?'margin-right:0;':'margin-right:15rpx;')">
+					</image>
+				</view>
+				<view style="padding-left: 25rpx;">
+					<albumCellParent v-if="contentInfo.parentGuid&&contentInfo.parent" :parentItem="contentInfo.parent"
+						@detail="toParentDetail">
+					</albumCellParent>
+				</view>
+				<view class="myp-flex-row myp-justify-end myp-bg-inverse"
+					style="padding-right: 30rpx;padding-bottom: 20rpx;padding-top: 16rpx;">
+					<text class="myp-color-third"
+						style="font-size: 10px;line-height: 28rpx;font-weight: 700;">{{createDate(contentInfo.createDate)}}</text>
+				</view>
+				<view style="height: 20rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-justify-between myp-bg-inverse"
+					style="height: 92rpx;padding-left: 30rpx;padding-right: 30rpx;">
+					<view class="myp-flex-row myp-align-center" @touchstart="toCollected">
+						<myp-icon :name="contentInfo.isCollected?'fav-fill':'fav'" type="second" size="l"
+							:iconStyle="contentInfo.isCollected?'color:#3F7600':'color:#AAAAAA'">
+						</myp-icon>
+						<text class="myp-size-s myp-lh-ss myp-color-second"
+							:style="contentInfo.isCollected?'color:#3F7600':'color:#AAAAAA'"
+							style="margin-left: 12rpx;">收藏</text>
+					</view>
+					<view class="myp-flex-row myp-align-center" @touchstart="toShareDialog">
+						<myp-icon name="share" type="second" size="l" :stop="false"
+							:iconStyle="contentInfo.isShared?'color:#f78063':'color:#AAAAAA'">
+						</myp-icon>
+						<text class="myp-size-ss myp-lh-ss myp-color-second"
+							:style="contentInfo.isShared?'color:#f78063':'color:#AAAAAA'"
+							style="margin-left: 12rpx;">{{contentInfo.shareCount?contentInfo.shareCount:'转发'}}</text>
+					</view>
+					<view class="myp-flex-row myp-align-center" @touchstart="toXinPraised">
+						<myp-icon :name="contentInfo.isXinPraised?'hand-solid':'hand'" type="second" size="l"
+							:iconStyle="contentInfo.isXinPraised?'color:#FFAF49':'color:#AAAAAA'">
+						</myp-icon>
+						<text class="myp-size-ss myp-lh-ss myp-color-second"
+							:style="contentInfo.isXinPraised?'color:#FFAF49':'color:#AAAAAA'"
+							style="margin-left: 12rpx;">{{contentInfo.xinPraiseCount?contentInfo.xinPraiseCount:'新赞'}}</text>
+					</view>
+					<view class="myp-flex-row myp-align-center" @touchstart="toPraised">
+						<myp-icon name="yes" type="second" size="l"
+							:iconStyle="contentInfo.isPraised?'color:#F7412D':'color:#AAAAAA'">
+						</myp-icon>
+						<text class="myp-size-ss myp-lh-ss myp-color-second"
+							:style="contentInfo.isPraised?'color:#F7412D':'color:#AAAAAA'"
+							style="margin-left: 12rpx;">{{contentInfo.praiseCount>0?contentInfo.praiseCount:'点赞'}}</text>
+					</view>
+					<view class="myp-flex-row myp-align-center">
+						<myp-icon name="chat" type="second" size="l"
+							:iconStyle="contentInfo.isCommented?'color:#0086FF':'color:#AAAAAA'">
+						</myp-icon>
+						<text class="myp-size-ss myp-lh-ss myp-color-second"
+							:style="contentInfo.isCommented?'color:#000000':'color:#AAAAAA'"
+							style="margin-left: 12rpx;">{{contentInfo.commentCount?contentInfo.commentCount:'评论'}}</text>
+					</view>
+				</view>
+				<view class="myp-bg-inverse">
+					<view style="margin-left: 30rpx;width: 690rpx;height: 0.5px;background-color: #EFEFF4;"></view>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in comments" :key="idx">
+				<comment-cell ref="comments" :item="item" @pop="toShowPop" @praise="toCommentPraised"
+					@userAlbum="toUser" :date="createDate(item.createDate)" @reply="toReply">
+				</comment-cell>
+				<view v-if="idx+1==comments.length">
+					<view style="height: 100rpx;"></view>
+					<myp-xbar bgType="none"></myp-xbar>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+		<myp-xbar bgType="inverse"></myp-xbar>
+		<view class="myp-position-absolute ad-foot myp-bg-inverse myp-flex-row myp-align-center"
+			:style="'bottom:'+xH+'px;'">
+			<myp-icon :name="contentInfo.isCollected?'fav-fill':'fav'" type="second"
+				:iconStyle="(contentInfo.isCollected?'color:#3F7600;':'color:#AAAAAA;')+'font-size:44rpx;'"
+				@iconClicked="toCollected">
+			</myp-icon>
+			<view style="width: 30rpx;"></view>
+			<myp-icon name="share" type="second"
+				:iconStyle="(contentInfo.isShared?'color:#f78063;':'color:#AAAAAA;')+'font-size:44rpx;'"
+				@iconClicked="toShareDialog()"></myp-icon>
+			<view style="width: 30rpx;"></view>
+			<view class="myp-flex-one myp-flex-row myp-align-center"
+				style="border-radius: 50rpx;background-color: #ECECEC;padding-left: 32rpx;height: 66rpx;"
+				@click.stop="toShowCommentArea">
+				<text class="myp-size-base myp-color-third"
+					style="line-height: 66rpx;border-radius: 45px;background: #EFEFF4;height: 66rpx;width: 363rpx;">写评论...</text>
+			</view>
+			<view style="width: 30rpx;"></view>
+			<myp-icon :name="contentInfo.isXinPraised?'hand-solid':'hand'"
+				:iconStyle="(contentInfo.isXinPraised?'color:#FFAF49;':'color:#AAAAAA;')+'font-size:44rpx;'"
+				type="second" @iconClicked="toXinPraised">
+			</myp-icon>
+			<view style="width: 30rpx;"></view>
+			<myp-icon name="yes" type="second"
+				:iconStyle="(contentInfo.isPraised?'color:#F7412D;':'color:#AAAAAA;')+'font-size:44rpx;'"
+				@iconClicked="toPraised">
+			</myp-icon>
+		</view>
+		<view class="myp-position-absolute ad-foot myp-bg-inverse myp-flex-row"
+			:style="'bottom:'+areaBottomOffset+'px;background-color: rgba(247, 247, 247, 0.8);'">
+			<view style="width: 24rpx;"></view>
+			<textarea v-model="comment" ref="input"
+				:placeholder="replyObj.id>0?'回复'+replyObj.commentUser.nickName:'写评论...'" class="ad-input"
+				style="border-radius: 45px;background: #EFEFF4;height: 66rpx;" :maxlength="200" :adjust-position="false"
+				confirm-type="send" @linechange="toChangeLine" @keyboardheightchange="toChangeKb"
+				@confirm="toConfirm"></textarea>
+			<view style="width: 24rpx;"></view>
+			<myp-icon name="plane" size='l'
+				:iconStyle="'font-size:50rpx;'+(comment.trim().length>0?'color:#4569FF;':'color:#d8d8d8;')"
+				@iconClicked="toConfirm">
+			</myp-icon>
+		</view>
+		<myp-popup :show="popShareVisible" pos="bottom" height="242rpx" @overlayClicked="toHideShare">
+			<view class="myp-bg-inverse myp-flex-column myp-align-center" style="height: 242rpx;border-radius: 32rpx;">
+				<view class="myp-flex-row myp-align-center" style="height: 120rpx;">
+					<myp-icon name="/static/logo.png" iconStyle="width: 60rpx;height: 60rpx;margin-left: 32rpx;"
+						@iconClicked="toShare(1)">
+					</myp-icon>
+					<myp-icon name="/static/icon/message.png" style='margin-left: 30rpx;justify-content:center;'
+						iconStyle='width:44rpx;height:44rpx;' @iconClicked="toShare(2)">
+					</myp-icon>
+					<myp-icon name="/static/ui/album-line.png" style='margin-left: 30rpx;justify-content:center;'
+						iconStyle='width:44rpx;height:44rpx;' @iconClicked="toShare(3)">
+					</myp-icon>
+				</view>
+				<view style="height: 2rpx;width: 480rpx;background-color: #D3D3D3;"></view>
+				<view class="myp-flex-row myp-align-center" style="height: 120rpx;">
+					<image src="/static/icon/weixin.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 32rpx;"></image>
+					<image src="/static/icon/toutiao.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+					<image src="/static/icon/weibo.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+					<image src="/static/icon/qqkongjian.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+					<image src="/static/icon/qq.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+				</view>
+			</view>
+		</myp-popup>
+		<myp-popup :show="popVisible" pos="center" width="420rpx" height="304rpx" :leftOffset="popLeft"
+			:bottomOffset="popBottom" :topOffset="popTop" @overlayClicked="toHidePop">
+			<view class="myp-bg-inverse myp-flex-column myp-align-center"
+				style="width: 420rpx;height: 202rpx;border-radius: 32rpx;"
+				v-if="popItem.createId==$store.getters.userId">
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@tap="editComment">编辑</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #808080;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@tap="delComment">删除</text>
+			</view>
+			<view class="myp-bg-inverse myp-flex-column myp-align-center"
+				style="width: 420rpx;height: 304rpx;border-radius: 32rpx;" v-else>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@click="complainted('辱骂骚扰','comment',popItem.id)">辱骂骚扰</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #B8AEAE;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@click="complainted('人生攻击','comment',popItem.id)">人生攻击</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #B8AEAE;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@click="complainted('政治敏感','comment',popItem.id)">政治敏感</text>
+			</view>
+		</myp-popup>
+		<myp-popup :show="tsPopVisible" pos="center" width="420rpx" height="304rpx" hasOverlay="true"
+			@overlayClicked="toHideTsPop">
+			<view class="myp-bg-inverse myp-flex-column myp-align-center"
+				style="width: 420rpx;height: 202rpx;border-radius: 32rpx;"
+				v-if="contentInfo.createID==$store.getters.userId">
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@tap="edit">编辑</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #808080;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@tap="del">删除</text>
+			</view>
+			<view class="myp-bg-inverse myp-flex-column myp-align-center"
+				style="width: 420rpx;height: 304rpx;border-radius: 32rpx;" v-else>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@click="complainted('辱骂骚扰','content',contentInfo.guid)">辱骂骚扰</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #B8AEAE;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@click="complainted('人生攻击','content',contentInfo.guid)">人生攻击</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #B8AEAE;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@click="complainted('政治敏感','content',contentInfo.guid)">政治敏感</text>
+			</view>
+		</myp-popup>
+	</view>
+</template>
+
+<script>
+	import commentCell from './components/commentCell.vue'
+	import albumCellParent from '@/pages/tabs/components/albumCellParent.vue'
+	import {
+		getXBarHeight,
+		getScreenHeight,
+		getPlatform
+	} from '@/mypUI/utils/system.js'
+	import {
+		getTouchPoint
+	} from '@/mypUI/utils/element.js'
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	import navHelper from '@/service/navHelper.js'
+	import imageHelper from '@/service/imageHelper.js'
+
+	import 'dayjs/locale/zh-cn'
+	import dayjs from 'dayjs'; // ES 2015 
+	dayjs.locale('zh-cn');
+	dayjs.extend(relativeTime);
+	import relativeTime from 'dayjs/plugin/relativeTime'
+	import {
+		GetAlbumDetail
+	} from '@/api/album/index.js'
+	import {
+		GetComments,
+		PostComments,
+		PutComments,
+		DelComments,
+		PraiseComments
+	} from '@/api/album/comment.js'
+	import {
+		FollowUser
+	} from '@/api/friend/follow.js'
+
+	import {
+		PostComplaint
+	} from '@/api/system.js'
+	import {
+		AlbumCollect,
+		AlbumPraise,
+		AlbumXinPraise,
+		DelAlbumDetail
+	} from '@/api/album/index.js'
+	export default {
+		components: {
+			commentCell,
+			albumCellParent
+		},
+		mixins: [navHelper, imageHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'elipsis'
+				}],
+				contentInfo: {},
+				comments: [],
+				comment: '',
+				parentId: 0,
+				areaHeight: uni.upx2px(72),
+				kbHide: false,
+				kbHeight: 0,
+				xH: 0,
+				areaBottomOffset: -500,
+				tsPopVisible: false,
+				popItem: {},
+				popVisible: false,
+				popShareVisible: false,
+				popLeft: '-1',
+				popBottom: '-1',
+				popTop: '-1',
+				replyObj: {}
+			}
+		},
+		computed: {
+			screenHeight() {
+				return getScreenHeight()
+			},
+			avatar() {
+				return baseAvatar(this.contentInfo.contentUser?.avatar);
+			}
+		},
+		methods: {
+			createDate(date) {
+				return dayjs(date).fromNow();
+			},
+			toRightTab(i) {
+				this.tsPopVisible = true;
+			},
+			toFollow() {
+				FollowUser(this.contentInfo.createID).then(res => {
+					if (res.data === 1)
+						this.contentInfo.isFollowing = true;
+					else
+						this.contentInfo.isFollowing = false;
+				})
+			},
+			toCollected() {
+				AlbumCollect(this.contentInfo.guid).then(res => {
+					this.contentInfo.isCollected = res.data > 0;
+				});
+			},
+			toShareDialog() {
+				this.popShareVisible = true;
+			},
+			toShare(val) {
+				this.popShareVisible = false;
+				if (val == 1)
+					uni.navigateTo({
+						url: `/pages/album/writeAlbum?fromType=album&shareAlbumId=${this.contentInfo.guid}&contents=${this.contentInfo.contents}&pic=${(this.contentInfo.pics[0]||{}).path}`
+					});
+				if (val == 2)
+					uni.navigateTo({
+						url: `/pages/friend/selectFriend?type=chat&contentId=${this.contentInfo.guid}&contents=${this.contentInfo.contents}&pic=${(this.contentInfo.pics[0]||{}).path}`
+					});
+				if (val == 3)
+					uni.navigateTo({
+						url: `/pages/album/writeAlbum?fromType=friend&shareAlbumId=${this.contentInfo.guid}&contents=${this.contentInfo.contents}&pic=${(this.contentInfo.pics[0]||{}).path}`
+					});
+			},
+			toXinPraised() {
+				AlbumXinPraise(this.contentInfo.guid).then(res => {
+					if (res.status) {
+						this.contentInfo.isXinPraised = res.data > 0;
+						this.contentInfo.xinPraiseCount += res.data;
+					}
+				});
+			},
+			toPraised() {
+				AlbumPraise(this.contentInfo.guid).then(res => {
+					this.contentInfo.isPraised = res.data > 0;
+					this.contentInfo.praiseCount += res.data;
+				});
+			},
+			toUser(userId) {
+				console.log(userId);
+				uni.navigateTo({
+					url: 'userAlbums?userId=' + userId
+				});
+			},
+			toShowCommentArea() {
+				if (this.platorm != 'ios') {
+					this.areaBottomOffset = 0 // (this.kbHeight||200) + this.xH
+				}
+				this.$refs.input.focus();
+			},
+			toConfirm() {
+				if (!this.comment || this.comment.trim().length === 0) {
+					return
+				}
+				let commentObj = {
+					"id": 0,
+					"parentId": 0,
+					"commentUser": {
+						"nickName": this.$store.getters.nickName,
+						"avatar": this.$store.getters.avatar,
+						"userId": this.$store.getters.userId
+					},
+					"parentcommentUser": null,
+					"comments": this.comment,
+					"praiseCount": 0,
+					"createDate": new Date(),
+					createId: this.$store.getters.userId
+				};
+				if (this.replyObj.id > 0) {
+					commentObj.parentId = this.replyObj.id;
+					commentObj.parentcommentUser = this.replyObj.commentUser;
+				}
+				this.comments.splice(0, 0, commentObj);
+				PostComments(this.contentInfo.guid, this.comment, this.replyObj.id).then(res => {
+					if (res.status) {
+						this.comment = "";
+						commentObj.id = res.data.id;
+						this.comments.splice(0, 1, commentObj);
+					}
+				});
+				this.$refs.input.blur();
+				this.areaBottomOffset = -500;
+				this.replyObj = {};
+				// to send comment
+			},
+			toChangeLine(e) {
+				console.log(e)
+				// 最大显示四行
+				if (e.detail.lineCount <= 4) {
+					let h = e.detail.height
+					if (h <= uni.upx2px(72)) {
+						h = uni.upx2px(72)
+					}
+					this.areaHeight = h
+				} else {
+					this.areaHeight = 4 * e.detail.height / e.detail.lineCount
+				}
+			},
+			toChangeKb(e) {
+				console.log(e)
+				const h = e.detail.height
+				if (!this.kbHeight) {
+					this.kbHeight = h
+				}
+				if (h == 0) {
+					this.$refs.input.blur();
+					this.areaBottomOffset = -500;
+					this.replyObj = {};
+				} else {
+					this.$refs.input.focus();
+					this.areaBottomOffset = this.kbHeight + this.xH
+				}
+			},
+			toReply(item) {
+				this.replyObj = item;
+				this.$refs.input.focus();
+			},
+			toCommentPraised(item) {
+				PraiseComments(item.id).then(res => {
+					item.praised = res.data > 0;
+					item.praiseCount = item.praiseCount + res.data;
+				});
+			},
+			toShowPop(e) {
+				this.popLeft = uni.upx2px(375) - uni.upx2px(210) - uni.upx2px(60);
+				const h = uni.upx2px(152);
+				let c1 = e.sY
+				if (c1 + h * 2 >= this.screenHeight) {
+					c1 = c1 - h
+				} else {
+					c1 = c1 + h
+				}
+				const off = c1 - this.screenHeight * 0.5
+				if (off > 0) {
+					this.popTop = off + 'px'
+					this.popBottom = '-1'
+				} else if (off < 0) {
+					this.popBottom = (-1 * off) + 'px'
+					this.popTop = '-1'
+				} else {
+					this.popTop = '-1'
+					this.popBottom = '-1'
+				}
+				setTimeout(() => {
+					this.popVisible = true;
+					this.popItem = e.popItem;
+					console.log(this.popItem);
+				}, 0)
+			},
+			toHidePop() {
+				this.popVisible = false;
+			},
+			toHideTsPop() {
+				this.tsPopVisible = false;
+			},
+			toHideShare() {
+				this.popShareVisible = false;
+			},
+			toParentDetail(parent) {
+				uni.navigateTo({
+					url: '/pages/album/albumDetail?guid=' + parent.guid,
+					animationType: 'slide-in-right',
+					animationDuration: 400
+				})
+			},
+			complainted(dic, type, guid) { //投诉
+				PostComplaint({
+					ComplaintDic: dic,
+					ComplaintType: type,
+					ComplaintGuid: guid
+				}).then(res => {
+					this.toHidePop();
+					this.toHideTsPop();
+				});
+			},
+			del() {
+				let _this = this;
+				uni.showModal({
+					confirmText: '确定删除',
+					title: '删除提示',
+					content: '您确定要彻底删除此条内容吗?',
+					success: function(res) {
+						_this.toHideTsPop();
+						if (res.confirm) {
+							DelAlbumDetail(_this.contentInfo.guid).then(d => {
+								uni.navigateBack();
+							});
+						}
+					}
+				});
+			},
+			edit() {
+				let _this = this;
+				uni.navigateTo({
+					url: "writeAlbum?guid=" + _this.contentInfo.guid,
+					success() {
+						_this.toHideTsPop();
+					},
+					events: {
+						resetUserAlbums(data) {
+							console.log(data);
+							_this.getDetail(_this.contentInfo.guid);
+						}
+					}
+				});
+			},
+			delComment() {
+				let _this = this;
+				_this.toHidePop();
+				uni.showModal({
+					confirmText: '确定删除',
+					title: '删除提示',
+					content: '您确定要彻底删除此条评论吗?',
+					success: function(res) {
+						if (res.confirm) {
+							DelComments(_this.popItem.id).then(d => {
+								var index = _this.comments.findIndex(m => m.id == _this.popItem.id);
+								_this.comments.splice(index, 1);
+							});
+						}
+					}
+				});
+			},
+			editComment() {
+				let _this = this;
+				_this.toHidePop();
+				plus.nativeUI.prompt(" ", function(e) {
+					if (e.index == 0) {
+						PutComments(_this.popItem.id, e.value).then(res => {
+							var putItem = _this.comments.find(m => m.id == _this.popItem.id);
+							putItem.comments = e.value;
+						});
+					}
+				}, "修改评论:", "输入新的评论...", ["确定", "取消"]);
+			},
+			getDetail(guid) {
+				GetAlbumDetail(guid).then(res => {
+					if (res.status) {
+						this.contentInfo = res.data;
+						if (this.contentInfo.commentCount > 0)
+							GetComments(this.contentInfo.guid).then(cc => {
+								this.comments = cc.data;
+							});
+					} else
+						setTimeout(() => uni.navigateBack(), 1000);
+				});
+			}
+		},
+		onLoad(options) {
+			this.platorm = getPlatform();
+			this.xH = getXBarHeight();
+			if (!options.guid)
+				uni.navigateBack();
+			else
+				this.getDetail(options.guid);
+			// 是否是通过点击评论进来的
+			if (options.comment) {
+				setTimeout(() => {
+					this.$refs.input.focus();
+				}, 50)
+			}
+		},
+		onHide() {
+			uni.hideKeyboard()
+			this.areaBottomOffset = -500
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.ad {
+		&-foot {
+			left: 0;
+			width: 750rpx;
+			padding-top: 20rpx;
+			padding-bottom: 20rpx;
+			padding-right: 24rpx;
+			padding-left: 24rpx;
+		}
+
+		&-input {
+			flex: 1;
+			background-color: #EFEFF4;
+			border-radius: 40rpx;
+			padding-top: 12rpx;
+			padding-left: 32rpx;
+			padding-right: 32rpx;
+			color: $myp-text-color;
+			font-size: $myp-font-size-base;
+			font-weight: 900;
+			line-height: 36rpx;
+			text-align: left;
+		}
+	}
+</style>

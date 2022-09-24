@@ -1,0 +1,120 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="新赞" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" :down="null" :up="null">
+			<myp-list-cell>
+				<view class="myp-bg-inverse"
+					style="padding-left: 30rpx;padding-right: 30rpx;padding-top: 32rpx;padding-bottom: 8rpx;">
+					<view class="myp-flex-row myp-align-center">
+						<image :src="baseAvatar($store.getters.avatar)" mode="aspectFill"
+							style="width: 120rpx;height: 120rpx;border-radius: 24rpx;"></image>
+						<view style="margin-left: 24rpx;">
+							<text class="myp-size-ll myp-lh-ll myp-color-text"
+								style="font-weight: 900;">{{$store.getters.nickName}}</text>
+							<view style="height: 6rpx;"></view>
+							<view class="myp-flex-row myp-align-center">
+								<myp-icon name="hand-solid" type="warning" size="base"></myp-icon>
+								<text class="myp-size-ss myp-lh-ss myp-color-text"
+									style="margin-left: 24rpx;font-weight: 700;">{{xinZanInfo.quantity}}</text>
+							</view>
+						</view>
+					</view>
+					<view style="height: 40rpx;"></view>
+					<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 76rpx;">
+						<text class="myp-size-s myp-color-text" style="font-weight: 700;">今日使用新赞次数</text>
+						<text class="myp-size-s myp-color-second"
+							style="font-weight: 700;">{{xinZanInfo.todayUsed}}</text>
+					</view>
+					<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 76rpx;">
+						<text class="myp-size-s myp-color-text" style="font-weight: 700;">今日下一次新赞数</text>
+						<text class="myp-size-s myp-color-second"
+							style="font-weight: 700;">{{xinZanInfo.nextUsed}}</text>
+					</view>
+				</view>
+				<view style="height: 20rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view class="myp-bg-inverse myp-flex-row myp-align-center myp-justify-between"
+					style="padding-left: 30rpx;padding-right: 30rpx;height: 92rpx;">
+					<text class="myp-size-s myp-color-text" style="font-weight: 700;">邀请的数量</text>
+					<text class="myp-size-s myp-color-second"
+						style="font-weight: 700;">{{xinZanInfo.invitedUsers.length}}位好友</text>
+				</view>
+				<view class="myp-bg-inverse myp-flex-row myp-wrap-wrap" style="padding-left: 30rpx;width: 750rpx;">
+					<image v-for="(item,idx) in xinZanInfo.invitedUsers" :key="idx" :src="baseAvatar(item.avatar)"
+						mode="aspectFill"
+						:style="'width: 88rpx;height: 88rpx;border-radius: 16rpx;margin-bottom:24rpx;'+((idx+1)%6===0?'margin-right:0;':'margin-right:32rpx;')">
+					</image>
+				</view>
+				<view class="myp-bg-inverse" style="height: 8rpx;"></view>
+				<view style="height: 20rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view class="myp-flex-row myp-align-center myp-bg-inverse"
+					style="height: 76rpx;padding-left: 30rpx;padding-right: 30rpx;" @tap="toCopyLink">
+					<text class="myp-size-s myp-color-text" style="font-weight: 700;width: 143rpx;">邀请链接</text>
+					<text class="myp-size-s myp-color-second"
+						style="font-weight: 700;margin-right: 56rpx;">https://www.guxin.link</text>
+					<myp-icon name="/static/icon/copy.png" size="ll" type="second" @iconClicked="toCopyLink"></myp-icon>
+				</view>
+				<view class="myp-flex-row myp-align-center myp-bg-inverse"
+					style="height: 76rpx;padding-left: 30rpx;padding-right: 30rpx;" @tap="toCopyCode">
+					<text class="myp-size-s myp-color-text" style="font-weight: 700;width: 143rpx;">邀请码</text>
+					<text class="myp-size-l myp-color-warning"
+						style="font-weight: 700;margin-right: 56rpx;">{{xinZanInfo.invitedCode}}</text>
+					<myp-icon name="/static/icon/copy.png" size="ll" type="second" @iconClicked="toCopyCode"></myp-icon>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+	import {
+		GetXinPraiseInfo
+	} from '@/api/user/index.js'
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	import {
+		setText
+	} from '@/js_sdk/dc-clipboard/clipboard.js'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				xinZanInfo: {
+					invitedUsers: []
+				}
+			}
+		},
+		methods: {
+			baseAvatar(url) {
+				return baseAvatar(url);
+			},
+			toCopyLink() {
+				setText('guxin.link');
+				uni.showToast({
+					title: '已复制'
+				});
+			},
+			toCopyCode() {
+				setText(this.xinZanInfo.invitedCode);
+				uni.showToast({
+					title: '已复制'
+				});
+			}
+		},
+		onLoad() {
+			GetXinPraiseInfo().then(res => {
+				this.xinZanInfo = res.data;
+			});
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

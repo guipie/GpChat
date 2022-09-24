@@ -1,0 +1,69 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="收藏" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="collectList" :autoUpdate="true" @down="toLoadData" @up="toLoadData" :useLoading="true">
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<album-cell :item="item" :last="items.length-1===idx" :hasChat="false" :forCared="true"
+					@detail="toDetail"></album-cell>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import albumCell from '../tabs/components/albumCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+
+	import {
+		GetAlbumCollect
+	} from '@/api/album/index.js'
+	export default {
+		components: {
+			albumCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'search'
+				}],
+				items: [],
+				searchDate: ''
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				uni.navigateTo({
+					url: '/pages/chat/search?type=collected'
+				})
+			},
+			toDetail(item) {
+				uni.navigateTo({
+					url: '/pages/album/albumDetail?guid=' + item.guid
+				})
+			},
+			toLoadData() {
+				const ins = this.$refs['collectList'];
+				const cp = ins.mypCurrentPage;
+				if (cp === 1) {
+					this.items = [];
+					this.searchDate = "";
+				}
+				GetAlbumCollect(this.searchDate).then(res => {
+					console.log(res.data.length >= 5);
+					this.items.push.apply(this.items, res.data || []);
+					this.searchDate = res.data.map(m => m.createDate)[res.data.length - 1];
+					ins.mypEndSuccess(res.data.length >= 5);
+				}).catch(err => {
+					ins.mypEndError()
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

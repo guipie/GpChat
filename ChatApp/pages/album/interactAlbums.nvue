@@ -1,0 +1,50 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="我的互动" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-tabs-h :items="tabs" :value="mypCurrentTab" :delay="50" :isTap="mypIsTap" :offset="mypDx"
+			:last="mypLastTabIndex" width="160rpx" justify="center" height="76rpx" textType="second"
+			activeTextType="text" textStyle="font-weight:700;" indicatorWidth="36rpx" indicatorHeight="5rpx"
+			indicatorType="custom" @change="mypOnTabChange"></myp-tabs-h>
+		<swiper :current="mypCurrentTab" style="flex: 1;" @change="mypOnSwiperChange"
+			@animationfinish="mypOnSwiperAnimationFinish" @onAnimationEnd="mypOnSwiperAnimationFinish"
+			@transition="mypOnSwiperScroll">
+			<swiper-item v-for="(tab,idx) in tabs" :key="idx">
+				<inter-album-list :current="mypCurrentTab" :index="idx"></inter-album-list>
+			</swiper-item>
+		</swiper>
+	</view>
+</template>
+
+<script>
+	import interAlbumList from './components/interAlbumList.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import tabsSwiperMixin from '@/mypUI/myp-tabs-h/tabsSwiperMixin.js'
+
+	export default {
+		components: {
+			interAlbumList
+		},
+		mixins: [navHelper, tabsSwiperMixin],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'search'
+				}],
+				tabs: ['全部', '点赞', '评论', '新赞']
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				uni.navigateTo({
+					url: '/pages/chat/search?type=interact'
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

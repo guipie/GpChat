@@ -1,0 +1,233 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="登陆" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 66rpx;"></view>
+				<view class="myp-flex-row myp-justify-center">
+					<image style="width: 150rpx;height: 150rpx;" mode="aspectFill"></image>
+				</view>
+				<view style="height: 40rpx;"></view>
+				<view class="big-phone-margin">
+					<myp-input v-model="phone" type="digit" :maxlength="11" icon="phone" height="l" placeholder="输入手机号"
+						space="20rpx" bgType="none" boxStyle="padding-left:10rpx;padding-right:10rpx;"></myp-input>
+					<myp-input v-model="password" :maxlength="24" :password="pwdNoVisible" :indicator="rightEye"
+						icon="lock" height="l" placeholder="密码" space="20rpx" bgType="none"
+						boxStyle="padding-left:10rpx;padding-right:10rpx;" @indicatorClicked="togglePwdVisible">
+					</myp-input>
+					<view class="big-phone-ask">
+						<text class="big-phone-ask-text" @tap="toProblem">登录遇到问题？</text>
+					</view>
+				</view>
+				<myp-button :disabled="loginDisabled" bgType="primary" text="登录" textType="inverse" radius="ll"
+					border="none" boxStyle="margin-left:75rpx;margin-right:75rpx;" :loading="Logging"
+					@buttonClicked="toLoginCheck"></myp-button>
+				<view class="big-phone-privacy">
+					<text class="big-phone-privacy-hint">登录表示同意</text>
+					<text class="big-phone-privacy-title" @tap="toPrivacyCheck('service')">《服务协议》</text>
+					<text class="big-phone-privacy-hint">与</text>
+					<text class="big-phone-privacy-title" @tap="toPrivacyCheck('secret')">《隐私政策》</text>
+				</view>
+				<view class="big-phone-regist">
+					<myp-icon name="circle-right" iconStyle="color:#0273F1;" @iconClicked="toRegister"></myp-icon>
+					<text class="big-phone-regist-text" @tap="toRegister">注册账号</text>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+		<privacy-pop :show="privacyVisible" @agree="toAgreePrivacy" @reject="toRejectPrivacy" @privacy="toPrivacy">
+		</privacy-pop>
+		<privacy-confirm :show="privacyConfirmVisible" @agree="toConfirmAgree" @reject="toConfirmReject">
+		</privacy-confirm>
+		<myp-loading ref="myp-loading" :needMask="true" maskStyle="background-color:transparent;"></myp-loading>
+		<myp-toast ref="myp-toast"></myp-toast>
+	</view>
+</template>
+
+<script>
+	import privacyPop from './components/privacyPop.vue'
+	import privacyConfirm from './components/privacyPopConfirm.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import toastMixin from '@/mypUI/myp-mixin/toastMixin.js'
+	import loadingMixin from '@/mypUI/myp-mixin/loadingMixin.js'
+
+	import validator from '@/mypUI/utils/validate.js'
+
+	import {
+		mapMutations,
+		mapActions
+	} from 'vuex'
+
+	export default {
+		components: {
+			privacyPop,
+			privacyConfirm
+		},
+		mixins: [navHelper, loadingMixin, toastMixin],
+		data() {
+			return {
+				Logging: false,
+				pwdNoVisible: true,
+				password: "1234567",
+				rightEye: "eye",
+				phone: '18600766046',
+				privacyVisible: false,
+				privacyConfirmVisible: false,
+				agreed: false
+			}
+		},
+		computed: {
+			loginDisabled() {
+				const pwdFlag = validator.is6To24Pwd(this.password)
+				const phoneFlag = validator.isMobile(this.phone)
+				if (pwdFlag && phoneFlag) {
+					return false;
+				}
+				return true;
+			}
+		},
+		methods: {
+			...mapActions({
+				LoginAsync: "user/LoginAsync"
+			}),
+			// ...mapMutations({
+			// 	Login: "user/Login"
+			// }),
+			toLoginCheck() {
+				if (!this.agreed) {
+					this.privacyVisible = true
+					return false;
+				}
+				this.Logging = true;
+				uni.hideKeyboard();
+				this.LoginAsync({
+					"userName": this.phone,
+					"passWord": this.password,
+				}).then(res => {
+					this.Logging = false;
+					uni.navigateBack();
+				}).catch(err => {
+					this.Logging = false;
+				});
+			},
+			toRegister() {
+				uni.redirectTo({
+					url: '/pages/auth/register'
+				})
+			},
+			toProblem() {
+
+			},
+			togglePwdVisible() {
+				this.pwdNoVisible = !this.pwdNoVisible
+				this.rightEye = this.pwdNoVisible ? "eye" : "eye-close"
+			},
+			toPrivacy(val) {
+
+			},
+			toPrivacyCheck(val) {
+				// #ifdef APP-NVUE
+				if (!this.agreed) {
+					this.privacyVisible = true
+					return
+				}
+				// #endif
+				this.toPrivacy(val)
+			},
+			toAgreePrivacy() {
+				this.agreed = true
+				uni.setStorage({
+					key: 'privacyAgreed',
+					data: true
+				})
+				this.privacyVisible = false
+			},
+			toRejectPrivacy() {
+				this.agreed = false
+				uni.setStorage({
+					key: 'privacyAgreed',
+					data: false
+				})
+				this.privacyVisible = false
+				this.privacyConfirmVisible = true
+			},
+			toConfirmAgree() {
+				this.privacyConfirmVisible = false
+				this.privacyVisible = true
+			},
+			toConfirmReject() {
+				this.agreed = false
+				uni.setStorage({
+					key: 'privacyAgreed',
+					data: false
+				})
+				this.privacyConfirmVisible = false
+			}
+		},
+		onLoad() {
+			try {
+				const a = uni.getStorageSync("privacyAgreed")
+				this.agreed = a
+				if (!this.agreed) {
+					setTimeout(() => {
+						this.privacyVisible = true
+					}, 50)
+				}
+			} catch (e) {
+				//TODO handle the exception
+				this.agreed = false
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.big-phone {
+		&-margin {
+			margin: 0 62rpx;
+		}
+
+		&-ask {
+			margin-top: 22rpx;
+			margin-bottom: 45rpx;
+			flex-direction: row;
+			justify-content: flex-end;
+
+			&-text {
+				color: $myp-text-color-third;
+				font-size: $myp-font-size-base;
+			}
+		}
+
+		&-privacy {
+			margin-top: 32rpx;
+			margin-bottom: 80rpx;
+			flex-direction: row;
+			justify-content: center;
+
+			&-hint {
+				color: $myp-text-color-forth;
+				font-size: $myp-font-size-s;
+			}
+
+			&-title {
+				color: $myp-color-primary;
+				font-size: $myp-font-size-s;
+			}
+		}
+
+		&-regist {
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			margin-bottom: 78rpx;
+
+			&-text {
+				color: $myp-color-link;
+				font-size: $myp-font-size-l;
+				margin-left: 10rpx;
+			}
+		}
+	}
+</style>

@@ -1,0 +1,369 @@
+<template>
+	<view style="padding-bottom: 20rpx;">
+		<myp-navbar leftStyle="width:0;" centerStyle="width:750rpx;" rightStyle="width:0;padding-left:30rpx;">
+			<view slot="title" class="myp-flex-row myp-align-center myp-wrap-nowrap">
+				<view class="myp-flex-row myp-align-center myp-wrap-nowrap myp-radius-ss"
+					style="width: 602rpx;height: 32px;padding-left:16rpx;padding-right:16rpx;background-color: #F7F8FA;">
+					<myp-icon name="search" size="s" type="second"></myp-icon>
+					<input v-model="search" class="s-input myp-color-text" :placeholder="searchTxt"
+						placeholder-style="font-size:14px;color:#9092A5;" :adjust-position="false" confirm-type="search"
+						@confirm="toSearch" />
+				</view>
+				<text class="myp-color-text" style="font-size: 14px;font-weight: 700;margin-left: 32rpx;"
+					@tap="toCancel">取消</text>
+			</view>
+		</myp-navbar>
+		<myp-list ref="search-list" :autoUpdate="search" :down="null" :up="{use:isPage}" @up="toSearch()">
+			<myp-list-cell>
+				<view style="height: 12rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-if="searchType=='newFriend'">
+				<search-member-cell :item="item" v-for="(item,idx) in friends" :key="idx">
+				</search-member-cell>
+				<text class="myp-color-second myp-size-l"
+					style="height: 44rpx;margin-top: 72rpx;text-align: center;width: 750rpx;"
+					v-if="!searched">去搜索新的朋友</text>
+				<text class="myp-color-second myp-size-l"
+					style="height: 44rpx;margin-top: 72rpx;text-align: center;width: 750rpx;"
+					v-if="searched&&friends.length==0">未搜索到好友</text>
+			</myp-list-cell>
+
+			<myp-list-cell>
+				<view style="height: 12rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-if="isSearchFriends">
+				<search-member-cell :item="item" v-for="(item,idx) in friends" :key="idx">
+				</search-member-cell>
+			</myp-list-cell>
+			<myp-list-cell class="myp-flex-row  myp-align-center myp-justify-center" style="padding-top: 20rpx;"
+				v-if="friends.length==3&&!searchType">
+				<myp-icon name="search" size="s" type="error"></myp-icon>
+				<text class="more-text" @tap="toMore('friends')">搜索更多好友</text>
+			</myp-list-cell>
+
+			<myp-list-cell v-if="chatRecords.length>0">
+				<text class="myp-color-second myp-size-s title">聊天记录</text>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in chatRecords" :key="idx">
+				<search-chat-cell :item="item" :isLast="idx===chatRecords.length-1" :search="search"
+					@detail="chatDetail">
+				</search-chat-cell>
+			</myp-list-cell>
+			<myp-list-cell class="myp-flex-row  myp-align-center myp-justify-center" style="padding-top: 20rpx;"
+				v-if="chatRecords.length==3&&!searchType">
+				<myp-icon name="search" size="s" type="error"></myp-icon>
+				<text class="more-text" @tap="toMore('chats')">搜索更多聊天记录</text>
+			</myp-list-cell>
+
+			<myp-list-cell v-if="chatGroupRecords.length>0">
+				<text class="myp-color-second myp-size-s title">群聊记录</text>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in chatGroupRecords" :key="idx">
+				<search-chat-group-cell :item="item" :group="getGroup(item)" :isLast="idx===chatGroupRecords.length-1"
+					:search="search" @detail="groupChatDetail">
+				</search-chat-group-cell>
+			</myp-list-cell>
+			<myp-list-cell class="myp-flex-row  myp-align-center myp-justify-center" style="padding-top: 20rpx;"
+				v-if="chatGroupRecords.length==3&&!searchType">
+				<myp-icon name="search" size="s" type="error"></myp-icon>
+				<text class="more-text" @tap="toMore('chats')">搜索更多聊天记录</text>
+			</myp-list-cell>
+
+
+			<myp-list-cell v-if="contents.length>0">
+				<text class="myp-color-second myp-size-s title">故新内容</text>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in contents" :key="idx">
+				<search-content-cell :item="item" :isLast="idx===contents.length-1" @detail="contentDetail">
+				</search-content-cell>
+			</myp-list-cell>
+			<myp-list-cell class="myp-flex-row  myp-align-center myp-justify-center" style="padding-top: 20rpx;"
+				v-if="contents.length==3&&!searchType">
+				<myp-icon name="search" size="s" type="error"></myp-icon>
+				<text class="more-text" @tap="toMore('contents')">搜索更多内容</text>
+			</myp-list-cell>
+
+			<!-- 某个用户的单独内容 -->
+			<myp-list-cell v-if="contentsByUser.length>0">
+				<text class="myp-color-second myp-size-s title">{{searchTxt}}</text>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in contentsByUser" :key="idx">
+				<search-content-cell :item="item" :isLast="idx===contentsByUser.length-1" @detail="contentDetail">
+				</search-content-cell>
+			</myp-list-cell>
+			<myp-list-cell class="myp-flex-row  myp-align-center myp-justify-center" style="padding-top: 20rpx;"
+				v-if="contentsByUser.length==3&&isSearchContentsByUser">
+				<myp-icon name="search" size="s" type="error"></myp-icon>
+				<text class="more-text" @tap="toMore('contentsByUser')">搜索更多内容</text>
+			</myp-list-cell>
+
+			<myp-list-cell v-if="userContents.length>0">
+				<text class="myp-color-second myp-size-s title">用户及内容</text>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in userContents" :key="idx">
+				<searchUserContentCell :item="item" :isLast="idx===userContents.length-1" @detail="contentDetail">
+				</searchUserContentCell>
+			</myp-list-cell>
+			<myp-list-cell class="myp-flex-row  myp-align-center myp-justify-center" style="padding-top: 20rpx;"
+				v-if="userContents.length>=3&&!searchType">
+				<myp-icon name="search" size="s" type="error"></myp-icon>
+				<text class="more-text" @tap="toMore('userContents')">搜索更多用户</text>
+			</myp-list-cell>
+		</myp-list>
+		<view v-if="chatView">
+			<web-view :webview-styles="webviewStyles" src="https://uniapp.dcloud.io/static/web-view.html"></web-view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import searchMemberCell from './components/searchMemberCell.vue'
+	import searchChatCell from './components/searchChatCell.vue'
+	import searchChatGroupCell from './components/searchChatGroupCell.vue'
+	import searchContentCell from './components/searchContentCell.vue'
+	import searchUserContentCell from './components/searchUserContentCell.vue'
+	import {
+		SearchUser
+	} from '@/api/friend/index.js'
+	import {
+		SearchAlbums,
+		SearchUserAlbums
+	} from '@/api/album/index.js';
+	import {
+		selectSQL
+	} from '@/api/db.js'
+	import {
+		isNullOrEmpty
+	} from '@/mypUI/utils/validate.js'
+	import {
+		mapMutations,
+		mapState
+	} from 'vuex'
+	export default {
+		components: {
+			searchMemberCell,
+			searchChatCell,
+			searchChatGroupCell,
+			searchContentCell,
+			searchUserContentCell
+		},
+		data() {
+			return {
+				fromPage: "",
+				searchUserId: 0,
+				search: '',
+				searchDate: "",
+				searched: false,
+				serachType: '', //newFriend为新的好友搜索添加 
+				friends: [], //好友
+				chatRecords: [], //聊天记录
+				chatGroupRecords: [], //群聊天记录
+				contents: [], //内容
+				contentsByUser: [],
+				userContents: [], //用户内容 
+				previousPage: ""
+			}
+		},
+		computed: {
+			isPage() {
+				return this.searchType && this.searchType != 'newFriend' && this.search ?
+					true : false;
+			},
+			isSearchNewFriend() {
+				return this.searchType == 'newFriend' && this.search;
+			},
+			isSearchContents() {
+				return (isNullOrEmpty(this.searchType) || this.searchType == 'contents') && this.search;
+			},
+			isSearchContentsByUser() {
+				return this.searchType == 'contentsByUser' && this.search;
+			},
+			isSearchUserContents() {
+				return (isNullOrEmpty(this.searchType) || this.searchType == 'userContents') && this.search;
+			},
+			isSearchChats() {
+				return (isNullOrEmpty(this.searchType) || this.searchType == 'chats') && this.search;
+			},
+			isSearchGroupChats() {
+				return (isNullOrEmpty(this.searchType) || this.searchType == 'groupChats') && this.search;
+			},
+			isSearchFriends() {
+				return (isNullOrEmpty(this.searchType) || this.searchType == 'friends') && this.search;
+			},
+			...mapState({
+				groups: state => state.group.groups
+			})
+		},
+		methods: {
+			...mapMutations({
+				SetChattingUser: "chat/SetChattingUser",
+				SetChattingGroup: "chat/SetChattingGroup"
+			}),
+			getGroup(item) {
+				return this.groups.find(m => m.GroupId == item.ReceiveUserId);
+			},
+			toSearch() {
+				const ins = this.$refs['search-list'];
+				const cp = ins.mypCurrentPage;
+				if (cp === 1 || !this.searchDate) {
+					this.userContents = [];
+					this.contents = [];
+					this.chatRecords = [];
+					this.friends = [];
+					this.contentsByUser = [];
+					this.searchDate = ""
+				}
+				if (this.isSearchNewFriend) { //搜索添加好友  
+					SearchUser(this.search).then(res => {
+						if ((res.data || {}).FriendUserId > 0)
+							this.friends = [res.data];
+						this.searched = true;
+					});
+				}
+				if (this.isSearchContents) {
+					SearchAlbums(this.search, this.searchDate).then(res => {
+						this.contents = [...this.contents, ...res.data];
+						this.searchDate = res.data.map(m => m.createDate)[res.data.length - 1];
+						ins.mypEndSuccess(res.data.length >= 3);
+						if (this.contents.length <= 10)
+							ins.mypLoad();
+					});
+				}
+				if (this.isSearchContentsByUser) {
+					SearchUserAlbums(this.search, this.searchDate, this.searchUserId).then(res => {
+						this.contentsByUser = [...this.contentsByUser, ...res.data];
+						this.searchDate = res.data.map(m => m.createDate)[res.data.length - 1];
+						console.log(this.searchDate);
+						ins.mypEndSuccess(res.data.length >= 3);
+						if (this.contentsByUser.length <= 10)
+							ins.mypLoad();
+					});
+				}
+				if (this.isSearchUserContents) {
+					SearchUserAlbums(this.search, this.searchDate).then(res => {
+						this.userContents = [...this.userContents, ...res.data];
+						this.searchDate = res.data.map(m => m.lastLoginDate)[res.data.length - 1];
+						ins.mypEndSuccess(res.data.length >= 3);
+						if (this.userContents.length <= 10)
+							ins.mypLoad();
+					}).catch(err => {
+						ins.mypEndError()
+					});
+				}
+				if (this.isSearchChats) {
+					selectSQL(
+						`select chat.*,friend.Avatar as Avatar,friend.FriendRemarkName as Name from chat left outer join friend on chat.SendUserId=friend.FriendUserId  where IsGroup=0 and SendTime<'${(this.searchDate?this.searchDate:new Date())}' and Content like '%${this.search}%' order by SendTime desc limit 0,3`,
+						(data) => {
+							this.chatRecords = [...this.chatRecords, ...data];
+							this.searchDate = data.map(m => m.SendTime)[data.length - 1];
+							ins.mypEndSuccess(data.length >= 3);
+							if (this.chatRecords.length <= 10)
+								ins.mypLoad();
+						});
+				}
+				if (this.isSearchGroupChats) {
+					selectSQL(
+						`select * from chat where IsGroup=1 and SendTime<'${(this.searchDate?this.searchDate:new Date())}' and Content like '%${this.search}%' order by SendTime desc  limit 0,3`,
+						(data) => {
+							this.chatGroupRecords = [...this.chatGroupRecords, ...data];
+							this.searchDate = data.map(m => m.SendTime)[data.length - 1];
+							ins.mypEndSuccess(data.length >= 3);
+							if (this.chatGroupRecords.length <= 10)
+								ins.mypLoad();
+						});
+				}
+				if (this.isSearchFriends) {
+					selectSQL(
+						`select * from friend where FriendRemarkName like '%${this.search}%' and CreateDate<'${(this.searchDate?this.searchDate:new Date())}'`,
+						(data) => {
+							this.friends = [...this.friends, ...data];
+							this.searchDate = data.map(m => m.CreateDate)[data.length - 1];
+							ins.mypEndSuccess(data.length >= 3);
+							if (this.friends.length <= 10)
+								ins.mypLoad();
+						});
+				}
+			},
+			toMore(type) {
+				uni.navigateTo({
+					url: '/pages/chat/search?type=' + type + '&search=' + this.search + '&userId=' + this
+						.searchUserId
+				})
+			},
+			toCancel() {
+				uni.navigateBack();
+			},
+			chatDetail(c) {
+				this.SetChattingUser({
+					FriendUserId: getApp().globalData.userId == c.SendUserId ? c.ReceiveUserId : c.SendUserId,
+					FriendRemarkName: c.Name,
+					Avatar: c.Avatar,
+					searchDate: c.SendTime,
+					page: this.fromPage
+				});
+			},
+			groupChatDetail(c) {
+				this.SetChattingGroup({
+					groupId: c.ReceiveUserId,
+					searchDate: c.SendTime,
+					page: this.fromPage
+				});
+			},
+			contentDetail(c) {
+				uni.navigateTo({
+					url: '/pages/album/albumDetail?guid=' + c.contentGuid
+				});
+			}
+		},
+		onLoad(options) {
+			this.searchType = options.type;
+			this.previousPage = options.page;
+			if (this.searchType === 'newFriend')
+				this.searchTxt = "搜索故新号/手机号码添加好友"
+			else if (this.searchType === 'contentsByUser')
+				this.searchTxt = "搜索" + options.searchNickName + "内容"
+			else if (this.searchType === 'collected')
+				this.searchTxt = "搜索收藏的内容"
+			else if (this.searchType === 'interact')
+				this.searchTxt = "搜索互动的内容"
+			else if (this.searchType === 'chats')
+				this.searchTxt = "搜索聊天记录"
+			else if (this.searchType === 'groupChats')
+				this.searchTxt = "搜索群聊记录"
+			else
+				this.searchTxt = '搜索'
+			options.search && (this.search = options.search);
+			options.page && (this.fromPage = options.page);
+			if (options.userId > 0) {
+				this.searchUserId = options.userId
+				this.searchNickName = options.searchNickName;
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.s {
+		&-input {
+			font-size: 14px;
+			font-weight: 700;
+			margin-left: 24rpx;
+			flex: 1;
+		}
+	}
+
+	.more-text {
+		padding-left: 12rpx;
+		padding-right: 12rpx;
+		color: #FF3838;
+		font-family: Microsoft YaHei;
+		font-weight: 700;
+		font-size: 12px;
+		text-align: left;
+	}
+
+	.title {
+		padding-left: 20rpx;
+		padding-top: 40rpx;
+	}
+</style>

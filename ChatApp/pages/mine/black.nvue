@@ -1,0 +1,53 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="黑名单" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" :autoUpdate="true" @down="toLoadData" @up="toLoadData">
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<black-cell :item="item" :last="items.length-1===idx" @cancel="toCancel"></black-cell>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import blackCell from './components/blackCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+
+
+	import {
+		GetBlackList,
+		SetFriendBlack
+	} from '@/api/friend/index.js'
+	export default {
+		components: {
+			blackCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				items: []
+			}
+		},
+		methods: {
+			toCancel(friendUserId) {
+				SetFriendBlack(friendUserId, false).then(res => {
+					var index = this.items.findIndex(m => m.friendUserId == friendUserId);
+					this.items.splice(index, 1);
+					this.$store.dispatch("friend/GetFriendsAsync"); //重置好友列表  
+				});
+			},
+			toLoadData() {
+				GetBlackList().then(res => {
+					this.items = res.data;
+				});
+			}
+		},
+		onLoad() {}
+	}
+</script>
+
+<style>
+
+</style>

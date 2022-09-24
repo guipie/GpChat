@@ -1,0 +1,13 @@
+{
+    "id": "wonyes-checkappupdate",
+    "name": "app版本更新升级检测工具",
+    "version": "4.0.0",
+    "description": "单js文件实现版本检测更新升级，简单易用，附带后端php示例代码，支持强制/取消更新，显示下载进度",
+    "keywords": [
+        "升级",
+        "更新",
+        "版本升级",
+        "版本检测",
+        "Native.js"
+    ]
+}

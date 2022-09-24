@@ -1,0 +1,252 @@
+<template>
+	<view>
+		<myp-navbar :lefts="null" title="登陆" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 66rpx;"></view>
+				<view class="myp-flex-row myp-justify-center">
+					<image style="width: 150rpx;height: 150rpx;" mode="aspectFill"></image>
+				</view>
+				<view style="height: 40rpx;"></view>
+				<view class="big-phone-margin">
+					<myp-input label="手机号" ref="phone" v-model="loginUser.phoneNo" type="digit" :maxlength="11"
+						icon="phone" height="l" placeholder="输入手机号" space="20rpx" bgType="none" focus
+						boxStyle="padding-left:10rpx;padding-right:10rpx;"></myp-input>
+					<myp-input v-if="pwdLogin" label="密    码" v-model="loginUser.passWord" :maxlength="24"
+						:password="pwdNoVisible" indicator="eye-close" icon="lock" height="l" placeholder="输入密码"
+						space="20rpx" bgType="none" boxStyle="padding-left:10rpx;padding-right:10rpx;"
+						@indicatorClicked="togglePwdVisible">
+					</myp-input>
+					<view v-else class="myp-flex-row myp-align-center myp-wrap-nowrap">
+						<myp-input label="验证码" v-model="loginUser.vcode" type="digit" :maxlength="6" icon="lock"
+							height="l" placeholder="输入验证码" space="20rpx" bgType="none"
+							boxStyle="padding-left:10rpx;padding-right:10rpx;flex:1;">
+						</myp-input>
+						<myp-button :loading="registerCodeLoading" :text="seconds!=60?(seconds+'s'):'发送'" bgType="none"
+							height="l" border="bottom" radius="ll" textType="primary" :disabled="seconds!=60"
+							boxStyle="width:138rpx;height:55rpx;background-color:#E8EAF6;" @buttonClicked="toGetCode">
+						</myp-button>
+					</view>
+				</view>
+				<view class="big-phone-privacy">
+					<myp-icon :name="agreed?'check-solid':'check'" :type="agreed?'success':'second'"
+						iconStyle="width: 45rpx;height: 38rpx;" @iconClicked="toToggleSync"></myp-icon>
+					<text class="big-phone-privacy-hint">我已经阅读</text>
+					<text class="big-phone-privacy-title" @tap="toPrivacyCheck('user')">《用户协议》</text>
+					<text class="big-phone-privacy-hint">与</text>
+					<text class="big-phone-privacy-title" @tap="toPrivacyCheck('secrecy')">《隐私协议》</text>
+				</view>
+				<view class="big-phone-regist">
+					<image style="width: 200rpx; height: 88rpx;" mode="scaleToFill" src="/static/ui/login.png"
+						@error="imageError" @tap="toLogin"></image>
+					<image style="width: 200rpx; height: 88rpx;margin-left: 75rpx;" mode="scaleToFill"
+						src="/static/ui/register.png" @error="imageError" @tap="toRegister()"></image>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+		<view class="big-phone-privacy">
+			<text class="big-phone-privacy-title" style="margin-right:5rpx;"
+				@tap="pwdLogin=!pwdLogin;loginUser.passWord='';loginUser.vcode='';">
+				{{pwdLogin?"验证码登录":"密码登录"}}
+			</text>
+			<text class="big-phone-privacy-hint">
+				*
+			</text>
+			<text class="big-phone-privacy-title" style="margin-left:5rpx;" @tap="toPrivacyCheck('help')">
+				遇到问题
+			</text>
+		</view>
+
+		<myp-loading ref="myp-loading" :needMask="true" maskStyle="background-color:transparent;"></myp-loading>
+	</view>
+</template>
+
+<script>
+	import privacyPop from './components/privacyPop.vue'
+	import privacyConfirm from './components/privacyPopConfirm.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import toastMixin from '@/mypUI/myp-mixin/toastMixin.js'
+	import loadingMixin from '@/mypUI/myp-mixin/loadingMixin.js'
+
+	import validator from '@/mypUI/utils/validate.js'
+
+	import {
+		GetLCode
+	} from '@/api/user/index.js';
+	import {
+		mapActions,
+		mapMutations,
+		mapGetters
+	} from 'vuex'
+
+	export default {
+		components: {
+			privacyPop,
+			privacyConfirm
+		},
+		mixins: [navHelper, loadingMixin, toastMixin],
+		data() {
+			return {
+				rightEye: "eye",
+				Logging: false,
+				pwdNoVisible: true,
+				pwdLogin: true,
+				agreed: false,
+				loginUser: {
+					"phoneNo": "",
+					"passWord": "",
+					"vcode": ""
+				},
+				seconds: 60
+			}
+		},
+		computed: {
+			...mapGetters(['hasLogedIn']),
+			loginDisabled() {
+				const pwdFlag = validator.is6To24Pwd(this.password)
+				const phoneFlag = validator.isMobile(this.phone)
+				if (pwdFlag && phoneFlag) {
+					return false;
+				}
+				return true;
+			}
+		},
+		methods: {
+			...mapActions({
+				LoginAsync: "user/LoginAsync"
+			}),
+			toToggleSync() {
+				this.agreed = !this.agreed;
+			},
+			togglePwdVisible() {
+				this.pwdNoVisible = !this.pwdNoVisible;
+			},
+			toLogin() {
+				uni.hideKeyboard();
+				if (!validator.isMobile(this.loginUser.phoneNo))
+					return this.showToastWarning("请输入正确手机号");
+				if (validator.isNullOrEmpty(this.loginUser.passWord) && this.pwdLogin)
+					return this.showToastWarning("请输入密码");
+				if (validator.isNullOrEmpty(this.loginUser.vcode) && !this.pwdLogin)
+					return this.showToastWarning("请输入验证码");
+				if (!this.agreed)
+					return this.showToastWarning("请先同意用户协议");
+				this.LoginAsync(this.loginUser).then(userInfo => {
+					if (userInfo.userId > 0) {
+						uni.switchTab({
+							url: '/pages/tabs/news'
+						})
+					}
+				}).catch(err => {
+					console.log(err);
+				});
+			},
+			toRegister() {
+				uni.navigateTo({
+					url: '/pages/auth/register'
+				})
+			},
+			toPrivacyCheck(val) {
+				uni.navigateTo({
+					url: '/pages/common/pubRichText?type=' + val
+				})
+			},
+			toGetCode() {
+				GetLCode(this.loginUser.phoneNo).then(res => {
+					if (res.status) {
+						this.showToastSuccess('发送成功');
+						let interval = setInterval(() => {
+							if (this.seconds === 0) {
+								this.seconds = 60;
+								clearInterval(interval);
+							} else
+								this.seconds = this.seconds - 1
+						}, 1000)
+					}
+				});
+			}
+		},
+		onShow() {
+			this.$store.commit("socket/setSocketClose");
+		},
+		onLoad() {
+			// uni.getProvider({
+			// 	service: 'oauth',
+			// 	success: function(res) {
+			// 		console.log(res.provider) // ['qq', 'univerify']
+			// 		if (res.provider.indexOf("univerify") > -1)
+			// 			uni.login({
+			// 				provider: 'univerify',
+			// 				univerifyStyle: { // 自定义登录框样式参考`univerifyStyle 数据结构`
+			// 					"fullScreen": "false", // 是否全屏显示，默认值： "false"
+			// 					"backgroundColor": "#ffffff", // 授权页面背景颜色，默认值：#ffffff
+			// 					"backgroundImage": "", // 全屏显示的背景图片，默认值："" （仅支持本地图片，只有全屏显示时支持）  
+			// 					"icon": {
+			// 						"path": "/static/logo.png" // 自定义显示在授权框中的logo，仅支持本地图片 默认显示App logo   
+			// 					}
+			// 				},
+			// 				success(res) { // 登录成功
+			// 					console.log(res); // {openid:'登录授权唯一标识',access_token:'接口返回的 token'}
+			// 				},
+			// 				fail(res) { // 登录失败
+			// 					console.log(res.errCode)
+			// 					console.log(res.errMsg)
+			// 				}
+			// 			});
+			// 	}
+			// });
+		}
+	}
+</script>
+
+<style lang="scss">
+	.big-phone {
+		&-margin {
+			margin: 0 62rpx;
+		}
+
+		&-ask {
+			margin-top: 22rpx;
+			margin-bottom: 45rpx;
+			flex-direction: row;
+			justify-content: flex-end;
+
+			&-text {
+				color: $myp-text-color-third;
+				font-size: $myp-font-size-base;
+			}
+		}
+
+		&-privacy {
+			margin-top: 32rpx;
+			margin-bottom: 80rpx;
+			flex-direction: row;
+			justify-content: center;
+
+			&-hint {
+				color: $myp-text-color-forth;
+				font-size: $myp-font-size-s;
+			}
+
+			&-title {
+				color: $myp-color-primary;
+				font-size: $myp-font-size-s;
+			}
+		}
+
+		&-regist {
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			margin-bottom: 78rpx;
+
+			&-text {
+				color: $myp-color-link;
+				font-size: $myp-font-size-l;
+				margin-left: 10rpx;
+			}
+		}
+	}
+</style>

@@ -1,0 +1,253 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :title="name" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 5rpx;"></view>
+				<view class="myp-bg-inverse myp-flex-row myp-wrap-wrap" style="padding-left: 30rpx;">
+					<member-cell v-for="(m,idx) in [currentUser]" :key="idx" :item="m" :last="(idx+1)%6===0"
+						@detail="toMemberDetail"></member-cell>
+					<member-token-cell @add="toAdd"></member-token-cell>
+				</view>
+				<view style="height: 16rpx;"></view>
+				<view v-if="isFriend" class="myp-bg-inverse" style="padding-left: 30rpx;padding-right: 30rpx;"
+					bubble="true" @click="toUserQr">
+					<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 100rpx;">
+						<text class="myp-size-l myp-color-text">分享好友</text>
+						<view class="myp-flex-row myp-align-center">
+							<myp-icon name="qr" type="second" size="ss" boxStyle="margin-right:20rpx;"
+								@iconClicked="toUserQr"></myp-icon>
+							<myp-icon name="right" type="third" size="ss" @iconClicked="toUserQr"></myp-icon>
+						</view>
+					</view>
+				</view>
+				<view v-if="isFriend" style="height: 16rpx;"></view>
+				<view class="myp-bg-inverse" style="padding-left: 30rpx;padding-right: 30rpx;">
+					<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 100rpx;"
+						@click="toSearchChat">
+						<text class="myp-size-l myp-color-text">查找聊天记录</text>
+						<myp-icon name="right" type="third" size="ss"></myp-icon>
+					</view>
+				</view>
+				<view style="height: 16rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view class="myp-bg-inverse">
+					<view class="myp-flex-row myp-align-center myp-justify-between myp-border-bottom"
+						style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+						<text class="myp-size-l myp-color-text">置顶</text>
+						<myp-switch v-model="currentUser.Top" width="65rpx" height="35rpx" ballSize="35rpx"
+							onBgType="success" animateBgType="third" @change="toToggleTop"></myp-switch>
+					</view>
+					<view class="myp-flex-row myp-align-center myp-justify-between myp-border-bottom"
+						style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+						<text class="myp-size-l myp-color-text">消息免打扰</text>
+						<myp-switch v-model="currentUser.NotDisturb" width="65rpx" height="35rpx" ballSize="35rpx"
+							onBgType="success" animateBgType="third" @change="toNotDisturb"></myp-switch>
+					</view>
+					<view class="myp-flex-row myp-align-center myp-justify-between"
+						style="margin-left: 30rpx;width: 690rpx;height: 100rpx;">
+						<text class="myp-size-l myp-color-text">拉入黑名单</text>
+						<myp-switch v-model="isBlack" width="65rpx" height="35rpx" ballSize="35rpx" onBgType="success"
+							animateBgType="third" @change="toToggleBlack"></myp-switch>
+					</view>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view v-if="isFriend" style="height: 16rpx;"></view>
+				<view v-if="isFriend" class="myp-bg-inverse" style="padding-left: 30rpx;padding-right: 30rpx;">
+					<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 100rpx;"
+						bubble="true" @click="toChangeName">
+						<text class="myp-size-l myp-color-text">修改备注</text>
+						<view class="myp-flex-row myp-align-center">
+							<text class="myp-color-second myp-size-base"
+								style="margin-right: 32rpx;">{{currentUser.FriendRemarkName}}</text>
+							<myp-icon name="right" type="third" size="ss" @iconClicked="toChangeName"></myp-icon>
+						</view>
+					</view>
+				</view>
+				<view v-if="isFriend" style="height: 16rpx;"></view>
+				<view v-if="isFriend" class="myp-bg-inverse" style="padding-left: 30rpx;padding-right: 30rpx;">
+					<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 100rpx;"
+						@click="toSetBg">
+						<text class="myp-size-l myp-color-text">设置聊天背景</text>
+						<myp-icon name="right" type="third" size="ss" @iconClicked="toSetBg"></myp-icon>
+					</view>
+				</view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<view style="height: 16rpx;"></view>
+				<view class="myp-bg-inverse" style="padding-left: 30rpx;padding-right: 30rpx;">
+					<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 100rpx;"
+						@click="toComplain">
+						<text class="myp-size-l myp-color-text">投诉</text>
+						<myp-icon name="right" type="third" size="ss" @iconClicked="toComplain"></myp-icon>
+					</view>
+				</view>
+				<view style="height: 16rpx;"></view>
+				<view class="myp-flex-row myp-justify-center myp-align-center myp-bg-inverse" style="height: 100rpx;"
+					@tap="toShowClear">
+					<text class="myp-size-l myp-color-text">清空聊天记录</text>
+				</view>
+				<view v-if="isFriend" style="height: 16rpx;"></view>
+				<view v-if="isFriend" class="myp-flex-row myp-justify-center myp-align-center myp-bg-inverse"
+					style="height: 100rpx;" @tap="toDelFriendDialog">
+					<text class="myp-size-l myp-color-error">删除好友</text>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+		<clear-and-out-pop :show="clearVisible" desc="清空聊天记录" @cancel="toCancelClear" @clear="toClearChat">
+		</clear-and-out-pop>
+		<clear-and-out-pop :show="outVisible" @cancel="toCancelClear" @clear="toDelFriend"></clear-and-out-pop>
+	</view>
+</template>
+
+<script>
+	import memberCell from './components/memberCell.vue'
+	import memberTokenCell from './components/memberTokenCell.vue'
+	import clearAndOutPop from './components/clearAndOutPop.vue'
+	import {
+		isBool
+	} from '@/mypUI/utils/utils.js'
+	import navHelper from '@/service/navHelper.js'
+	// import {
+	// 	DelFriend
+	// } from '@/api/friend/index.js'
+	import {
+		mapState,
+		mapMutations,
+		mapActions
+	} from 'vuex';
+	export default {
+		components: {
+			memberTokenCell,
+			memberCell,
+			clearAndOutPop
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				clearVisible: false,
+				outVisible: false,
+				isBlack: false
+			}
+		},
+		computed: {
+			...mapState({
+				currentUser: state => state.chat.chattingUser
+			}),
+			isFriend() {
+				return this.currentUser.Status == 1;
+			}
+		},
+		methods: {
+			...mapActions({
+				"SetFriendTop": "friend/SetFriendTopAsync",
+				"SetFriendNotDisturb": "friend/SetFriendNotDisturbAsync",
+				"SetFriendBlack": "friend/SetFriendBlackAsync",
+				"DelFriend": "friend/DelFriendAsync",
+				"GetFriendDetail": "friend/GetFriendDetailAsync"
+			}),
+			...mapMutations({
+				"ClearCurrentChat": "chat/ClearChats",
+				"SetChattingUserLocal": "chat/SetChattingUserLocal"
+			}),
+			toAdd() {
+				uni.navigateTo({
+					url: '/pages/friend/selectFriend?type=create'
+				})
+			},
+			toMemberDetail(userId) {
+				uni.navigateTo({
+					url: '/pages/chat/userMiddle?userId=' + userId
+				})
+			},
+			toUserQr() {
+				uni.navigateTo({
+					url: '/pages/chat/userQr?shareUser=' + JSON.stringify(this.friendInfo)
+				})
+			},
+			toSearchChat() {
+				uni.navigateTo({
+					url: '/pages/chat/search?page=manage&type=chats'
+				});
+			},
+			toSetBg() {
+				uni.chooseImage({
+					count: 6, //默认9
+					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+					sourceType: ['album'], //从相册选择
+					success: function(res) {
+						console.log(JSON.stringify(res.tempFilePaths));
+					}
+				});
+			},
+			toChangeName() {
+				let _this = this;
+				uni.navigateTo({
+					url: '/pages/chat/nickname'
+				});
+			},
+			toToggleTop(val) {
+				this.SetFriendTop({
+					userId: this.currentUser.FriendUserId,
+					top: val
+				});
+			},
+			toNotDisturb(val) {
+				this.SetFriendNotDisturb({
+					userId: this.currentUser.FriendUserId,
+					notDisturb: val
+				});
+			},
+			toToggleBlack(val) {
+				this.SetFriendBlack({
+					userId: this.currentUser.FriendUserId,
+					black: val
+				});
+			},
+			toShowClear() {
+				this.clearVisible = true
+			},
+			toDelFriendDialog() {
+				this.outVisible = true
+			},
+			toDelFriend() {
+				this.outVisible = false;
+				this.DelFriend(this.currentUser.FriendUserId).then(res => {
+					uni.navigateBack({
+						delta: 2
+					});
+				});
+			},
+			toCancelClear() {
+				this.clearVisible = false
+				this.outVisible = false
+			},
+			toClearChat() {
+				this.clearVisible = false;
+				this.ClearCurrentChat(this.currentUser.FriendUserId);
+			},
+			toComplain() {
+				uni.navigateTo({
+					url: '/pages/set/complain'
+				})
+			}
+		},
+		onShow(options) {
+			if (this.currentUser.FriendUserId > 0) {
+				this.GetFriendDetail(this.currentUser.FriendUserId).then(friend => {
+					if (friend.Status == 3)
+						this.isBlack = true;
+					this.SetChattingUserLocal(friend);
+				});
+			} else
+				uni.navigateBack();
+		}
+	}
+</script>
+
+<style>
+
+</style>

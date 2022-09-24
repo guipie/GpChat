@@ -1,0 +1,13 @@
+{
+    "id": "mp-html",
+    "name": "mp-html 富文本组件【全端支持，可编辑】",
+    "version": "v2.0.4",
+    "description": "一个强大的富文本组件，高效轻量，功能丰富",
+    "keywords": [
+        "parser",
+        "rich-text",
+        "html",
+        "miniprogram",
+        "editor"
+    ]
+}

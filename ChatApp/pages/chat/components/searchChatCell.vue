@@ -1,0 +1,76 @@
+<template>
+	<view class="src myp-position-relative myp-bg-inverse myp-flex-row myp-wrap-nowrap" @tap="toDetail">
+		<image :src="avatar" mode="aspectFill" style="width: 72rpx;height: 72rpx;border-radius: 12rpx;">
+		</image>
+		<view class="myp-flex-one" style="margin-left: 18rpx;" @click="toDetail">
+			<view class="myp-flex-row myp-align-center myp-justify-between" style="height: 72rpx;">
+				<text class="myp-color-second myp-size-ss">{{item.Name}}</text>
+				<text class="myp-color-second myp-size-ss">{{sendTime}}</text>
+			</view>
+			<view style="height: 10rpx;"></view>
+			<view class="myp-flex-row myp-align-center myp-wrap-nowrap" style="width: 600rpx;">
+				<rich-text class="myp-size-s myp-color-text myp-lh-s" :nodes="contents"></rich-text>
+				<!--<text class="myp-size-s myp-color-error myp-lh-s">文章</text>
+				<text class="myp-size-s myp-color-text myp-lh-s">发的恢复</text> -->
+			</view>
+		</view>
+		<view v-if="!isLast" class="myp-position-absolute"
+			style="right: 30rpx;bottom: 0;width: 606rpx;height: 0.5px;background-color: #ECEEF0;"></view>
+	</view>
+</template>
+
+<script>
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+
+	import {
+		formatTime
+	} from '@/mypUI/utils/date.js'
+	import parseHtml from '@/common/nodesParser.js'
+	export default {
+		props: {
+			item: {
+				type: Object,
+				default: () => {
+					return {}
+				}
+			},
+			isLast: {
+				type: Boolean,
+				default: false
+			},
+			search: {
+				type: String,
+				default: ""
+			}
+		},
+		computed: {
+			avatar() {
+				return baseAvatar(this.item.Avatar);
+			},
+			sendTime() {
+				return formatTime(this.item.SendTime || '', '{y}-{m}-{d} {h}:{i}')
+			},
+			contents() {
+				return parseHtml(this.item.Content.replace(new RegExp(this.search, 'g'), '<span style="color:#E02020;">' +
+					this.search + '</span>'));
+			}
+		},
+		methods: {
+			toDetail() {
+				this.$emit("detail", this.item)
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.src {
+		width: 750rpx;
+		height: 158rpx;
+		padding-left: 30rpx;
+		padding-right: 30rpx;
+		padding-top: 24rpx;
+	}
+</style>

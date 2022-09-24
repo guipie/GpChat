@@ -1,0 +1,337 @@
+<template>
+	<view v-if="isShow">
+		<view class="date-picker-mask" bubble='true' @click="hide"
+			:class="[isOpen?'show-date-picker-mask':'hide-date-picekr-mask']" :style="{backgroundColor:maskColor}">
+		</view>
+		<view class="date-picker-container" @click.stop="handleClick"
+			:class="[isOpen?'show-date-picker':'hide-date-picekr']">
+
+			<!-- 操作 -->
+			<view class="date-picker-title row between-center">
+				<text class="date-picker-cancel" @click="hide">取消</text>
+				<text class="date-picker-confirm" @click="dateConfirm">确定</text>
+			</view>
+			<!-- 内容 -->
+			<picker-view class="date-picker-box" v-if="visible" :indicator-style="indicatorStyle" :value="value"
+				@change="bindChange">
+				<picker-view-column class="center">
+					<view class="date-picker-item center" v-for="(item,index) in years" :key="index">
+						<text>{{item}}年</text>
+					</view>
+				</picker-view-column>
+				<picker-view-column>
+					<view class="date-picker-item center" v-for="(item,index) in months" :key="index">
+						<text>{{item}}月</text>
+					</view>
+				</picker-view-column>
+				<picker-view-column v-if='!hideDay'>
+					<view class="date-picker-item center" v-for="(item,index) in days" :key="index">
+						<text>{{item}}日</text>
+					</view>
+				</picker-view-column>
+			</picker-view>
+
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		name: "datePicker",
+		props: {
+			maskColor: { // 模态框背景色
+				type: String,
+				default: 'rgba(0,0,0,0.3)'
+			},
+			hideDay: {
+				type: Boolean,
+				default: true
+			},
+			split: {
+				type: String,
+				default: '.'
+			}
+		},
+		data() {
+			const date = new Date();
+			const years = [];
+			const year = date.getFullYear();
+			const months = [];
+			const month = date.getMonth() + 1
+			const day = date.getDate();
+
+			// 可在此设置起始年份和终止年份
+			for (let i = 1940; i <= date.getFullYear(); i++) {
+				years.push(i);
+			}
+			for (let i = 1; i <= 12; i++) {
+				months.push(i);
+			}
+
+			return {
+				isShow: false, // 是否弹出
+				isOpen: false,
+
+				years,
+				months,
+				days: [],
+				year,
+				month,
+				day,
+				value: [year - 1940, month - 1, day - 1], // 默认选中当天
+				visible: true,
+				indicatorStyle: `height: ${Math.round(uni.getSystemInfoSync().screenWidth/(750/100))}px;`
+			}
+		},
+		methods: {
+
+			// 选中日期
+			dateConfirm() {
+				let date = this.year + this.split + (this.month > 9 ? this.month : '0' + this.month);
+				if (!this.hideDay)
+					date += this.split + (this.day > 9 ? this.day : '0' + this.day)
+				// 发送一个点击事件，并把当前选中的日期发送出去
+				this.$emit('dateConfirm', date);
+				this.hide();
+			},
+
+			bindChange(e) {
+				const val = e.detail.value;
+				this.year = this.years[val[0]];
+				this.month = this.months[val[1]];
+				this.day = this.days[val[2]];
+			},
+
+			// 弹出
+			show() {
+				this.isShow = true;
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.isOpen = true;
+					}, 20);
+				});
+			},
+
+			// 关闭
+			hide() {
+				this.isOpen = false;
+				setTimeout(() => {
+					this.isShow = false;
+				}, 200);
+			},
+
+			// 阻止冒泡
+			handleClick(event) {
+				event.stopPropagation();
+			}
+		},
+		watch: {
+			"month": { // 监听月份变化，改变当前月份天数值 
+				handler(val) {
+					if (val < 8) {
+						if (val % 2 !== 0) {
+							this.days = [];
+							for (let i = 1; i <= 31; i++) {
+								this.days.push(i);
+							}
+						} else {
+							this.days = [];
+							for (let i = 1; i <= 30; i++) {
+								this.days.push(i);
+							}
+						}
+					}
+					if (val > 7) {
+						if (val % 2 === 0) {
+							this.days = [];
+							for (let i = 1; i <= 31; i++) {
+								this.days.push(i);
+							}
+						} else {
+							this.days = [];
+							for (let i = 1; i <= 30; i++) {
+								this.days.push(i);
+							}
+						}
+					}
+					if (val === 2) {
+						if (this.year % 4 === 0) {
+							this.days = [];
+							for (let i = 1; i <= 29; i++) {
+								this.days.push(i);
+							}
+						} else {
+							this.days = [];
+							for (let i = 1; i <= 28; i++) {
+								this.days.push(i);
+							}
+						}
+					}
+				},
+				deep: true,
+				immediate: true
+			},
+			"year": { // 监听年份变化，处理2月份天数变化
+				handler(val) {
+					if (val % 4 === 0) {
+						if (this.month === 2) {
+							this.days = [];
+							for (let i = 1; i <= 29; i++) {
+								this.days.push(i);
+							}
+						}
+					} else {
+						if (this.month === 2) {
+							this.days = [];
+							for (let i = 1; i <= 28; i++) {
+								this.days.push(i);
+							}
+						}
+					}
+				}
+			},
+			deep: true,
+			immediate: true
+		}
+	}
+</script>
+
+<style lang="scss">
+	.date-picker-mask {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: 99988;
+	}
+
+	.date-picker-container {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 99999;
+		background-color: #FFFFFF;
+	}
+
+	.show-date-picker-mask {
+		transition-property: opacity;
+		transition-duration: 0.2s;
+		transition-timing-function: ease;
+		opacity: 1;
+	}
+
+	.hide-date-picekr-mask {
+		transition-property: opacity;
+		transition-duration: 0.2s;
+		transition-timing-function: ease;
+		opacity: 0;
+	}
+
+	.show-date-picker {
+		transition-property: transform, opacity;
+		transition-duration: 0.2s;
+		transition-timing-function: ease;
+		transform: translateY(0);
+		opacity: 1;
+		/* #ifndef APP-PLUS-NVUE */
+		-moz-transition-property: transform, opacity;
+		-webkit-transition-property: transform, opacity;
+		-o-transition-property: transform, opacity;
+
+		-moz-transition-duration: 0.2s;
+		-webkit-transition-duration: 0.2s;
+		-webkit-transition-duration: 0.2s;
+
+		-moz-transition-timing-function: ease;
+		-webkit-transition-timing-function: ease;
+		-o-transition-timing-function: ease;
+
+		-moz-transform: translateY(0);
+		-webkit-transform: translateY(0);
+		-o-transform: translateY(0);
+		/* #endif */
+	}
+
+	.hide-date-picekr {
+		transition-property: transform, opacity;
+		transition-duration: 0.2s;
+		transition-timing-function: ease;
+		transform: translateY(500px);
+		opacity: 1;
+		/* #ifndef APP-PLUS-NVUE */
+		-moz-transition-property: transform, opacity;
+		-webkit-transition-property: transform, opacity;
+		-o-transition-property: transform, opacity;
+
+		-moz-transition-duration: 0.2s;
+		-webkit-transition-duration: 0.2s;
+		-webkit-transition-duration: 0.2s;
+
+		-moz-transition-timing-function: ease;
+		-webkit-transition-timing-function: ease;
+		-o-transition-timing-function: ease;
+
+		-moz-transform: translateY(500px);
+		-webkit-transform: translateY(500px);
+		-o-transform: translateY(500px);
+		/* #endif */
+	}
+
+	// 确定、取消
+	.date-picker-title {
+		height: 100rpx;
+		padding: 0 20rpx;
+		box-shadow: 0 1rpx 1rpx #e4e4e4;
+	}
+
+	.date-picker-confirm {
+		padding: 10rpx 30rpx;
+		font-size: 32rpx;
+		color: #007AFF;
+	}
+
+	.date-picker-cancel {
+		padding: 10rpx 30rpx;
+		font-size: 32rpx;
+		color: red;
+	}
+
+	// 内容
+	.date-picker-box {
+		width: 750rpx;
+		height: 500rpx;
+		padding: 0 20rpx;
+		/* #ifndef APP-PLUS-NVUE */
+		box-sizing: border-box;
+		/* #endif */
+		background-color: #FFF;
+	}
+
+	.date-picker-item {
+		height: 100rpx;
+	}
+
+	// flex
+	.row {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+
+	}
+
+	.center {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		justify-content: center;
+		align-items: center;
+	}
+
+	.between-center {
+		justify-content: space-between;
+		align-items: center;
+	}
+</style>

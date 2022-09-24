@@ -1,0 +1,75 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="修改手机号" :rights="rightIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;" @leftAction="navLeftAction" @rightAction="toRightTab"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 5rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-bg-inverse myp-wrap-nowrap" style="height: 106rpx;padding-left: 52rpx;padding-right: 30rpx;">
+					<view class="myp-flex-row myp-align-center myp-border-bottom myp-wrap-nowrap" style="width: 690rpx;height: 106rpx;">
+						<text class="myp-size-l myp-color-text" style="font-weight: 700;">新手机号验证码</text>
+						<view class="myp-flex-one myp-border-bottom myp-flex-row myp-align-center" style="height: 66rpx;border-bottom-color: #808080;margin-left: 12rpx;">
+							<input v-model="code" class="myp-size-l myp-color-text" />
+						</view>
+						<view class="myp-flex-row myp-align-center myp-justify-center" style="margin-left: 18rpx;width: 203rpx;height: 66rpx;background-color: #C1C1C1;" @click="toRequestCode">
+							<text class="myp-size-l myp-color-text">{{second>0?(second+'s'):'发送验证'}}</text>
+						</view>
+					</view>
+				</view>
+				<view class="myp-flex-row myp-align-center myp-bg-inverse myp-wrap-nowrap" style="height: 106rpx;padding-left: 52rpx;padding-right: 30rpx;">
+					<text class="myp-size-l myp-color-text" style="font-weight: 700;">账号密码</text>
+					<view class="myp-border-bottom myp-flex-row myp-align-center" style="height: 66rpx;border-bottom-color: #808080;margin-left: 36rpx;width: 432rpx;">
+						<input v-model="password" class="myp-size-l myp-color-text myp-flex-one" />
+					</view>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+		<custom-toast :show="toastVisible"></custom-toast>
+	</view>
+</template>
+
+<script>
+	import customToast from './components/customToast.vue'
+	
+	import navHelper from '@/service/navHelper.js'
+	
+	export default {
+		components: {
+			customToast
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{text: '完成', textType: 'primary'}],
+				code: '',
+				password: '',
+				timer: null,
+				second: 0,
+				toastVisible: false
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				this.toastVisible = true
+				setTimeout(()=>{
+					this.toastVisible = false
+				}, 1500)
+			},
+			toRequestCode() {
+				if (this.second > 0) {
+					return
+				}
+				this.second = 60
+				this.timer = setInterval(()=>{
+					this.second -= 1
+					if (this.second === 0) {
+						clearInterval(this.timer)
+					}
+				}, 1000)
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

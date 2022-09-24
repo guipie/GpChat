@@ -1,0 +1,70 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="分享好友" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction"></myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 84rpx;"></view>
+				<view class="myp-bg-inverse myp-radius-base gq"
+					style="margin-left: 30rpx;width: 690rpx;height: 796rpx;">
+					<view class="myp-flex-row myp-align-center" style="margin-top: 32rpx;margin-left: 24rpx;">
+						<image :src="shareUser.avatar" mode="aspectFill" style="width: 88rpx;height: 88rpx;">
+						</image>
+						<text class="myp-size-ll myp-color-text"
+							style="margin-left: 24rpx;font-weight: 700;">{{shareUser.friendRemarkName}}</text>
+						<text class="myp-size-ll myp-color-second"
+							style="margin-left: 35rpx;">故新号：{{shareUser.friendUserName}}</text>
+					</view>
+					<view
+						style="height: 0.5px;background-color: #DDE2E5;margin-left: 24rpx;margin-top: 30rpx;width: 642rpx;">
+					</view>
+					<view style="height: 78rpx;"></view>
+					<view class="myp-flex-row myp-justify-center">
+						<image src="/static/pic7.jpg" mode="aspectFill" style="width: 310rpx;height: 310rpx;"></image>
+					</view>
+					<view style="height: 78rpx;"></view>
+					<view class="myp-flex-row myp-justify-center">
+						<myp-button icon="download" iconType="inverse" text="保存到本地相册" textType="inverse" textSize="s"
+							textStyle="font-weight:900;" bgType="success" border="none" radius="ll"
+							boxStyle="width:320rpx;height:80rpx;" @buttonClicked="toDownload"></myp-button>
+						<view style="width: 24rpx;"></view>
+						<myp-button icon="share" iconType="inverse" text="分享给好友" textType="inverse" textSize="s"
+							textStyle="font-weight:900;" bgType="success" border="none" radius="ll"
+							boxStyle="width:320rpx;height:80rpx;" @buttonClicked="toShare"></myp-button>
+					</view>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import navHelper from '@/service/navHelper.js'
+
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	export default {
+		mixins: [navHelper],
+		data() {
+			return {
+				shareUser: {}
+			}
+		},
+		methods: {
+			toDownload() {
+
+			}
+		},
+		onLoad(options) {
+			this.shareUser = JSON.parse(options.shareUser);
+			this.shareUser.avatar = baseAvatar(this.shareUser.avatar);
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.gq {
+		// box-shadow: 0 10rpx 10rpx 0 rgba(0,0,0,0.05);
+	}
+</style>

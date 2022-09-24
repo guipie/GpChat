@@ -1,0 +1,209 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="选择好友" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 16rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-wrap-nowrap myp-bg-inverse"
+					style="width: 750rpx;height: 86rpx;padding-left:50rpx;padding-right:30rpx;">
+					<myp-icon name="search" size="s" type="second"></myp-icon>
+					<input v-model="search" class="myp-flex-one myp-color-text myp-size-s" style="margin-left: 12rpx;"
+						placeholder="搜索好友" placeholder-style="font-size:14px;color:#9092A5;" :adjust-position="false"
+						confirm-type="search" @confirm="toSearch" />
+				</view>
+				<view style="height: 16rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell>
+				<text class="myp-size-ss myp-color-second myp-lh-ss" style="margin-left: 20rpx;">最近联系</text>
+				<view style="height: 16rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in friends" :key="idx">
+				<select-friend-cell :item="item" :isLast="idx===friends.length-1"
+					:selected="selected.includes(item.FriendUserId)" @select="toSelect"
+					:disable="selectedFriends.includes(item.FriendUserId)"></select-friend-cell>
+			</myp-list-cell>
+			<!-- 	<myp-list-cell v-if="hasItems" v-for="(item,idx) in friends" :key="idx">
+				<select-friend-cell :item="item" :isLast="idx===friends.length-1" :selected="selected"
+					@select="toSelect">
+				</select-friend-cell>
+			</myp-list-cell> -->
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import selectFriendCell from './components/selectFriendCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		isNullOrEmptyStr
+	} from '@/mypUI/utils/validate.js'
+	import {
+		AddGroup,
+		AddMembers
+	} from '@/api/chat/group.js'
+	import {
+		mapState,
+		mapMutations,
+		mapActions
+	} from 'vuex'
+	export default {
+		components: {
+			selectFriendCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				shareAlbumId: 0,
+				search: '',
+				items: [],
+				// 已经选择了索引
+				selected: [],
+				selectedFriends: [],
+				fromType: "" //create 从创建群聊进来,tag从标签过来
+			}
+		},
+		computed: {
+			rightIcons() {
+				return [{
+					text: '确定',
+					textType: this.selected.length > 0 ? 'primary' : 'third',
+					textStyle: 'font-weight: 700;'
+				}]
+			},
+			...mapState({
+				friends: (state) => state.friend.allFriends,
+				myUserId: (state) => state.user.userInfo.userId,
+				myNickName: (state) => state.user.userInfo.nickName,
+				currentGroup: (state) => state.chat.chattingGroup
+			})
+		},
+		methods: {
+			...mapMutations({
+				SetChattingGroup: "chat/SetChattingGroup",
+				SetGroupMembers: "group/SetGroupMembers",
+				SetLastSendChat: "chat/SetLastSendChat"
+			}),
+			...mapActions({
+				"SendGroupChatToMe": "chat/SendGroupChatToMeAsync",
+				"SendMsg": "chat/SendMsgAsync"
+			}),
+			toRightTab(i) {
+				// 这里需要提交数据给需要数据的页面，然后退回
+				// uni.$emit("selectedUsers", [1, 2])
+				if (this.fromType == 'create') { //创建群聊
+					console.log(this.selected);
+					if (this.selected.length >= 2)
+						AddGroup(this.selected).then(res => {
+							if (res.data > 0) {
+								let sendObj = {
+									SendUserId: this.myUserId,
+									ReceiveUserId: res.data,
+									Content: this.myNickName + "创建了群聊",
+									Type: 1,
+									IsGroup: 1
+								};
+								this.SendGroupChatToMe(sendObj); //推送给自己
+								uni.switchTab({
+									url: '../tabs/news'
+								});
+							}
+						})
+					else
+						uni.showToast({
+							title: "群聊必须两人以上",
+							icon: "none"
+						});
+				} else if (this.fromType == "update" && this.currentGroup.GroupId > 0) { //添加群成员
+					AddMembers(this.currentGroup.GroupId, this.selected).then(res => {
+						this.SetGroupMembers({
+							members: res.data,
+							groupId: this.currentGroup.GroupId
+						});
+						uni.navigateBack();
+					});
+				} else if (this.fromType == 'chat' && this.contentId) //分享内容
+				{
+					uni.navigateBack();
+				} else if (this.fromType == 'tag') { //创建标签
+					let eventChannel = this.$scope.eventChannel;
+					eventChannel.emit('selectedUsers', this.selected);
+					eventChannel.off('selectedUsers');
+					uni.navigateBack({
+						delta: 1
+					});
+				}
+			},
+			toSelect(i) {
+				console.log(i);
+				if (this.fromType == 'chat' && this.contentId) {
+					this.selected = [i];
+					let _this = this;
+					uni.showModal({
+						title: '发送提示',
+						content: '确定发送?',
+						success: function(res) {
+							if (res.confirm) {
+								let sendObj = {
+									SendUserId: _this.myUserId,
+									ReceiveUserId: i,
+									Content: _this.contentId,
+									Type: 4,
+									IsGroup: 0,
+									FileInfo: {
+										Content: _this.content,
+										Pic: _this.pic || ""
+									}
+								};
+								_this.SendMsg(sendObj);
+								sendObj.FriendUserId = i;
+								_this.SetLastSendChat(sendObj);
+								uni.navigateBack();
+							} else if (res.cancel) {
+								console.log('用户点击取消');
+							}
+						}
+					});
+					return;
+				}
+
+				const idx = this.selected.indexOf(i)
+				if (idx >= 0) {
+					this.selected.splice(idx, 1)
+				} else {
+					this.selected.push(i)
+				}
+			},
+			toSearch() {}
+		},
+		onLoad(options) {
+			let _this = this;
+			_this.fromType = options.type;
+			if (_this.fromType == 'create') { //从创建群聊过来
+
+			} else if (_this.fromType == 'update' && this.currentGroup.GroupId > 0) { //从群聊添加成员过来  
+				this.selectedFriends = JSON.parse(JSON.stringify(this.currentGroup.Members.map(m => m.UserId)));
+			} else if (_this.fromType == 'tag') //从标签过来
+			{
+				let eventChannel = this.$scope.eventChannel;
+				// 监听selectedUsers事件，获取上一页面通过eventChannel传送到当前页面的数据
+				eventChannel.on('selectedUsers', function(data) {
+					_this.selected = data;
+				});
+			} else if (_this.fromType == 'share') {
+				console.log(options.shareAlbumId);
+				_this.shareAlbumId = options.shareAlbumId;
+			} else if (_this.fromType == 'chat' && options.contentId) {
+				_this.contentId = options.contentId;
+				_this.content = options.contents;
+				_this.pic = isNullOrEmptyStr(options.pic);
+			} else
+				uni.navigateBack();
+		}
+	}
+</script>
+
+<style>
+
+</style>

@@ -1,0 +1,33 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/imServer",
+      "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "http://localhost:52574/",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "WSL 2": {
+      "commandName": "WSL2"
+    },
+    "Dev": {
+      "commandName": "Project",
+      //"commandLineArgs": " --urls http://192.108.0.104:3003",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Prod": {
+      "commandName": "Project",
+      //"commandLineArgs": " --urls http://114.215.169.143:3003",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      }
+    }
+  }
+}

@@ -1,0 +1,391 @@
+<template>
+	<view class="myp-bg-inverse">
+		<list :id="mypListId" :bounce="true" isSwiperList="true" ref="myp-scroller" style="width:750rpx;flex:1;"
+			@scroll="handleParentScroll">
+			<myp-refresher-n ref="myp-refresher" scrollerRef="myp-scroller" @refresh="handleRefresh"></myp-refresher-n>
+			<cell>
+				<!-- 428 + 76 -->
+				<user-head :userInfo="userInfo"></user-head>
+				<myp-tabs-h :items="tabs" :value="mypCurrentTab" :delay="50" :offset="mypDx" :last="2" width="160rpx"
+					justify="center" height="76rpx" textType="second" activeTextType="text" textStyle="font-weight:700;"
+					indicatorWidth="36rpx" indicatorHeight="5rpx" indicatorType="custom" @change="mypOnTabChange">
+				</myp-tabs-h>
+			</cell>
+			<cell>
+				<myp-content-box extra="status-nav-76rpx">
+					<swiper id="swiper" ref="swiper" :current="mypCurrentTab" style="flex: 1;"
+						@change="mypOnSwiperChange" @animationfinish="mypOnSwiperAnimationFinish"
+						@onAnimationEnd="mypOnSwiperAnimationFinish" @transition="mypOnSwiperScroll">
+						<swiper-item>
+							<album-list ref="nice" :userId="userId" :parentId="mypListId" :current="mypCurrentTab"
+								:index="0" @pop="toShowPop"></album-list>
+						</swiper-item>
+						<swiper-item>
+							<album-list ref="all" :userId="userId" :parentId="mypListId" :current="mypCurrentTab"
+								:index="1" @pop="toShowPop">
+							</album-list>
+						</swiper-item>
+						<swiper-item>
+							<info-list ref="info" :userId="userId" :parentId="mypListId" :current="mypCurrentTab"
+								:index="2" @pop="toShowPop">
+							</info-list>
+						</swiper-item>
+					</swiper>
+				</myp-content-box>
+			</cell>
+		</list>
+		<view :class="['myp-position-fixed', navVisible&&'myp-bg-inverse']" style="top: 0;left: 0;width: 750rpx;">
+			<myp-status bgType="none"></myp-status>
+			<myp-height height="nav"
+				boxStyle="flex-direction:row;justify-content:space-between;align-items:center;width:750rpx;padding-left:30rpx;padding-right:30rpx;">
+				<myp-icon name="left" :type="navVisible?'text':'inverse'" iconStyle="font-size: 20px;"
+					@iconClicked="toLeft"></myp-icon>
+				<myp-icon name="search" :type="navVisible?'text':'inverse'" iconStyle="font-size: 20px;"
+					@iconClicked="toRight"></myp-icon>
+			</myp-height>
+		</view>
+		<myp-popup :show="popVisible" pos="center" width="420rpx" height="304rpx" :leftOffset="popLeft"
+			:bottomOffset="popBottom" :topOffset="popTop" @overlayClicked="toHidePop">
+			<view class="myp-bg-inverse myp-flex-column myp-align-center"
+				style="width: 526rpx;height: 202rpx;border-radius: 32rpx;" v-if="popType=='share'">
+				<view class="myp-flex-row myp-align-center" style="height: 100rpx;width: 526rpx;">
+					<myp-icon name="/static/logo.png" iconStyle="width: 60rpx;height: 60rpx;margin-left: 32rpx;"
+						@iconClicked="toShare(1)">
+					</myp-icon>
+					<myp-icon name="/static/icon/message.png" style='margin-left: 30rpx;justify-content:center;'
+						iconStyle='width:44rpx;height:44rpx;' @iconClicked="toShare(2)">
+					</myp-icon>
+					<myp-icon name="/static/ui/album-line.png" style='margin-left: 30rpx;justify-content:center;'
+						iconStyle='width:44rpx;height:44rpx;' @iconClicked="toShare(3)">
+					</myp-icon>
+				</view>
+				<view style="height: 2rpx;width: 480rpx;background-color: #D3D3D3;"></view>
+				<view class="myp-flex-row myp-align-center" style="height: 100rpx;width: 526rpx;">
+					<image src="/static/icon/weixin.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 32rpx;"></image>
+					<image src="/static/icon/toutiao.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+					<image src="/static/icon/weibo.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+					<image src="/static/icon/qqkongjian.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+					<image src="/static/icon/qq.png" mode="aspectFill"
+						style="width: 60rpx;height: 60rpx;margin-left: 18rpx;"></image>
+				</view>
+			</view>
+			<view class="myp-bg-inverse myp-flex-column myp-align-center"
+				style="width: 420rpx;height: 202rpx;border-radius: 32rpx;" v-else-if="userInfo.isMine">
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@tap="edit">编辑</text>
+				<view style="height: 2rpx;width: 336rpx;background-color: #808080;"></view>
+				<text class="myp-color-warning myp-size-l" style="line-height: 100rpx;width: 420rpx;text-align: center;"
+					@tap="del">删除</text>
+			</view>
+			<view class="myp-bg-inverse myp-flex-column myp-align-center"
+				style="width: 420rpx;height: 202rpx;border-radius: 32rpx;" v-else>
+				<view class="myp-flex-row myp-align-center myp-justify-center" style="height: 100rpx;"
+					@click="notIntereste">
+					<myp-icon name="eye-close" type="second" size="l"></myp-icon>
+					<text class="myp-color-second myp-size-l" style="width: 200rpx;margin-left: 12rpx;">不感兴趣</text>
+				</view>
+				<view style="height: 2rpx;width: 336rpx;background-color: #808080;"></view>
+				<view class="myp-flex-row myp-align-center myp-justify-center" style="height: 100rpx;" bubble="true"
+					@click="complainted">
+					<myp-icon name="report" :stop="false" type="second" size="l"></myp-icon>
+					<text class="myp-color-second myp-size-l" style="width: 200rpx;margin-left: 12rpx;">投诉</text>
+				</view>
+			</view>
+		</myp-popup>
+	</view>
+</template>
+
+<script>
+	import userHead from './components/userHead.vue'
+	import albumList from './components/albumList.vue'
+	import infoList from './components/mainInfoList.vue'
+
+	import tabsSwiperMixin from '@/mypUI/myp-tabs-h/tabsSwiperMixin.js'
+	import parentMixin from '@/mypUI/myp-list/header/headerParent.js'
+
+	import {
+		UserQuantity
+	} from '@/api/user/index.js'
+	import {
+		DelAlbumDetail
+	} from '@/api/album/index.js'
+	import {
+		PostComplaint
+	} from '@/api/system.js'
+	import {
+		getScreenHeight,
+		getNavBarHeight,
+		getStatusBarHeight,
+		getPlatform
+	} from '@/mypUI/utils/system.js'
+	import {
+		IntroDel
+	} from '@/api/album/intro.js'
+	export default {
+		components: {
+			userHead,
+			albumList,
+			infoList
+		},
+		mixins: [tabsSwiperMixin, parentMixin],
+		data() {
+			return {
+				tabs: ['优质', '全部', '简介'],
+				selectedIntroGuid: "",
+				selectedPics: [],
+				navVisible: false,
+				statusNavHeight: 64,
+				platform: '',
+				popVisible: false,
+				popLeft: '-1',
+				popBottom: '-1',
+				popTop: '-1',
+				popType: "",
+				popItem: {},
+				mypCurrentTab: 1,
+				userId: 0,
+				userInfo: {}
+			}
+		},
+		computed: {
+			screenHeight() {
+				return getScreenHeight()
+			}
+		},
+		methods: {
+			toLeft() {
+				uni.navigateBack({
+					delta: 1
+				})
+			},
+			toRight() {
+				uni.navigateTo({
+					url: '../chat/search?type=contentsByUser&searchNickName=' + this.userInfo.nickName +
+						'&userId=' + this.userInfo.userId
+				});
+			},
+			toShowPop(e) {
+				this.popLeft = uni.upx2px(375) - uni.upx2px(210) - uni.upx2px(60);
+				const h = uni.upx2px(152);
+				let c1 = e.sY
+				if (c1 + h * 2 >= this.screenHeight) {
+					c1 = c1 - h
+				} else {
+					c1 = c1 + h
+				}
+				const off = c1 - this.screenHeight * 0.5
+				if (off > 0) {
+					this.popTop = off + 'px'
+					this.popBottom = '-1'
+				} else if (off < 0) {
+					this.popBottom = (-1 * off) + 'px'
+					this.popTop = '-1'
+				} else {
+					this.popTop = '-1'
+					this.popBottom = '-1'
+				};
+				setTimeout(() => {
+					this.popType = e.type;
+					this.popItem = e.item;
+					this.popVisible = true;
+				}, 0)
+			},
+			toHidePop() {
+				this.popVisible = false;
+			},
+			handleRefresh() {
+				let ref = null
+				if (this.mypCurrentTab === 0) {
+					ref = this.$refs.nice
+				} else if (this.mypCurrentTab === 1) {
+					ref = this.$refs.all
+				} else if (this.mypCurrentTab === 2) {
+					ref = this.$refs.info
+				}
+				this.mypHandleRefresh(ref)
+			},
+			handleParentScroll(e) {
+				const offsetY = e.contentOffset.y
+				// console.log(offsetY)
+				let offY = -offsetY
+				if (offY >= this.statusNavHeight) {
+					this.navVisible = true
+				} else {
+					this.navVisible = false
+				}
+			},
+			mypToSwitchTab(i) {
+				this.toSwitchTab(i)
+				this.mypCurrentTab = i
+			},
+			toSwitchTab(i) {
+				let ref = null
+				if (i === 0) {
+					ref = this.$refs.nice
+				} else if (i === 1) {
+					ref = this.$refs.all
+				} else if (i === 2) {
+					ref = this.$refs.info
+				}
+				this.mypSetScrollRef(ref)
+			},
+			toInitSpecial() {
+				this.toSwitchTab(this.mypCurrentTab)
+			},
+			toShare(val) {
+				this.popVisible = false;
+				if (val == 1)
+					uni.navigateTo({
+						url: `/pages/album/writeAlbum?fromType=album&shareAlbumId=${this.popItem.guid}&contents=${this.popItem.contents}&pic=${(this.popItem.pics[0]||{}).path}`
+					});
+				if (val == 2)
+					uni.navigateTo({
+						url: '/pages/friend/selectFriend?shareAlbumId=12'
+					});
+				if (val == 3)
+					uni.navigateTo({
+						url: `/pages/album/writeAlbum?fromType=friend&shareAlbumId=${this.popItem.guid}&contents=${this.popItem.contents}&pic=${(this.popItem.pics[0]||{}).path}`
+					});
+			},
+			del() {
+				let _this = this;
+				if (_this.popType == 'intro')
+					uni.showModal({
+						confirmText: '确定删除',
+						title: '删除提示',
+						content: '您确定要彻底删除此条简介?',
+						success: function(res) {
+							if (res.confirm) {
+								IntroDel(_this.popItem.introGuid).then(res => {
+									if (res.status) {
+										_this.popVisible = false;
+										let delIndex = _this.$refs.info.items.findIndex(m => m.introGuid ==
+											_this.popItem.introGuid);
+										_this.$refs.info.items.splice(delIndex, 1);
+										if (_this.popItem.pics.length > 0)
+											uniCloud.callFunction({
+												name: 'delFiles',
+												data: {
+													urls: _this.popItem.pics.map(m => m.uploadPath)
+												}
+											});
+									}
+								});
+							}
+						}
+					});
+				else if (_this.popType == 'album')
+					uni.showModal({
+						confirmText: '确定删除',
+						title: '删除提示',
+						content: '您确定要彻底删除此条内容吗?',
+						success: function(res) {
+							if (res.confirm) {
+								DelAlbumDetail(_this.popItem.guid).then(d => {
+									if (d.status) {
+										_this.popVisible = false;
+										let delIndex1 = _this.$refs.nice.items.findIndex(m => m.guid ==
+											_this.popItem.guid);
+										_this.$refs.nice.items.splice(delIndex1, 1);
+										let delIndex2 = _this.$refs.all.items.findIndex(m => m.guid ==
+											_this.popItem.guid);
+										_this.$refs.all.items.splice(delIndex2, 1);
+										if (_this.popItem.pics.length > 0)
+											uniCloud.callFunction({
+												name: 'delFiles',
+												data: {
+													urls: _this.popItem.pics.map(m => m.path)
+												}
+											});
+									}
+								});
+							}
+						}
+					});
+			},
+			edit() {
+				let _this = this;
+				if (this.popType == 'intro')
+					uni.navigateTo({
+						url: 'editIntro?introGuid=' + _this.popItem.introGuid,
+						events: {
+							acceptCurrentIntro(data) {
+								console.log(data);
+								let acceptIndex = _this.$refs.info.items.findIndex(m => m.introGuid == data.introGuid);
+								_this.$refs.info.items.splice(acceptIndex, 1, data);
+							}
+						},
+						success(res) {
+							_this.popVisible = false;
+							let sendItem = _this.$refs.info.items.find(m => m.introGuid ==
+								_this.popItem.introGuid);
+							res.eventChannel.emit('acceptCurrentIntro', sendItem);
+						}
+					});
+				else if (this.popType == 'album')
+					uni.navigateTo({
+						url: "writeAlbum?guid=" + this.popItem.guid,
+						success() {
+							_this.popVisible = false;
+						},
+						events: {
+							resetUserAlbums(data) {
+								console.log(data);
+								_this.handleRefresh();
+							}
+						}
+					})
+			},
+			complainted() { //投诉
+				PostComplaint({
+					ComplaintDic: this.popType == 'intro' ? '简介投诉' : '内容投诉',
+					ComplaintType: this.popType == 'intro' ? 'intro' : 'content',
+					ComplaintGuid: this.popType == 'intro' ? this.popItem.introGuid : this.popItem.guid
+				}).then(res => {
+					this.toHidePop()
+				});
+			},
+			notIntereste() { //不感兴趣
+				this.toHidePop();
+				uni.showToast({
+					title: '已处理.'
+				})
+			}
+		},
+		onReady() {
+			this.platform = getPlatform()
+			const h = uni.upx2px(428) - getNavBarHeight() - getStatusBarHeight()
+			if (this.platform === 'android') {
+				this.mypAllHeight = h - uni.upx2px(140)
+			} else {
+				this.mypAllHeight = h
+			}
+			setTimeout(() => {
+				this.toInitSpecial()
+				console.log("current:" + this.mypCurrentTab);
+			}, 100)
+		},
+		onLoad(options) {
+			console.log(options);
+			this.mypCurrentTab = (options.albumsType || 0) * 1;
+			console.log(options);
+			this.userId = options.userId > 0 ? options.userId : getApp().globalData.userId;
+			this.platform = getPlatform();
+			this.statusNavHeight = getNavBarHeight() + getStatusBarHeight();
+			// this.toInitSpecial()
+
+			UserQuantity(this.userId).then(res => {
+				if (res.status)
+					this.userInfo = res.data;
+			});
+		}
+	}
+</script>
+
+<style>
+
+</style>

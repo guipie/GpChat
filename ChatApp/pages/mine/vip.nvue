@@ -1,0 +1,78 @@
+<template>
+	<view>
+		<myp-list bgType="inverse" ref="myp-list" :down="null" :up="null" @scroll="toScroll">
+			<myp-list-cell>
+				<vip-head></vip-head>
+				<view style="height: 45rpx;"></view>
+				<text class="myp-size-base myp-lh-base myp-color-second" style="margin-left: 30rpx;font-weight: 700;">会员权益</text>
+				<view style="height: 53rpx;"></view>
+				<view class="myp-flex-row myp-wrap-wrap" style="margin-left: 47rpx;">
+					<view v-for="(item,idx) in items" :key="idx" class="myp-flex-column myp-align-center" style="width: 328rpx;height: 252rpx;">
+						<view class="myp-flex-row myp-align-center myp-justify-center" style="width: 88rpx;height: 88rpx;background-color: #F8C269;border-radius: 32rpx;">
+							<image :src="item.icon" mode="aspectFill" style="width: 42rpx;height: 42rpx;"></image>
+						</view>
+						<view style="height: 22rpx;"></view>
+						<text class="myp-size-s myp-lh-s" style="color: #F7B500;font-weight: 700;">{{item.title}}</text>
+						<view style="height: 6rpx;"></view>
+						<text class="myp-size-ss myp-color-second myp-lh-ss" style="font-weight: 700;">{{item.desc}}</text>
+					</view>
+				</view>
+				<view style="height: 100rpx;"></view>
+				<myp-xbar bgType="none"></myp-xbar>
+			</myp-list-cell>
+		</myp-list>
+		<view :class="['myp-position-fixed', navVisible&&'myp-bg-inverse']" style="top: 0;left: 0;width: 750rpx;">
+			<myp-status bgType="none"></myp-status>
+			<myp-height height="nav" boxStyle="flex-direction:row;justify-content:space-between;align-items:center;width:750rpx;padding-left:30rpx;padding-right:30rpx;">
+				<myp-icon name="left" :type="navVisible?'text':'inverse'" iconStyle="font-size: 20px;" @iconClicked="toLeft"></myp-icon>
+			</myp-height>
+		</view>
+		<myp-position :fixed="true" offset="x-30rpx" boxStyle="left:30rpx;">
+			<myp-button bgType="custom" icon="crown-line" text="立即续费" border="none" radius="ll" iconStyle="color:#F8C269;" textStyle="color:#F8C269;font-weight:700;font-size:32rpx;" boxStyle="width:690rpx;height:88rpx;" @buttonClicked="toPay"></myp-button>
+		</myp-position>
+	</view>
+</template>
+
+<script>
+	import vipHead from './components/vipHead.vue'
+	
+	import {getNavBarHeight, getStatusBarHeight} from '@/mypUI/utils/system.js'
+	
+	export default {
+		components: {
+			vipHead
+		},
+		data() {
+			return {
+				items: [{icon: '/static/bear.jpg', title: '特权一', desc: '多发点发货啦发货'}, {icon: '', title: '特权二', desc: '那地方拉的法律纠纷'}, {icon: '', title: '特权三', desc: '女啦放假啦法兰克福'}],
+				navVisible: false,
+				statusNavHeight: 64
+			}
+		},
+		methods: {
+			toLeft() {
+				uni.navigateBack({
+					delta: 1
+				})
+			},
+			toPay() {
+				
+			},
+			toScroll(e) {
+				// console.log(e)
+				if (-1*e.contentOffset.y >= this.statusNavHeight) {
+					this.navVisible = true
+				} else {
+					this.navVisible = false
+				}
+			}
+		},
+		onLoad() {
+			this.statusNavHeight = getNavBarHeight() + getStatusBarHeight()
+		}
+	}
+</script>
+
+<style>
+
+</style>

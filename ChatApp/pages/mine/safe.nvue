@@ -1,0 +1,73 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" title="安全中心" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @leftAction="navLeftAction" @rightAction="toShowRemove"> </myp-navbar>
+		<myp-list :down="null" :up="null">
+			<myp-list-cell>
+				<view style="height: 5rpx;"></view>
+				<view class="myp-bg-inverse myp-flex-row myp-align-center myp-wrap-nowrap" style="height: 145rpx;">
+					<text class="myp-color-text myp-size-l"
+						style="width: 156rpx;text-align: center;line-height: 84rpx;">注销</text>
+					<view class="myp-flex-row myp-align-center myp-border-bottom"
+						style="margin-left: 6rpx;height: 80rpx;width: 432rpx;border-bottom-color: #808080;">
+						<input v-model="password" class="myp-color-text myp-size-l"
+							style="width: 432rpx;text-align: center;" placeholder="请填写密码"
+							placeholder-style="text-align:center;font-size:18px;" />
+					</view>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+		<safe-pop :show="removeVisible" @cancel="toHideSafe" @confirm="toConfirmSafe"></safe-pop>
+	</view>
+</template>
+
+<script>
+	import safePop from './components/safePop.vue'
+
+	import navHelper from '@/service/navHelper.js'
+
+	export default {
+		components: {
+			safePop
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				password: '',
+				removeVisible: false
+			}
+		},
+		computed: {
+			rightIcons() {
+				return [{
+					text: '确定注销',
+					textType: this.password ? 'error' : 'third'
+				}]
+			}
+		},
+		methods: {
+			toShowRemove() {
+				if (this.password == '123456')
+					this.removeVisible = true
+				else
+					uni.showToast({
+						icon: 'none',
+						title: '密码错误..'
+					})
+			},
+			toHideSafe() {
+				this.removeVisible = false
+			},
+			toConfirmSafe() {
+				this.removeVisible = false;
+				uni.navigateBack({
+
+				});
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

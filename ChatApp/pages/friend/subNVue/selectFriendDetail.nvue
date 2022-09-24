@@ -1,0 +1,38 @@
+<template>
+	<view class="ac myp-bg-inverse">
+		<view class="myp-flex-row myp-align-center myp-justify-between">
+			<view class="myp-flex-row myp-align-center" @tap="toUser()">
+				<image src="../../../static/icon/club.png" style="width: 64rpx;height: 64rpx;border-radius: 16rpx;"
+					mode="aspectFill">
+				</image>
+				<text class="myp-size-s myp-color-text" style="margin-left: 20rpx;font-weight: 700;">张飞</text>
+			</view> 
+		</view>
+		<view style="height: 26rpx;"></view>
+		<text class="myp-lines-two myp-color-text myp-size-s myp-lh-s"
+			@click="toDetail">fffffffffsdfasd就是看了都会JFK厉害</text>
+		<view style="height: 16rpx;"></view>
+		<view v-if="hasImages" class="myp-flex-row myp-wrap-wrap">
+			<image v-for="(img,idx) in item.pics" :key="idx" :src="img.path"
+				:style="'width:220rpx;height:220rpx;margin-bottom:15rpx;'+(idx%3==2?'margin-right:0;':'margin-right:15rpx;')"
+				mode="aspectFill" @click="previewImage(item.pics.map(m=>m.path),idx)"></image>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+
+	}
+</script>
+
+<style lang="scss" scoped>
+	.ac {
+		width: 750rpx;
+		padding-top: 36rpx;
+		padding-left: 30rpx;
+		padding-right: 30rpx;
+		padding-bottom: 16rpx;
+		position: relative;
+	}
+</style>

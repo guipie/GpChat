@@ -1,0 +1,69 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="互动通知" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" @down='getInteractNotices' @up="getInteractNotices" :autoUpdate="true">
+			<myp-list-cell>
+				<view style="height: 5rpx;"></view>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<interact-notice-cell :item="item"></interact-notice-cell>
+				<view style="height: 20rpx;"></view>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import interactNoticeCell from './components/interactNoticeCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		GetInteractNotices
+	} from '@/api/news/interact.js'
+	export default {
+		components: {
+			interactNoticeCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'elipsis'
+				}],
+				searchDate: "",
+				items: []
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				uni.navigateTo({
+					url: '/pages/set/interactSet'
+				})
+			},
+			getInteractNotices() {
+				const ins = this.$refs['myp-list'];
+				const cp = ins.mypCurrentPage;
+				if (cp == 1) {
+					this.searchDate = "";
+					this.items = [];
+				}
+				GetInteractNotices(this.searchDate).then(res => {
+					this.items.push.apply(this.items, res.data || []);
+					let dates = res.data.map(m => m.createDate);
+					this.searchDate = dates[dates.length - 1];
+					ins.mypEndSuccess(res.data.length > 0);
+				}).catch(err => {
+					ins.mypEndError()
+				});
+			}
+		},
+		onLoad() {
+
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

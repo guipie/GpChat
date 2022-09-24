@@ -1,0 +1,11 @@
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\GuXin.ImServer.exe
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\appsettings.json
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\GuXin.ImServer.dll
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\GuXin.ImServer.deps.json
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\GuXin.ImServer.runtimeconfig.json
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\GuXin.ImServer.pdb
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\FreeRedis.dll
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\Newtonsoft.Json.dll
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\System.Net.WebSockets.WebSocketProtocol.dll
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\GuXin.ImCore.dll
+D:\work\GuxinCode\GuXin.Api\GuXin.ImServer\obj\Release\net5.0\win-x64\PubTmp\Out\GuXin.ImCore.pdb

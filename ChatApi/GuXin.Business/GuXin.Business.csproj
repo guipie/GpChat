@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>GuXin.Business</AssemblyName>
+    <RootNamespace>GuXin.Business</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GuXin.Core\GuXin.Core.csproj" />
+  </ItemGroup>
+
+</Project>

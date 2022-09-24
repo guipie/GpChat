@@ -1,0 +1,270 @@
+<template>
+	<view>
+		<myp-list ref="myp-list" :autoUpdate="true" @down="toLoadData" @up="toLoadData" @scroll="toScroll">
+			<myp-list-cell>
+				<circle-head :userInfo="currentUserInfo" :avatar="avatar(currentUserInfo.avatar)"></circle-head>
+			</myp-list-cell>
+			<myp-list-cell v-for="(item,idx) in albums" :key="idx">
+				<album-cell :userId="userId" :myUser="userInfo" :item="item" :avatar="avatar(item.avatar)"
+					@comment="toCommentDialog" @praised="toPraise" @detail="toDetail" @friend="toFriend"
+					:fmtDate="fmtDate(item.createDate)" @preview="previewImage" @contentDetail="toContentDetail">
+				</album-cell>
+			</myp-list-cell>
+		</myp-list>
+		<view :class="['myp-position-fixed', navVisible&&'myp-bg-inverse']" style="top: 0;left: 0;width: 750rpx;">
+			<myp-status bgType="none"></myp-status>
+			<myp-height height="nav"
+				boxStyle="flex-direction:row;justify-content:space-between;align-items:center;width:750rpx;padding-left:30rpx;padding-right:30rpx;"
+				v-show="navVisible">
+				<myp-icon name="left" type="inverse" iconStyle="font-size: 20px;" @iconClicked="toLeft"></myp-icon>
+				<myp-icon name="more" v-if="fromType==='photo'" type="inverse" iconStyle="font-size: 20px;"
+					@iconClicked="toInteractAlbum">
+				</myp-icon>
+				<myp-icon name="plane" v-else type="inverse" iconStyle="font-size: 20px;" @iconClicked="toWriteAlbum">
+				</myp-icon>
+			</myp-height>
+		</view>
+		<pub-menu :show="menuVisible" @pub="toPub"></pub-menu>
+		<view class="itl myp-flex-row myp-wrap-nowrap myp-align-end" :style="'bottom:'+areaBottomOffset+'px;'"
+			v-if="commentShow">
+			<textarea class="itl-area myp-flex-one" ref="comment" :placeholder="commentPlace" v-model="comments"
+				:style="'height:'+areaHeight+'px;'" :maxlength="200" confirm-type="send" :cursor-spacing="2"
+				:adjust-position="false" @keyboardheightchange="toChangeKb"></textarea>
+			<view style="width: 32rpx;"></view>
+			<myp-button text="评论" textType="inverse" textSize="s" bgType="primary" border="none" radius="base"
+				boxStyle="width:100rpx;height:60rpx;" @buttonClicked="toComment" @touchend.prevent="submit">
+			</myp-button>
+		</view>
+	</view>
+</template>
+
+<script>
+	import circleHead from './components/circleHead.vue'
+	import albumCell from './components/albumCell.vue'
+	import pubMenu from './components/pubMenu.vue'
+	import imageHelper from '@/service/imageHelper.js';
+
+	import {
+		baseAvatar
+	} from '@/common/env.js'
+	import {
+		getNavBarHeight,
+		getStatusBarHeight
+	} from '@/mypUI/utils/system.js'
+	import {
+		MyFriendAlbums,
+		UserFriendAlbums
+	} from '@/api/album/friend.js';
+	import {
+		UserInfo
+	} from '@/api/user/index.js';
+	import {
+		FriendPraisesPost
+	} from '@/api/album/friend.js'
+	import {
+		PostFriendComments
+	} from '@/api/album/comment.js'
+	import {
+		mapState
+	} from 'vuex';
+	import dayjs from 'dayjs';
+	import relativeTime from 'dayjs/plugin/relativeTime'
+	import 'dayjs/locale/zh-cn'
+	dayjs.locale('zh-cn');
+	dayjs.extend(relativeTime);
+	export default {
+		components: {
+			circleHead,
+			albumCell,
+			pubMenu
+		},
+		mixins: [imageHelper],
+		data() {
+			return {
+				areaHeight: uni.upx2px(60),
+				albums: [],
+				navVisible: false,
+				statusNavHeight: 64,
+				menuVisible: false,
+				userId: 0,
+				fromType: '',
+				searchDate: '',
+				currentUserInfo: {},
+				commentShow: false,
+				areaBottomOffset: -500,
+				kbHeight: 0,
+				xH: 0,
+				commentItem: {},
+				comments: "",
+				commentPlace: "友好评论.."
+			}
+		},
+		computed: {
+			...mapState({
+				userInfo: (state) => state.user.userInfo
+			})
+		},
+		methods: {
+			avatar(avatar) {
+				return baseAvatar(avatar);
+			},
+			toLeft() {
+				uni.navigateBack({
+					delta: 1
+				})
+			},
+			fmtDate(date) {
+				return dayjs(date).fromNow();
+			},
+			toWriteAlbum() {
+				this.menuVisible = !this.menuVisible
+			},
+			toInteractAlbum() {
+				uni.navigateTo({
+					url: '/pages/album/albumInteract'
+				})
+			},
+			toPub(i) {
+				this.menuVisible = false;
+				uni.navigateTo({
+					url: '/pages/album/writeAlbum?fromType=friend&isImg=' + i
+				})
+			},
+			toContentDetail(guid) {
+				uni.navigateTo({
+					url: '/pages/album/albumDetail?guid=' + guid
+				})
+			},
+			toFriend(userId) {
+				uni.navigateTo({
+					url: '/pages/album/friendAlbums?userId=' + userId
+				})
+			},
+			toLoadData() {
+				const ins = this.$refs['myp-list'];
+				const cp = ins.mypCurrentPage;
+				if (cp === 1) {
+					this.searchDate = "";
+					this.albums = [];
+				}
+				if (this.userId > 0) {
+					UserFriendAlbums(this.userId, this.searchDate).then(res => {
+						this.albums.push.apply(this.albums, res.data || []);
+						this.searchDate = res.data.map(m => m.createDate)[res.data.length - 1];
+						ins.mypEndSuccess(res.data.length >= 5);
+					}).catch(err => {
+						ins.mypEndError();
+					});
+				} else {
+					this.currentUserInfo = this.userInfo;
+					MyFriendAlbums(this.searchDate).then(res => {
+						this.albums.push.apply(this.albums, res.data || []);
+						this.searchDate = res.data.map(m => m.createDate)[res.data.length - 1];
+						ins.mypEndSuccess(res.data.length >= 5);
+					}).catch(err => {
+						ins.mypEndError();
+					});
+				}
+			},
+			toScroll(e) {
+				this.menuVisible = false;
+				this.commentShow = false;
+				// console.log(e)
+				if (-1 * e.contentOffset.y >= this.statusNavHeight) {
+					this.navVisible = true
+				} else {
+					this.navVisible = false
+				}
+			},
+			toChangeKb(e) {
+				const h = e.detail.height
+				if (!this.kbHeight) {
+					this.kbHeight = h
+				}
+				if (h == 0) {
+					this.commentShow = false;
+					this.areaBottomOffset = -500;
+				} else {
+					this.areaBottomOffset = this.kbHeight + this.xH
+				}
+			},
+			toCommentDialog(item) {
+				this.commentItem = item;
+				this.commentShow = true;
+				if (this.platorm != 'ios') {
+					this.areaBottomOffset = 0 // (this.kbHeight||200) + this.xH
+				}
+				console.log(this.commentItem.replyItem);
+				if ((this.commentItem.replyItem || {}).id > 0)
+					this.commentPlace = "回复" + this.commentItem.replyItem.nickName;
+				setTimeout(() => {
+					this.$refs.comment.focus();
+				}, 100);
+			},
+			toComment() {
+				this.commentShow = false;
+				uni.hideKeyboard();
+				PostFriendComments(this.commentItem.contentGuid, this.comments, (this.commentItem.replyItem || {}).id)
+					.then(res => {
+						this.commentItem.comments = this.commentItem.comments || [];
+						this.commentItem.comments.push({
+							id: res.data.id,
+							"contents": this.comments,
+							"nickName": this.currentUserInfo.nickName,
+							"parentId": (this.commentItem.replyItem || {}).id
+						});
+						this.comments = "";
+					});
+			},
+			toPraise(item) {
+				item.isPraised = !item.isPraised;
+				FriendPraisesPost(item.contentGuid).then(res => {
+					if (res.data > 1) {
+						item.isPraised = true;
+						item.praiseUsers.push({
+							"userId": this.userInfo.userId,
+							"nickName": this.userInfo.nickname
+						});
+					} else {}
+				});
+			}
+		},
+		onLoad(options) {
+			console.log(options);
+			this.statusNavHeight = getNavBarHeight() + getStatusBarHeight();
+			this.userId = options.userId || 0;
+			this.fromType = options.fromType;
+			if (!this.userId || this.userId == this.userInfo.userId)
+				this.currentUserInfo = this.userInfo;
+			else
+				UserInfo(this.userId).then(res => {
+					this.currentUserInfo = res.data;
+				});
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.itl {
+		// box-shadow: 0 -5rpx 5rpx 0 rgba(0,0,0,0.03);
+		padding-top: 20rpx;
+		padding-bottom: 30rpx;
+		padding-left: 20rpx;
+		padding-right: 30rpx;
+		background-color: #FFFFFF;
+		width: 750rpx;
+
+		&-area {
+			padding-left: 12rpx;
+			padding-right: 12rpx;
+			padding-top: 12rpx;
+			padding-bottom: 12rpx;
+			// border-radius: 12rpx;
+			background-color: #EFEFF4;
+			font-size: 32rpx;
+			color: $myp-text-color;
+			border-radius: 40rpx;
+			height: 66rpx;
+		}
+	}
+</style>

@@ -1,0 +1,78 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" title="关注的动态" :rights="rightIcons" leftStyle="width:90rpx;"
+			centerStyle="width:460rpx;" @rightAction="toRightTab" @leftAction="navLeftAction"></myp-navbar>
+		<myp-list ref="myp-list" @down="followNotices" @up="followNotices">
+			<myp-list-cell v-for="(item,idx) in items" :key="idx">
+				<album-cell :item="item" :hasChat="false" :forCared="true" @detail="toDetail"></album-cell>
+			</myp-list-cell>
+		</myp-list>
+	</view>
+</template>
+
+<script>
+	import albumCell from '../tabs/components/albumCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import {
+		GetFollowAlbums
+	} from '@/api/album/index.js'
+	export default {
+		components: {
+			albumCell
+		},
+		mixins: [navHelper],
+		data() {
+			return {
+				rightIcons: [{
+					icon: 'search'
+				}, {
+					icon: 'elipsis',
+					style: 'margin-left: 32rpx;'
+				}],
+				items: []
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				if (i === 0)
+					uni.navigateTo({
+						url: '/pages/chat/search?type=follow'
+					})
+				if (i === 1)
+					uni.navigateTo({
+						url: '/pages/set/careSet'
+					})
+			},
+			toDetail(val) {
+				console.log(val);
+				uni.navigateTo({
+					url: '/pages/album/albumDetail?guid=' + val.guid
+				})
+			},
+			followNotices() {
+				const ins = this.$refs['myp-list'];
+				const cp = ins.mypCurrentPage;
+				if (cp == 1) {
+					this.searchDate = "";
+					this.items = [];
+				}
+				GetFollowAlbums(this.searchDate).then(res => {
+					this.items.push.apply(this.items, res.data || []);
+					this.searchDate = res.data.map(m => m.createDate)[res.data.length - 1];
+					ins.mypEndSuccess(res.data.length >= 5)
+				}).catch(err => {
+					ins.mypEndError()
+				});
+			}
+		},
+		mounted() {
+			const ins = this.$refs['myp-list'];
+			ins.mypLoad();
+		}
+	}
+</script>
+
+<style>
+
+</style>

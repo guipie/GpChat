@@ -1,0 +1,620 @@
+@import './mypui.scss';
+@import '@/uni.scss';
+
+.myp-flex {
+	&-row {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		box-sizing: border-box;
+		/* #endif */
+		flex-direction: row;
+	}
+	&-column {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		box-sizing: border-box;
+		/* #endif */
+		flex-direction: column;
+	}
+	&-one {
+		flex: 1;
+	}
+}
+.myp-justify {
+	&-start {
+		justify-content: flex-start;
+	}
+	&-center {
+		justify-content: center;
+	}
+	&-end {
+		justify-content: flex-end;
+	}
+	&-between {
+		justify-content: space-between;
+	}
+}
+.myp-align {
+	&-start {
+		align-items: flex-start;
+	}
+	&-center {
+		align-items: center;
+	}
+	&-end {
+		align-items: flex-end;
+	}
+}
+.myp-wrap {
+	&-wrap {
+		flex-wrap: wrap;
+	}
+	&-nowrap {
+		flex-wrap: nowrap;
+	}
+}
+.myp-position {
+	&-relative {
+		position: relative;
+	}
+	&-absolute {
+		position: absolute;
+	}
+	&-fixed {
+		position: fixed;
+	}
+}
+.myp-full {
+	&-width {
+		width: 750rpx;
+	}
+	&-height {
+		flex: 1;
+		/* #ifndef APP-NVUE */
+		height: 100%;
+		/* #endif */
+	}
+	&-flex {
+		flex: 1;
+	}
+}
+.myp-text-align {
+	&-left {
+		text-align: left;	
+	}
+	&-center {
+		text-align: center;	
+	}
+	&-right {
+		text-align: right;
+	}
+}
+.myp-opacity {
+	&-1 {
+		opacity: 1;
+	}
+	&-0 {
+		opacity: 0;
+	}
+	&-hover {
+		opacity: $myp-opacity-hover;
+	}
+	&-disabled {
+		opacity: $myp-opacity-disabled;
+	}
+}
+.myp-bg {
+	&- {
+		background-color: $myp-bg-color-inverse;
+	}
+	&-nav {
+		background-color: $myp-nav-bg-color;
+	}
+	&-primary {
+		background-color: $myp-color-primary;
+	}
+	&-success {
+		background-color: $myp-color-success;
+	}
+	&-warning {
+		background-color: $myp-color-warning;
+	}
+	&-error {
+		background-color: $myp-color-error;
+	}
+	&-dark {
+		background-color: $myp-bg-color-dark;
+	}
+	&-light {
+		background-color: $myp-bg-color-light;
+	}
+	&-inverse {
+		background-color: $myp-bg-color-inverse;
+	}
+	&-border {
+		background-color: $myp-border-color;
+		&-light {
+			background-color: $myp-border-color-light;
+		}
+		&-dark {
+			background-color: $myp-border-color-dark;
+		}
+	}
+	&-custom {
+		background-color: $myp-color-custom;
+	}
+	&-link {
+		background-color: $myp-color-link;
+	}
+	&-none {
+		background-color: transparent;
+	}
+	&-page {
+		background-color: $myp-bg-color-page;
+	}
+	&-hover {
+		background-color: $myp-bg-color-hover;
+	}
+	&-mask {
+		background-color: $myp-bg-color-mask;
+		&-dark {
+			background-color: $myp-bg-color-mask-dark;
+		}
+	}
+}
+.myp-color {
+	&- {
+		color: $myp-text-color;
+	}
+	&-nav {
+		&-title {
+			color: $myp-nav-title-color;
+		}
+		&-icon {
+			color: $myp-nav-icon-color;
+		}
+		&-item {
+			color: $myp-nav-item-color;
+		}
+	}
+	&-text {
+		color: $myp-text-color;
+	}
+	&-custom {
+		color: $myp-color-custom;
+	}
+	&-link {
+		color: $myp-color-link;
+	}
+	&-primary {
+		color: $myp-color-primary;
+	}
+	&-success {
+		color: $myp-color-success;
+	}
+	&-warning {
+		color: $myp-color-warning;
+	}
+	&-error {
+		color: $myp-color-error;
+	}
+	&-inverse {
+		color: $myp-text-color-inverse;
+	}
+	&-second {
+		color: $myp-text-color-second;
+	}
+	&-third {
+		color: $myp-text-color-third;
+	}
+	&-forth {
+		color: $myp-text-color-forth;
+	}
+	&-place {
+		color: $myp-text-color-place;
+	}
+	&-disabled {
+		color: $myp-text-color-disabled;
+	}
+}
+.myp-size {
+	&- {
+		font-size: $myp-font-size-base;
+	}
+	&-nav {
+		&-title {
+			font-size: $myp-nav-title-size;
+		}
+		&-icon {
+			font-size: $myp-nav-icon-size;
+		}
+		&-item {
+			font-size: $myp-nav-item-size;
+		}
+	}
+	&-ss {
+		font-size: $myp-font-size-ss;
+	}
+	&-s {
+		font-size: $myp-font-size-s;
+	}
+	&-base {
+		font-size: $myp-font-size-base;
+	}
+	&-l {
+		font-size: $myp-font-size-l;
+	}
+	&-ll {
+		font-size: $myp-font-size-ll;
+	}
+}
+.myp-height {
+	&- {
+		height: $myp-height-base;
+	}
+	&-ss {
+		height: $myp-height-ss;
+	}
+	&-s {
+		height: $myp-height-s;
+	}
+	&-base {
+		height: $myp-height-base;
+	}
+	&-l {
+		height: $myp-height-l;
+	}
+	&-ll {
+		height: $myp-height-ll;
+	}
+}
+.myp-weight {
+	&-light {
+		font-weight: 300;
+	}
+	&-normal {
+		font-weight: 400;
+	}
+	&-bold {
+		font-weight: 600;
+	}
+	&-bolder {
+		font-weight: 700;
+	}
+}
+.myp-lh {
+	&- {
+		line-height: $myp-lh-base;
+	}
+	&-ss {
+		line-height: $myp-lh-ss;
+	}
+	&-s {
+		line-height: $myp-lh-s;
+	}
+	&-base {
+		line-height: $myp-lh-base;
+	}
+	&-l {
+		line-height: $myp-lh-l;
+	}
+	&-ll {
+		line-height: $myp-lh-ll;
+	}
+}
+.myp-wing {
+	&-ss {
+		margin-left: $myp-wing-ss;
+		margin-right: $myp-wing-ss;
+	}
+	&-s {
+		margin-left: $myp-wing-s;
+		margin-right: $myp-wing-s;
+	}
+	&-base {
+		margin-left: $myp-wing-base;
+		margin-right: $myp-wing-base;
+	}
+	&-l {
+		margin-left: $myp-wing-l;
+		margin-right: $myp-wing-l;
+	}
+	&-ll {
+		margin-left: $myp-wing-ll;
+		margin-right: $myp-wing-ll;
+	}
+}
+.myp-space {
+	&-ss {
+		margin-top: $myp-space-ss;
+		margin-bottom: $myp-space-ss;
+	}
+	&-s {
+		margin-top: $myp-space-s;
+		margin-bottom: $myp-space-s;
+	}
+	&-base {
+		margin-top: $myp-space-base;
+		margin-bottom: $myp-space-base;
+	}
+	&-l {
+		margin-top: $myp-space-l;
+		margin-bottom: $myp-space-l;
+	}
+	&-ll {
+		margin-top: $myp-space-ll;
+		margin-bottom: $myp-space-ll;
+	}
+}
+.myp-lines {
+	&-one {
+		lines: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		/* #ifndef APP-NVUE */
+		white-space: nowrap;
+		/* #endif */
+	}
+	&-two {
+		overflow: hidden;
+		/* #ifdef APP-NVUE */
+		lines: 2;
+		text-overflow: ellipsis;
+		/* #endif */
+		/* #ifndef APP-NVUE */
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		/* #endif */
+	}
+	&-three {
+		overflow: hidden;
+		/* #ifdef APP-NVUE */
+		lines: 3;
+		text-overflow: ellipsis;
+		/* #endif */
+		/* #ifndef APP-NVUE */
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		/* #endif */
+	}
+	&-four {
+		overflow: hidden;
+		/* #ifdef APP-NVUE */
+		lines: 4;
+		text-overflow: ellipsis;
+		/* #endif */
+		/* #ifndef APP-NVUE */
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 4;
+		/* #endif */
+	}
+	&-five {
+		overflow: hidden;
+		/* #ifdef APP-NVUE */
+		lines: 5;
+		text-overflow: ellipsis;
+		/* #endif */
+		/* #ifndef APP-NVUE */
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 5;
+		/* #endif */
+	}
+	&-six {
+		overflow: hidden;
+		/* #ifdef APP-NVUE */
+		lines: 6;
+		text-overflow: ellipsis;
+		/* #endif */
+		/* #ifndef APP-NVUE */
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 6;
+		/* #endif */
+	}
+}
+.myp-border {
+	&-all {
+		border-width: $myp-border-width;
+		border-style: solid;
+		border-color: $myp-border-color;
+		&-light {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-border-color-light;
+		}
+		&-dark {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-border-color-dark;
+		}
+		&-primary {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-color-primary;
+		}
+		&-success {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-color-success;
+		}
+		&-warning {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-color-warning;
+		}
+		&-error {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-color-error;
+		}
+		&-inverse {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-border-color-inverse;
+		}
+		&-custom {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-color-custom;
+		}
+		&-link {
+			border-width: $myp-border-width;
+			border-style: solid;
+			border-color: $myp-color-link;
+		}
+	}
+	&-top {
+		border-top-color: $myp-border-color;
+		border-top-width: $myp-border-width;
+		border-top-style: solid;
+		&-light {
+			border-top-color: $myp-border-color-light;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-dark {
+			border-top-color: $myp-border-color-dark;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-primary {
+			border-top-color: $myp-color-primary;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-success {
+			border-top-color: $myp-color-success;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-warning {
+			border-top-color: $myp-color-warning;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-error {
+			border-top-color: $myp-color-error;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-inverse {
+			border-top-color: $myp-border-color-inverse;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-custom {
+			border-top-color: $myp-color-custom;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+		&-link {
+			border-top-color: $myp-color-link;
+			border-top-width: $myp-border-width;
+			border-top-style: solid;
+		}
+	}
+	&-bottom {
+		border-bottom-color: $myp-border-color;
+		border-bottom-width: $myp-border-width;
+		border-bottom-style: solid;
+		&-light {
+			border-bottom-color: $myp-border-color-light;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-dark {
+			border-bottom-color: $myp-border-color-dark;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-primary {
+			border-bottom-color: $myp-color-primary;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-success {
+			border-bottom-color: $myp-color-success;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-warning {
+			border-bottom-color: $myp-color-warning;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-error {
+			border-bottom-color: $myp-color-error;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-inverse {
+			border-bottom-color: $myp-border-color-inverse;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-custom {
+			border-bottom-color: $myp-color-custom;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+		&-link {
+			border-bottom-color: $myp-color-link;
+			border-bottom-width: $myp-border-width;
+			border-bottom-style: solid;
+		}
+	}
+	&-none {
+		border-width: 0;
+	}
+}
+.myp-radius {
+	&-ss {
+		border-radius: $myp-border-radius-ss;
+	}
+	&-s {
+		border-radius: $myp-border-radius-s;
+	}
+	&-base {
+		border-radius: $myp-border-radius-base;
+	}
+	&-l {
+		border-radius: $myp-border-radius-l;
+	}
+	&-ll {
+		border-radius: $myp-border-radius-ll;
+	}
+	&-none {
+		border-radius: 0;
+	}
+}
+.myp-overflow {
+	&-hidden {
+		overflow: hidden;
+	}
+}
+.myp-hover {
+	&-opacity {
+		opacity: $myp-opacity-hover;
+	}
+	&-bg {
+		background-color: $myp-bg-color-hover;
+		
+		&-dark {
+			background-color: $myp-bg-color-hover-dark;
+		}
+	}
+	&-bg-opacity {
+		background-color: $myp-bg-color-hover;
+		opacity: $myp-opacity-hover;
+	}
+}
+.myp-disabled {
+	opacity: $myp-opacity-disabled;
+	&-text {
+		color: $myp-text-color-disabled;
+	}
+}

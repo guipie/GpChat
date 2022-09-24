@@ -1,0 +1,462 @@
+{
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"myp-icon": "@/components/myp-icon/myp-icon.vue",
+			"myp-navbar": "@/components/myp-navbar.vue",
+			"myp-(.*)": "@/mypUI/myp-$1/myp-$1.vue" // 匹配mypUI内的vue文件
+		}
+	},
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/tabs/news",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/tabs/friend",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/tabs/album",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/tabs/mine",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		// chat
+		{
+			"path": "pages/chat/chat",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/groupManage",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/userManage",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/groupMember",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/groupName",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/groupNotice",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/groupQr",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/joinGroup",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/userQr",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/nickname",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/nicknameGroup",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/search",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/systemNotice",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/systemNoticeDetail",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/interactNotice",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/userMiddle",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/chat/collected",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		// set
+		{
+			"path": "pages/set/systemNoticeSet",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/set/interactSet",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/set/careSet",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/set/complain",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/set/common",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		// friend
+		{
+			"path": "pages/friend/group",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/new",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/newFriend",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/addFriend",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/tag",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/addTag",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/selectFriend",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/cared",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		// album
+		{
+			"path": "pages/album/writeAlbum",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/discovery",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/friendAlbums",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/followAlbums",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/interactAlbums",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/userAlbums", // it's the my album page
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/albumDetail",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/albumInteract",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/album/editIntro",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		// mine
+		{
+			"path": "pages/mine/info",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/sign",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/nickname",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/area",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/sex",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/set",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/manage",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/secret",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/black",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/account",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/safe",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/phone",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/changePhone",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/changePhoneCode",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/about",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/password",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/wallet",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/newThumb",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/collect",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/photoAlbum",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/vip",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/mine/newRemind",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		// auth
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/auth/register",
+			"style": {
+				"disableScroll": true
+			}
+		}, {
+			"path": "pages/common/pubRichText",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		}
+	],
+	"globalStyle": {
+		"pageOrientation": "portrait",
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"navigationStyle": "custom",
+		"backgroundColor": "#fafbfc"
+	},
+	"tabBar": {
+		"color": "#9092A5",
+		// "selectedColor": "#FF0132",
+		"iconWidth": "40px",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "black",
+		"list": [{
+				"pagePath": "pages/tabs/news",
+				"iconPath": "/static/tabs/message_default.png",
+				"selectedIconPath": "/static/tabs/message.png"
+			},
+			{
+				"pagePath": "pages/tabs/friend",
+				"iconPath": "/static/tabs/friend_default.png",
+				"selectedIconPath": "/static/tabs/friend.png"
+			},
+			{
+				"pagePath": "pages/tabs/album",
+				"iconPath": "/static/tabs/new_default.png",
+				"selectedIconPath": "/static/tabs/new.png"
+			},
+			{
+				"pagePath": "pages/tabs/mine",
+				"iconPath": "/static/tabs/my_default.png",
+				"selectedIconPath": "/static/tabs/my.png"
+			}
+		]
+	}
+}

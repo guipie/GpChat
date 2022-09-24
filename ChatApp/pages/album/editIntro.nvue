@@ -1,0 +1,258 @@
+<template>
+	<view>
+		<myp-navbar :lefts="leftIcons" :rights="rightIcons" leftStyle="width:90rpx;" centerStyle="width:460rpx;"
+			@leftAction="navLeftAction" @rightAction="toRightTab"></myp-navbar>
+		<myp-list bgType="inverse" :down="null" :up="null">
+			<myp-list-cell v-for="(item,index) in intros" :key="index">
+				<view style="height: 16rpx;"></view>
+				<view class="myp-flex-row myp-align-center" style="margin-left: 66rpx;height: 48rpx;">
+					<text class="myp-size-ss myp-color-second" style="width: 78rpx;">时间</text>
+					<view class="myp-bg-page myp-flex-row myp-align-center"
+						style="width: 168rpx;height: 48rpx;border-radius: 8rpx;">
+						<input v-model="item.beginDate" placeholder="开始年月日" @tap="selectDate('start',index)" disabled
+							class="myp-flex-one myp-size-ss myp-color-text" />
+					</view>
+					<text class="myp-color-second" style="width: 72rpx;line-height: 48rpx;text-align: center;">-</text>
+					<view class="myp-bg-page myp-flex-row myp-align-center"
+						style="width: 168rpx;height: 48rpx;border-radius: 8rpx;">
+						<input v-model="item.endDate" placeholder="结束年月日" @tap="selectDate('end',index)" disabled
+							class="myp-flex-one myp-size-ss myp-color-text" />
+					</view>
+				</view>
+				<view style="height: 16rpx;"></view>
+				<view class="myp-flex-row myp-align-center" style="margin-left: 66rpx;height: 48rpx;">
+					<text class="myp-size-ss myp-color-second" style="width: 78rpx;">在</text>
+					<view class="myp-bg-page myp-flex-row myp-align-center"
+						style="width: 360rpx;height: 48rpx;border-radius: 8rpx;">
+						<input v-model="item.location" class="myp-flex-one myp-size-ss myp-color-text"
+							placeholder="地点\学校、公司等" maxlength="20" style="padding-left: 16rpx;padding-right: 16rpx;" />
+					</view>
+				</view>
+				<view style="height: 16rpx;"></view>
+				<view class="myp-flex-row myp-align-center" style="margin-left: 66rpx;height: 48rpx;">
+					<text class="myp-size-ss myp-color-second" style="width: 78rpx;">经历</text>
+				</view>
+				<view style="height: 6rpx;"></view>
+				<view class="myp-bg-page" style="margin-left: 66rpx;width: 632rpx;border-radius: 8rpx;">
+					<textarea v-model="item.introduction" class="myp-size-ss myp-color-text"
+						style="margin-left: 16rpx;margin-top: 16rpx;width: 600rpx;height: 128rpx;"
+						placeholder="发生的事，有什么想法" maxlength="200"></textarea>
+				</view>
+				<view style="height: 16rpx;"></view>
+				<view class="myp-flex-row myp-wrap-wrap" style="width: 750rpx;padding-left: 66rpx;">
+					<view v-for="(img,idx) in item.pics" :key="idx" style="margin-right: 10rpx;margin-bottom: 15rpx;">
+						<img-cell :src="img.uploadPath" @delete="toDeleteImg(idx,item)"
+							@preview="toPreviewImg(idx,item)"></img-cell>
+					</view>
+					<img-token v-if="item.pics.length <= 9" @add="toChooseImg(index)"></img-token>
+				</view>
+				<view class="myp-border-bottom" style="height: 28rpx;width: 680rpx;margin-left: 30rpx;"></view>
+				<view class="myp-flex-row myp-align-center myp-justify-end" style="margin-right: 50rpx;height: 92rpx;">
+					<view class="myp-flex-row myp-align-center myp-justify-center myp-bg-inverse myp-radius-ll"
+						bubble="true" style="width: 200rpx;height: 50rpx;box-shadow: 1px 3rpx 5rpx 0px #646464;"
+						@click="introsAdd" v-if='index===0&&!item.introGuid'>
+						<myp-icon name="plus" size="ss" type="second" @iconClicked="introsAdd"></myp-icon>
+						<text class="myp-size-ss myp-color-second" style="margin-left: 6rpx;">新增经历</text>
+					</view>
+					<myp-button text="删除" v-if="index>0" border="none" radius="ll" textType="inverse" textSize="ss"
+						bgType="error" boxStyle="width:140rpx;height:46rpx;" @buttonClicked='intros.splice(index,1)'>
+					</myp-button>
+				</view>
+			</myp-list-cell>
+		</myp-list>
+		<!-- 使用组件 -->
+		<itmister-date-picker ref="dateRef" @dateConfirm="dateConfirm"></itmister-date-picker>
+	</view>
+</template>
+
+<script>
+	import imgToken from '../album/components/imgToken.vue'
+	import imgCell from '../album/components/imgCell.vue'
+
+	import navHelper from '@/service/navHelper.js'
+	import toastMixin from '@/mypUI/myp-mixin/toastMixin.js'
+	import itmisterDatePicker from '@/components/itmister-date-picker/itmister-date-picker.nvue' // 引入组件
+	import {
+		Post,
+		Put
+	} from '@/api/album/intro.js'
+	import {
+		isNullOrEmpty
+	} from '@/mypUI/utils/validate.js'
+	export default {
+		components: {
+			imgToken,
+			imgCell,
+			itmisterDatePicker
+		},
+		mixins: [navHelper, toastMixin],
+		data() {
+			return {
+				intros: [],
+				delPics: [],
+				selectDateType: "",
+				selectIndex: 0
+			}
+		},
+		computed: {
+			rightIcons() {
+				return [{
+					text: (this.intros[0] || {}).introGuid ? '确定编辑' : '确定',
+					textType: this.intros.findIndex(currentIntro => isNullOrEmpty(currentIntro.StartDate) &&
+						isNullOrEmpty(currentIntro.endDate) && isNullOrEmpty(
+							currentIntro.location) && isNullOrEmpty(currentIntro.introduction) && currentIntro
+						.pics
+						.length == 0) > -1 ? 'third' : 'primary'
+				}]
+			}
+		},
+		methods: {
+			toRightTab(i) {
+				if ((this.intros[0] || {}).introGuid) {
+					Put({
+						...this.intros[0],
+						...{
+							DelFiles: this.delPics.map(m => m.guid)
+						}
+					}).then(res => {
+						console.log(res.status);
+						if (res.status) {
+							uni.navigateBack({
+								delta: 1
+							});
+							let eventChannel = this.$scope.eventChannel;
+							eventChannel.emit('acceptCurrentIntro', this.intros[0]);
+							eventChannel.off('acceptCurrentIntro');
+							if (this.delPics.length > 0)
+								uniCloud.deleteFile({
+									fileList: this.delPics.map(m => path),
+									success(scc) {
+										console.log(scc);
+									},
+									fail(err) {
+										console.log(err);
+									},
+								});
+						}
+					});
+				} else {
+					for (let index = 0; index < this.intros.length; index++) {
+						console.log(index);
+						let currentIntro = this.intros[index];
+						if (isNullOrEmpty(currentIntro.StartDate) && isNullOrEmpty(currentIntro.endDate) && isNullOrEmpty(
+								currentIntro.location) && isNullOrEmpty(currentIntro.introduction) && currentIntro.pics
+							.length == 0 && this.intros.length > 1)
+							this.intros.splice(index, 1);
+					}
+					Post(this.intros).then(res => {
+						if (res.status)
+							uni.navigateBack();
+						console.log(res);
+					});
+				}
+			},
+			introsAdd() {
+				this.intros.push({
+					beginDate: '',
+					endDate: '',
+					location: '',
+					introduction: '',
+					pics: []
+				});
+			},
+			toChooseImg(index) {
+				let _this = this;
+				if (this.intros[index].pics.length >= 9) return;
+				uni.chooseImage({
+					count: 9 - this.intros[index].pics.length,
+					success: (res) => {
+						res.tempFiles.forEach(file => {
+							let fileInfo = new Object();
+							uni.getImageInfo({
+								src: file.path,
+								success: function(info) {
+									fileInfo.contentType = info.type;
+									fileInfo.width = info.width;
+									fileInfo.height = info.height;
+									fileInfo.orientation = info.orientation;
+								}
+							});
+							let cloudPath = 'intro/' + _this.userId + '/' + new Date().getTime() +
+								file.path.substring(file.path.lastIndexOf('.'));
+							uniCloud.uploadFile({
+								filePath: file.path,
+								fileType: "image",
+								cloudPath: cloudPath,
+								onUploadProgress: function(progressEvent) {
+									if (progressEvent.loaded === progressEvent.total) {
+										fileInfo.loaded = true;
+									}
+								}
+							}).then(up => {
+								fileInfo.name = cloudPath;
+								fileInfo.uploadPath = up.fileID;
+								fileInfo.length = file.size;
+								_this.intros[index].pics.push(fileInfo);
+							}).catch(upError => {
+								console.log(uploadError);
+							})
+						});
+					},
+					fail: (chooseError) => {
+						console.log(chooseError);
+					}
+				});
+			},
+			toDeleteImg(current, item) {
+				if (item.pics.length > 0 && !isNullOrEmpty(item.pics[current].guid))
+					this.delPics.push({
+						guid: item.pics[current].guid,
+						path: item.pics[current].uploadPath
+					});
+				item.pics.splice(current, 1);
+			},
+			toPreviewImg(current, item) {
+				uni.previewImage({
+					current: current,
+					urls: (item.pics || []).Map(m => m.uploadPath)
+				})
+			},
+			selectDate(type, index) {
+				this.$refs.dateRef.show();
+				this.selectDateType = type;
+				this.selectIndex = index;
+			},
+			dateConfirm(d) {
+				if (this.selectDateType === 'start') this.intros[this.selectIndex].beginDate = d;
+				if (this.selectDateType === 'end') this.intros[this.selectIndex].endDate = d;
+			}
+		},
+		onLoad(options) {
+			if (options.introGuid) {
+				let _this = this;
+				let eventChannel = this.$scope.eventChannel;
+				// 监听selectedUsers事件，获取上一页面通过eventChannel传送到当前页面的数据
+				eventChannel.on('acceptCurrentIntro', function(data) {
+					_this.intros.push(data);
+				});
+			} else
+				this.introsAdd();
+
+			uniCloud.deleteFile({
+				fileList: [
+					'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-8716c6bc-b2de-4722-a574-f54df9cb8f31/97c0b7ee-4588-4c4d-b68a-c1bc1a104378.jpg'
+				],
+				success(scc) {
+					console.log(scc);
+				},
+				fail(err) {
+					console.log(err);
+				},
+			});
+		}
+	}
+</script>
+
+<style>
+
+</style>
