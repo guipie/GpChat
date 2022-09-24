@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 import store from '../store/index'
 axios.defaults.timeout = 50000;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
@@ -23,8 +23,8 @@ if (process.env.NODE_ENV == 'development')
   ipAddressApp = "http://192.168.0.104:9992/";
 } else if (process.env.NODE_ENV == 'production')
 {
-  axios.defaults.baseURL = 'http://inshine.xyz:9003/';
-  ipAddressApp = "http://inshine.xyz:9002/";
+  axios.defaults.baseURL = 'http://**:9003/';
+  ipAddressApp = "http://**9002/";
 }
 let ipAddress = axios.defaults.baseURL;
 axios.interceptors.request.use((config) => {

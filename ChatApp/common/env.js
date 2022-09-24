@@ -1,7 +1,7 @@
-const devBase = "http://192.168.0.104:9992/AppApi/V1/"
+﻿const devBase = "http://192.168.0.104:9992/AppApi/V1/"
 const devFileBase = "http://192.168.0.104:9992/"
-const prodFileBase = "http://inshine.xyz:9001/"
-const prodBase = "http://inshine.xyz:9001/AppApi/V1/" // product server
+const prodFileBase = "http://**:9001/"
+const prodBase = "http://**:9001/AppApi/V1/" // product server
 
 import {
 	isNullOrEmpty
