@@ -10,7 +10,7 @@ App采用uniapp的纯nvue，性能更好。
 相关截图
 </br>
 <h2>APP</h2> 
-![g82zF.jpg](https://i.imgtg.com/2022/09/26/g82zF.jpg)
+![alt 微信图片_20220926151908.jpg](https://raw.githubusercontent.com/guipie/GpChat/main/微信图片_20220926151908.jpg)
 ![chat1](https://i.imgtg.com/2022/09/26/g8scM.jpg)
 ![chat1](https://i.imgtg.com/2022/09/26/g8cBc.jpg)
 ![chat1](https://i.imgtg.com/2022/09/26/g8dZr.jpg)
