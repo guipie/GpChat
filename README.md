@@ -21,3 +21,11 @@ App采用uniapp的纯nvue，性能更好。
 <img src="https://user-images.githubusercontent.com/55727172/192235742-03c33b53-148e-408a-bc7d-05e095f87658.jpg" width="30%">
 <img src="https://user-images.githubusercontent.com/55727172/192235760-5def9f38-19c8-4bcc-8528-0ac8f19c607c.jpg" width="30%">
 </div>
+<h2><a href='https://github.com/guipie/GpChat/tree/main/ChatAdmin'>后台管理运营端</a></h2>  
+<img src="https://user-images.githubusercontent.com/55727172/192468535-a7863b49-25a9-4a41-988e-37e88f1d69f2.jpg" style="object-fit: fill;">
+<img src="https://user-images.githubusercontent.com/55727172/192468553-3a881a93-7b31-4676-bdb5-527580720fe7.jpg">
+<img src="https://user-images.githubusercontent.com/55727172/192468571-a9cef25e-f306-4202-b7a2-339731f27caf.jpg">
+<img src="https://user-images.githubusercontent.com/55727172/192468586-b4fb1840-173d-4549-a5a8-b34ff87e20c1.jpg">
+<img src="https://user-images.githubusercontent.com/55727172/192468598-db4bb5f4-3f3f-4ca1-ad93-39120f2b7299.jpg">
+<img src="https://user-images.githubusercontent.com/55727172/192468613-3e118282-ae10-443f-8e27-794889adb4f4.jpg">
+
