@@ -9,7 +9,7 @@ App采用uniapp的纯nvue，性能更好。
 </br>
 相关截图
 </br>
-<h2>APP</h2>  
+<h2><a href='https://github.com/guipie/GpChat/tree/main/ChatApp'>APP端</a></h2>  
 <div style='display: flex;'>
 <img src="https://user-images.githubusercontent.com/55727172/192235681-506ab1fe-a789-47d7-8be5-b3668142d801.jpg" width="30%">
 <img src="https://user-images.githubusercontent.com/55727172/192235770-68af916a-5303-4d2a-b8ec-4d2d490461e2.jpg" width="30%">
