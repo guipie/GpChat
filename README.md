@@ -7,6 +7,7 @@ App采用uniapp的纯nvue，性能更好。
 </br>
 后台管理采用vue+elementui。
 </br>
+<h3>功能全部已实现，会有些许bug 。 目前已转战flutter,所以暂不维护了..真要做通讯不建议用uni，真的是太.........</h3>
 相关截图
 </br>
 <h2><a href='https://github.com/guipie/GpChat/tree/main/ChatApp'>APP端</a></h2>  
